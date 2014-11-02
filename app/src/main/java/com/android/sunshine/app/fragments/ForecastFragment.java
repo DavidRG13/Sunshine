@@ -25,7 +25,7 @@ public class ForecastFragment extends Fragment {
     public boolean onOptionsItemSelected(MenuItem item) {
         if(item.getItemId() == R.id.action_refresh){
             final WeatherRequester weatherRequester = new WeatherRequester();
-            weatherRequester.execute();
+            weatherRequester.execute("94043");
         }
         return super.onOptionsItemSelected(item);
     }

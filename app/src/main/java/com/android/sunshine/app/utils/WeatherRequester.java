@@ -17,7 +17,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 
-public class WeatherRequester extends AsyncTask<String, Void, Void> {
+public class WeatherRequester extends AsyncTask<String, Void, ArrayList<String>> {
 
     public static final String QUERY_PARAM = "q";
     public static final String MODE_PARAM = "mode";
@@ -26,7 +26,7 @@ public class WeatherRequester extends AsyncTask<String, Void, Void> {
     public static final String BASE_URI = "http://api.openweathermap.org/data/2.5/forecast/daily";
 
     @Override
-    protected Void doInBackground(String... params) {
+    protected ArrayList<String> doInBackground(String... params) {
         if (params.length == 0) {
             return null;
         }
@@ -63,10 +63,11 @@ public class WeatherRequester extends AsyncTask<String, Void, Void> {
                     forecastJsonStr = buffer.toString();
                 }
                 Log.v("forecastJsonStr", forecastJsonStr);
-                final ArrayList<String> weatherDataFromJson = getWeatherDataFromJson(forecastJsonStr);
+                return getWeatherDataFromJson(forecastJsonStr);
             }
         } catch (IOException | JSONException e) {
             Log.e("WeatherRequester", "Error ", e);
+            return null;
         } finally {
             if (urlConnection != null) {
                 urlConnection.disconnect();

@@ -1,7 +1,9 @@
 package com.android.sunshine.app.fragments;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.*;
@@ -59,7 +61,9 @@ public class ForecastFragment extends Fragment implements AdapterView.OnItemClic
 
     private void refreshWeatherData() {
         final WeatherRequester weatherRequester = new WeatherRequester();
-        weatherRequester.execute("94043");
+        final SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
+        final String location = sharedPreferences.getString(getString(R.string.pref_location_key), getString(R.string.location_default));
+        weatherRequester.execute(location);
         try {
             adapter.clear();
             for (String s : weatherRequester.get()) {

@@ -24,6 +24,8 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.android.sunshine.app.activities.MainActivity" />
         </activity>
+        <activity android:name=".activities.SettingsActivity"
+                  android:label="@string/title_activity_settings"/>
     </application>
 
     <uses-permission android:name="android.permission.INTERNET" />

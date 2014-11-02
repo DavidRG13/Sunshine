@@ -1,22 +1,24 @@
 package com.android.sunshine.app.fragments;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.*;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import com.android.sunshine.app.R;
+import com.android.sunshine.app.activities.DetailActivity;
 import com.android.sunshine.app.utils.WeatherRequester;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
-public class ForecastFragment extends Fragment {
+public class ForecastFragment extends Fragment implements AdapterView.OnItemClickListener {
 
     private ArrayAdapter<String> adapter;
-    private List<String> adapterData;
 
     public ForecastFragment() {
     }
@@ -26,7 +28,8 @@ public class ForecastFragment extends Fragment {
         setHasOptionsMenu(true);
         final View view = inflater.inflate(R.layout.fragment_main, container, false);
         final ListView forecastList = (ListView) view.findViewById(R.id.forecast_listview);
-        adapterData = new ArrayList<>();
+        forecastList.setOnItemClickListener(this);
+        final List<String> adapterData = new ArrayList<>();
         adapterData.add("uno");
         adapterData.add("dos");
         adapter = new ArrayAdapter<>(getActivity(), R.layout.forecast_list_item, R.id.forecast_list_item, adapterData);
@@ -47,8 +50,14 @@ public class ForecastFragment extends Fragment {
         return super.onOptionsItemSelected(item);
     }
 
+    @Override
+    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+        final Intent intent = new Intent(getActivity(), DetailActivity.class);
+        intent.putExtra(DetailActivity.PlaceholderFragment.WEATHER_DATA, (String) parent.getItemAtPosition(position));
+        startActivity(intent);
+    }
+
     private void refreshWeatherData() {
-        final ArrayList<String> newWeatherData;
         final WeatherRequester weatherRequester = new WeatherRequester();
         weatherRequester.execute("94043");
         try {

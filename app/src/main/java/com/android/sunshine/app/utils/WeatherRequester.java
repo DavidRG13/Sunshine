@@ -62,7 +62,6 @@ public class WeatherRequester extends AsyncTask<String, Void, ArrayList<String>>
                 if (buffer.length() > 0) {
                     forecastJsonStr = buffer.toString();
                 }
-                Log.v("forecastJsonStr", forecastJsonStr);
                 return getWeatherDataFromJson(forecastJsonStr);
             }
         } catch (IOException | JSONException e) {

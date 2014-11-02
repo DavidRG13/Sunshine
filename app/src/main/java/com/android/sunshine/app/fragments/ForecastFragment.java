@@ -40,6 +40,12 @@ public class ForecastFragment extends Fragment implements AdapterView.OnItemClic
     }
 
     @Override
+    public void onStart() {
+        super.onStart();
+        refreshWeatherData();
+    }
+
+    @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater menuInflater) {
         menuInflater.inflate(R.menu.forecast_fragment, menu);
     }

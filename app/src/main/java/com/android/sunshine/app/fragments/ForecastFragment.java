@@ -5,7 +5,6 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
-import android.util.Log;
 import android.view.*;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -22,8 +21,7 @@ public class ForecastFragment extends Fragment implements AdapterView.OnItemClic
 
     private ArrayAdapter<String> adapter;
 
-    public ForecastFragment() {
-    }
+    public ForecastFragment() {}
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -32,8 +30,6 @@ public class ForecastFragment extends Fragment implements AdapterView.OnItemClic
         final ListView forecastList = (ListView) view.findViewById(R.id.forecast_listview);
         forecastList.setOnItemClickListener(this);
         final List<String> adapterData = new ArrayList<>();
-        adapterData.add("uno");
-        adapterData.add("dos");
         adapter = new ArrayAdapter<>(getActivity(), R.layout.forecast_list_item, R.id.forecast_list_item, adapterData);
         forecastList.setAdapter(adapter);
         return view;
@@ -69,7 +65,8 @@ public class ForecastFragment extends Fragment implements AdapterView.OnItemClic
         final WeatherRequester weatherRequester = new WeatherRequester();
         final SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
         final String location = sharedPreferences.getString(getString(R.string.pref_location_key), getString(R.string.location_default));
-        weatherRequester.execute(location);
+        final String unit = sharedPreferences.getString(getString(R.string.pref_unit_key), getString(R.string.prefs_units_imperial));
+        weatherRequester.execute(new String[]{location, unit});
         try {
             adapter.clear();
             for (String s : weatherRequester.get()) {
@@ -77,7 +74,6 @@ public class ForecastFragment extends Fragment implements AdapterView.OnItemClic
             }
         } catch (InterruptedException | ExecutionException e) {
             // TODO: show error
-            Log.d("AQUIIIIIIIIIII", "errrrorrrr");
             e.printStackTrace();
         }
     }

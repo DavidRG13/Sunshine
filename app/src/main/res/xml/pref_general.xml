@@ -9,4 +9,11 @@
        android:inputType="text"
        android:singleLine="true"/>
 
+    <ListPreference
+        android:key="@string/pref_unit_key"
+        android:title="@string/pref_unit_label"
+        android:defaultValue="@string/prefs_units_imperial"
+        android:entryValues="@array/pref_units_values"
+        android:entries="@array/pref_units_options"/>
+
 </PreferenceScreen>

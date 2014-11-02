@@ -17,7 +17,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 
-public class WeatherRequester extends AsyncTask<String, Void, ArrayList<String>> {
+public class WeatherRequester extends AsyncTask<String[], Void, ArrayList<String>> {
 
     public static final String QUERY_PARAM = "q";
     public static final String MODE_PARAM = "mode";
@@ -26,13 +26,13 @@ public class WeatherRequester extends AsyncTask<String, Void, ArrayList<String>>
     public static final String BASE_URI = "http://api.openweathermap.org/data/2.5/forecast/daily";
 
     @Override
-    protected ArrayList<String> doInBackground(String... params) {
+    protected ArrayList<String> doInBackground(String[]... params) {
         if (params.length == 0) {
             return null;
         }
 
         Uri.Builder builder = Uri.parse(BASE_URI).buildUpon()
-                .appendQueryParameter(QUERY_PARAM, params[0])
+                .appendQueryParameter(QUERY_PARAM, params[0][0])
                 .appendQueryParameter(MODE_PARAM, "json")
                 .appendQueryParameter(UNITS_PARAM, "metric")
                 .appendQueryParameter(DAYS_PARAM, "7");
@@ -62,7 +62,8 @@ public class WeatherRequester extends AsyncTask<String, Void, ArrayList<String>>
                 if (buffer.length() > 0) {
                     forecastJsonStr = buffer.toString();
                 }
-                return getWeatherDataFromJson(forecastJsonStr);
+                final String unitType = params[0][1];
+                return getWeatherDataFromJson(forecastJsonStr, unitType);
             }
         } catch (IOException | JSONException e) {
             Log.e("WeatherRequester", "Error ", e);
@@ -82,7 +83,7 @@ public class WeatherRequester extends AsyncTask<String, Void, ArrayList<String>>
         return null;
     }
 
-    private ArrayList<String> getWeatherDataFromJson(String forecastJsonStr) throws JSONException {
+    private ArrayList<String> getWeatherDataFromJson(String forecastJsonStr, String unitType) throws JSONException {
         final String OWM_LIST = "list";
         final String OWM_WEATHER = "weather";
         final String OWM_TEMPERATURE = "temp";
@@ -112,7 +113,7 @@ public class WeatherRequester extends AsyncTask<String, Void, ArrayList<String>>
             double high = temperatureObject.getDouble(OWM_MAX);
             double low = temperatureObject.getDouble(OWM_MIN);
 
-            highAndLow = formatHighLows(high, low);
+            highAndLow = formatHighLows(high, low, unitType);
             resultStrs.add(day + " - " + description + " - " + highAndLow);
         }
         return resultStrs;
@@ -124,7 +125,11 @@ public class WeatherRequester extends AsyncTask<String, Void, ArrayList<String>>
         return format.format(date);
     }
 
-    private String formatHighLows(double high, double low) {
+    private String formatHighLows(double high, double low, String unitType) {
+        if(unitType.equals("imperial")){
+            high = (high * 1.8) + 32;
+            low = (low * 1.8) + 32;
+        }
         long roundedHigh = Math.round(high);
         long roundedLow = Math.round(low);
         return roundedHigh + "/" + roundedLow;

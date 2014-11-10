@@ -24,6 +24,7 @@ import com.android.sunshine.app.utils.Utilities;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 import static com.android.sunshine.app.model.WeatherContract.LocationEntry;
 import static com.android.sunshine.app.model.WeatherContract.WeatherEntry;
@@ -81,7 +82,7 @@ public class ForecastFragment extends Fragment implements AdapterView.OnItemClic
             @Override
             public boolean setViewValue(View view, Cursor cursor, int columnIndex) {
                 boolean isMetric = Utilities.isMetric(getActivity());
-                switch (columnIndex){
+                switch (columnIndex) {
                     case COL_WEATHER_MAX_TEMP:
                     case COL_WEATHER_MIN_TEMP:
                         ((TextView) view).setText(Utilities.formatTemperature(cursor.getDouble(columnIndex), isMetric));
@@ -121,7 +122,17 @@ public class ForecastFragment extends Fragment implements AdapterView.OnItemClic
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
         final Intent intent = new Intent(getActivity(), DetailActivity.class);
-        intent.putExtra(DetailActivity.PlaceholderFragment.WEATHER_DATA, (String) parent.getItemAtPosition(position));
+        final Cursor cursor = adapter.getCursor();
+        String forecast = "";
+        if (cursor != null && cursor.moveToPosition(position)) {
+            boolean isMetric = Utilities.isMetric(getActivity());
+            forecast = String.format(Locale.getDefault(), "%s - %s - %s/%s",
+                    Utilities.formatDate(cursor.getString(COL_WEATHER_DATE)),
+                    cursor.getString(COL_WEATHER_DESC),
+                    Utilities.formatTemperature(cursor.getDouble(COL_WEATHER_MAX_TEMP), isMetric),
+                    Utilities.formatTemperature(cursor.getDouble(COL_WEATHER_MIN_TEMP), isMetric));
+        }
+        intent.putExtra(DetailActivity.PlaceholderFragment.WEATHER_DATA, forecast);
         startActivity(intent);
     }
 

@@ -26,6 +26,9 @@
         </activity>
         <activity android:name=".activities.SettingsActivity"
                   android:label="@string/title_activity_settings"/>
+        <provider
+                android:authorities="com.android.sunshine.app"
+                android:name=".db.WeatherProvider"/>
     </application>
 
     <uses-permission android:name="android.permission.INTERNET" />

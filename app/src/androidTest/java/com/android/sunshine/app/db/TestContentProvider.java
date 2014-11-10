@@ -16,9 +16,10 @@ public class TestContentProvider extends AndroidTestCase {
     @Override
     protected void setUp() throws Exception {
         super.setUp();
-        DbUtilities.resetDB(getContext());
         dbHelper = new DBHelper(mContext);
         db = dbHelper.getWritableDatabase();
+        db.delete(WeatherEntry.TABLE_NAME, null, null);
+        db.delete(LocationEntry.TABLE_NAME, null, null);
     }
 
     @Override
@@ -27,30 +28,33 @@ public class TestContentProvider extends AndroidTestCase {
         dbHelper.close();
     }
 
-    public void testFindLocationById(){
+    public void testReadOneForecast() {
         ContentValues testValues = DbUtilities.createNorthPoleLocationValues();
-        final long locationRowId = insertLocation(testValues);
-        Cursor locationCursor = mContext.getContentResolver().query(LocationEntry.buildLocationUri(locationRowId), null, null, null, null);
-        DbUtilities.validateCursor(locationCursor, testValues);
-    }
-
-    public void testFindOneLocation(){
-        ContentValues testValues = DbUtilities.createNorthPoleLocationValues();
-        insertLocation(testValues);
-        Cursor locationCursor = mContext.getContentResolver().query(LocationEntry.CONTENT_URI, null, null, null, null);
-        DbUtilities.validateCursor(locationCursor, testValues);
-    }
-
-    public void testInsertReadProvider() {
-        ContentValues locationValues = DbUtilities.createNorthPoleLocationValues();
-        long locationRowId = insertLocation(locationValues);
-
+        long locationRowId = insertLocation(testValues);
         ContentValues weatherValues = DbUtilities.createWeatherValues(locationRowId);
-        long weatherRowId = db.insert(WeatherEntry.TABLE_NAME, null, weatherValues);
-        assertTrue(weatherRowId != -1);
+        insertWeather(weatherValues);
 
         Cursor weatherCursor = mContext.getContentResolver().query(WeatherEntry.CONTENT_URI, null, null, null, null);
+
         DbUtilities.validateCursor(weatherCursor, weatherValues);
+    }
+
+    public void testReadOneLocation() {
+        ContentValues testValues = DbUtilities.createNorthPoleLocationValues();
+        insertLocation(testValues);
+
+        Cursor cursor = mContext.getContentResolver().query(LocationEntry.CONTENT_URI, null, null, null, null);
+
+        DbUtilities.validateCursor(cursor, testValues);
+    }
+
+    public void testFindLocationById() {
+        ContentValues testValues = DbUtilities.createNorthPoleLocationValues();
+        long insertLocationId = insertLocation(testValues);
+
+        Cursor cursor = mContext.getContentResolver().query(LocationEntry.buildLocationUri(insertLocationId), null, null, null, null);
+
+        DbUtilities.validateCursor(cursor, testValues);
     }
 
     public void testGetType() {
@@ -61,13 +65,15 @@ public class TestContentProvider extends AndroidTestCase {
 
         String testLocation = "94074";
         // content://com.example.android.sunshine.app/weather/94074
-        type = mContext.getContentResolver().getType(WeatherEntry.buildWeatherLocation(testLocation));
+        type = mContext.getContentResolver().getType(
+                WeatherEntry.buildWeatherLocation(testLocation));
         // vnd.android.cursor.dir/com.example.android.sunshine.app/weather
         assertEquals(WeatherEntry.CONTENT_TYPE, type);
 
         String testDate = "20140612";
         // content://com.example.android.sunshine.app/weather/94074/20140612
-        type = mContext.getContentResolver().getType(WeatherEntry.buildWeatherLocationWithDate(testLocation, testDate));
+        type = mContext.getContentResolver().getType(
+                WeatherEntry.buildWeatherLocationWithDate(testLocation, testDate));
         // vnd.android.cursor.item/com.example.android.sunshine.app/weather
         assertEquals(WeatherEntry.CONTENT_ITEM_TYPE, type);
 
@@ -86,5 +92,11 @@ public class TestContentProvider extends AndroidTestCase {
         long locationRowId = db.insert(LocationEntry.TABLE_NAME, null, contentValues);
         assertTrue(locationRowId != -1);
         return locationRowId;
+    }
+
+    private long insertWeather(ContentValues weatherValues){
+        long weatherRowId = db.insert(WeatherEntry.TABLE_NAME, null, weatherValues);
+        assertTrue(weatherRowId != -1);
+        return weatherRowId;
     }
 }

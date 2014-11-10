@@ -5,13 +5,14 @@ import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.UriMatcher;
 import android.database.Cursor;
+import android.database.sqlite.SQLiteQueryBuilder;
 import android.net.Uri;
 import com.android.sunshine.app.model.WeatherContract;
 
 import static com.android.sunshine.app.model.WeatherContract.LocationEntry;
 import static com.android.sunshine.app.model.WeatherContract.WeatherEntry;
 
-public class WeatherProvider extends ContentProvider{
+public class WeatherProvider extends ContentProvider {
 
     private static final int WEATHER = 100;
     private static final int WEATHER_WITH_LOCATION = 101;
@@ -19,7 +20,21 @@ public class WeatherProvider extends ContentProvider{
     private static final int LOCATION = 300;
     private static final int LOCATION_ID = 301;
     private static final UriMatcher uriMatcher = buildUriMatcher();
+    private static final String locationSettingsSelection = LocationEntry.TABLE_NAME + "." +
+            LocationEntry.COLUMN_LOCATION_SETTING + " = ?";
+    private static final String locationSettingsWithStartDateSelection = LocationEntry.TABLE_NAME + "." +
+            LocationEntry.COLUMN_LOCATION_SETTING + " = ? AND " + WeatherEntry.COLUMN_DATETEXT + ">= ? ";
     private DBHelper dbHelper;
+
+    private static SQLiteQueryBuilder weatherByLocationSettingsQueryBuilder;
+
+    static {
+        weatherByLocationSettingsQueryBuilder = new SQLiteQueryBuilder();
+        weatherByLocationSettingsQueryBuilder.setTables(
+                WeatherEntry.TABLE_NAME + " INNER JOIN " + LocationEntry.TABLE_NAME + " ON " +
+                        WeatherEntry.TABLE_NAME + "." + WeatherEntry.COLUMN_LOC_KEY + " = " +
+                        LocationEntry.TABLE_NAME + "." + LocationEntry._ID);
+    }
 
     @Override
     public boolean onCreate() {
@@ -29,14 +44,15 @@ public class WeatherProvider extends ContentProvider{
 
     @Override
     public Cursor query(Uri uri, String[] projection, String selection, String[] selectionArgs, String sortOrder) {
-        final int match = uriMatcher.match(uri);
         final Cursor cursor;
-        switch (match){
+        switch (uriMatcher.match(uri)) {
             case WEATHER:
                 cursor = dbHelper.getReadableDatabase().query(WeatherEntry.TABLE_NAME, projection, selection, selectionArgs, null, null, sortOrder);
                 break;
-//            case WEATHER_WITH_LOCATION:
-//                return WeatherEntry.CONTENT_TYPE;
+            case WEATHER_WITH_LOCATION:
+                cursor = getWeatherByLocationSettings(uri, projection, sortOrder);
+//                cursor = null;
+                break;
 //            case WEATHER_WITH_LOCATION_AND_DATE:
 //                return WeatherEntry.CONTENT_ITEM_TYPE;
             case LOCATION:
@@ -48,7 +64,7 @@ public class WeatherProvider extends ContentProvider{
                         null, sortOrder);
                 break;
             default:
-                throw new UnsupportedOperationException("Unknown uri: "+ uri);
+                throw new UnsupportedOperationException("Unknown uri: " + uri);
         }
         cursor.setNotificationUri(getContext().getContentResolver(), uri);
         return cursor;
@@ -57,7 +73,7 @@ public class WeatherProvider extends ContentProvider{
     @Override
     public String getType(Uri uri) {
         final int match = uriMatcher.match(uri);
-        switch (match){
+        switch (match) {
             case WEATHER:
                 return WeatherEntry.CONTENT_TYPE;
             case WEATHER_WITH_LOCATION:
@@ -69,7 +85,7 @@ public class WeatherProvider extends ContentProvider{
             case LOCATION_ID:
                 return LocationEntry.CONTENT_ITEM_TYPE;
             default:
-                throw new UnsupportedOperationException("Unknown uri: "+ uri);
+                throw new UnsupportedOperationException("Unknown uri: " + uri);
         }
     }
 
@@ -88,7 +104,23 @@ public class WeatherProvider extends ContentProvider{
         return 0;
     }
 
-    private static UriMatcher buildUriMatcher(){
+    private Cursor getWeatherByLocationSettings(Uri uri, String[] projection, String sortOrder) {
+        final String locationSetting = WeatherEntry.getLocationSettingFromUri(uri);
+        final String startDate = WeatherEntry.getStartDateFromUri(uri);
+        String[] selectionArgs;
+        String selection;
+        if (startDate == null) {
+            selection = locationSettingsSelection;
+            selectionArgs = new String[]{locationSetting};
+        }else{
+            selection = locationSettingsWithStartDateSelection;
+            selectionArgs = new String[]{locationSetting, startDate};
+        }
+        return weatherByLocationSettingsQueryBuilder.query(dbHelper.getReadableDatabase(),
+                projection, selection, selectionArgs, null, null, sortOrder);
+    }
+
+    private static UriMatcher buildUriMatcher() {
         final UriMatcher matcher = new UriMatcher(UriMatcher.NO_MATCH);
         final String authority = WeatherContract.CONTENT_AUTHORITY;
 

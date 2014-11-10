@@ -61,6 +61,6 @@ public class TestDb extends AndroidTestCase {
     }
 
     private void resetDB() {
-        DbUtilities.resetDB(getContext());
+        DbUtilities.dropDb(getContext());
     }
 }

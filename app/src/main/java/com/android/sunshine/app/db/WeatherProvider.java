@@ -123,13 +123,45 @@ public class WeatherProvider extends ContentProvider {
     }
 
     @Override
-    public int delete(Uri uri, String s, String[] strings) {
-        return 0;
+    public int delete(Uri uri, String whereClause, String[] whereArgs) {
+        final SQLiteDatabase db = dbHelper.getWritableDatabase();
+        final int match = uriMatcher.match(uri);
+        final int rowsDeleted;
+        switch (match) {
+            case WEATHER:
+                rowsDeleted = db.delete(WeatherEntry.TABLE_NAME, whereClause, whereArgs);
+                break;
+            case LOCATION:
+                rowsDeleted = db.delete(LocationEntry.TABLE_NAME, whereClause, whereArgs);
+                break;
+            default:
+                throw new UnsupportedOperationException("Unknown uri: " + uri);
+        }
+        if(whereClause == null || rowsDeleted != 0) {
+            getContext().getContentResolver().notifyChange(uri, null);
+        }
+        return rowsDeleted;
     }
 
     @Override
-    public int update(Uri uri, ContentValues contentValues, String s, String[] strings) {
-        return 0;
+    public int update(Uri uri, ContentValues contentValues, String whereClause, String[] whereArgs) {
+        final SQLiteDatabase db = dbHelper.getWritableDatabase();
+        final int match = uriMatcher.match(uri);
+        final int rowsUpdated;
+        switch (match) {
+            case WEATHER:
+                rowsUpdated = db.update(WeatherEntry.TABLE_NAME, contentValues, whereClause, whereArgs);
+                break;
+            case LOCATION:
+                rowsUpdated = db.update(LocationEntry.TABLE_NAME, contentValues, whereClause, whereArgs);
+                break;
+            default:
+                throw new UnsupportedOperationException("Unknown uri: " + uri);
+        }
+        if(rowsUpdated != 0) {
+            getContext().getContentResolver().notifyChange(uri, null);
+        }
+        return rowsUpdated;
     }
 
     private Cursor getWeatherByLocationSettings(Uri uri, String[] projection, String sortOrder) {

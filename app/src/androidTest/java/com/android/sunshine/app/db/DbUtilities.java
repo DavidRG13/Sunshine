@@ -12,7 +12,7 @@ import static com.android.sunshine.app.model.WeatherContract.WeatherEntry;
 
 public class DbUtilities {
 
-    static void resetDB(Context context) {
+    static void dropDb(Context context) {
         context.deleteDatabase(DBHelper.DATABASE_NAME);
     }
 

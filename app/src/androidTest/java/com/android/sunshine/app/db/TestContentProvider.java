@@ -41,6 +41,22 @@ public class TestContentProvider extends AndroidTestCase {
         DbUtilities.validateCursor(weatherCursor, weatherValues);
     }
 
+    public void testInsertSeveralLocations() {
+        ContentValues locationValues = DbUtilities.createNorthPoleLocationValues();
+        final ContentValues secondLocation = new ContentValues(locationValues);
+        secondLocation.put(LocationEntry._ID, 2);
+        secondLocation.put(LocationEntry.COLUMN_LOCATION_SETTING, "34233");
+        final ContentValues thirdLocation = new ContentValues(locationValues);
+        thirdLocation.put(LocationEntry._ID, 3);
+        thirdLocation.put(LocationEntry.COLUMN_LOCATION_SETTING, "8765766");
+        insertLocation(locationValues);
+        insertLocation(secondLocation);
+        insertLocation(thirdLocation);
+
+        Cursor weatherCursor = getContentResolver().query(LocationEntry.CONTENT_URI, null, null, null, null);
+        assertTrue(weatherCursor.getCount() == 3);
+    }
+
     public void testDeleteOneForecast() {
         ContentValues testValues = DbUtilities.createNorthPoleLocationValues();
         long locationRowId = insertLocation(testValues);

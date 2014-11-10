@@ -49,9 +49,8 @@ public class TestContentProvider extends AndroidTestCase {
         final ContentValues thirdLocation = new ContentValues(locationValues);
         thirdLocation.put(LocationEntry._ID, 3);
         thirdLocation.put(LocationEntry.COLUMN_LOCATION_SETTING, "8765766");
-        insertLocation(locationValues);
-        insertLocation(secondLocation);
-        insertLocation(thirdLocation);
+
+        getContentResolver().bulkInsert(LocationEntry.CONTENT_URI, new ContentValues[]{locationValues, secondLocation, thirdLocation});
 
         Cursor weatherCursor = getContentResolver().query(LocationEntry.CONTENT_URI, null, null, null, null);
         assertTrue(weatherCursor.getCount() == 3);

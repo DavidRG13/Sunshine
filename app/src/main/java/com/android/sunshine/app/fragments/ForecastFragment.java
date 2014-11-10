@@ -11,7 +11,7 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import com.android.sunshine.app.R;
 import com.android.sunshine.app.activities.DetailActivity;
-import com.android.sunshine.app.utils.WeatherRequester;
+import com.android.sunshine.app.utils.FetchWeatherTask;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -62,7 +62,7 @@ public class ForecastFragment extends Fragment implements AdapterView.OnItemClic
     }
 
     private void refreshWeatherData() {
-        final WeatherRequester weatherRequester = new WeatherRequester();
+        final FetchWeatherTask weatherRequester = new FetchWeatherTask(getActivity());
         final SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
         final String location = sharedPreferences.getString(getString(R.string.pref_location_key), getString(R.string.location_default));
         final String unit = sharedPreferences.getString(getString(R.string.pref_unit_key), getString(R.string.prefs_units_imperial));

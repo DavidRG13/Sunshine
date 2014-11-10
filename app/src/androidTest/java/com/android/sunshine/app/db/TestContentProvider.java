@@ -1,8 +1,10 @@
 package com.android.sunshine.app.db;
 
+import android.content.ContentUris;
 import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.net.Uri;
 import android.test.AndroidTestCase;
 
 import static com.android.sunshine.app.model.WeatherContract.LocationEntry;
@@ -11,13 +13,12 @@ import static com.android.sunshine.app.model.WeatherContract.WeatherEntry;
 public class TestContentProvider extends AndroidTestCase {
 
     private DBHelper dbHelper;
-    private SQLiteDatabase db;
 
     @Override
     protected void setUp() throws Exception {
         super.setUp();
         dbHelper = new DBHelper(mContext);
-        db = dbHelper.getWritableDatabase();
+        SQLiteDatabase db = dbHelper.getWritableDatabase();
         db.delete(WeatherEntry.TABLE_NAME, null, null);
         db.delete(LocationEntry.TABLE_NAME, null, null);
     }
@@ -136,13 +137,15 @@ public class TestContentProvider extends AndroidTestCase {
     }
 
     private long insertLocation(ContentValues contentValues) {
-        long locationRowId = db.insert(LocationEntry.TABLE_NAME, null, contentValues);
+        final Uri uri = mContext.getContentResolver().insert(LocationEntry.CONTENT_URI, contentValues);
+        long locationRowId = ContentUris.parseId(uri);
         assertTrue(locationRowId != -1);
         return locationRowId;
     }
 
     private long insertWeather(ContentValues weatherValues) {
-        long weatherRowId = db.insert(WeatherEntry.TABLE_NAME, null, weatherValues);
+        final Uri uri = mContext.getContentResolver().insert(WeatherEntry.CONTENT_URI, weatherValues);
+        final long weatherRowId = ContentUris.parseId(uri);
         assertTrue(weatherRowId != -1);
         return weatherRowId;
     }

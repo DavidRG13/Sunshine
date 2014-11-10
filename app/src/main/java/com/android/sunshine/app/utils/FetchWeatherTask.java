@@ -18,15 +18,13 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.Vector;
 
 import static com.android.sunshine.app.model.WeatherContract.LocationEntry;
 import static com.android.sunshine.app.model.WeatherContract.WeatherEntry;
 
-public class FetchWeatherTask extends AsyncTask<String[], Void, ArrayList<String>> {
+public class FetchWeatherTask extends AsyncTask<String[], Void, Void> {
 
     public static final String QUERY_PARAM = "q";
     public static final String MODE_PARAM = "mode";
@@ -40,7 +38,7 @@ public class FetchWeatherTask extends AsyncTask<String[], Void, ArrayList<String
     }
 
     @Override
-    protected ArrayList<String> doInBackground(String[]... params) {
+    protected Void doInBackground(String[]... params) {
         if (params.length == 0) {
             return null;
         }
@@ -77,8 +75,7 @@ public class FetchWeatherTask extends AsyncTask<String[], Void, ArrayList<String
                 if (buffer.length() > 0) {
                     forecastJsonStr = buffer.toString();
                 }
-                final String unitType = params[0][1];
-                return getWeatherDataFromJson(forecastJsonStr, unitType, locationSettings);
+                parseWeatherDataFromJson(forecastJsonStr, locationSettings);
             }
         } catch (IOException | JSONException e) {
             Log.e("WeatherRequester", "Error ", e);
@@ -98,7 +95,7 @@ public class FetchWeatherTask extends AsyncTask<String[], Void, ArrayList<String
         return null;
     }
 
-    private ArrayList<String> getWeatherDataFromJson(String forecastJsonStr, String unitType, String locationSettings) throws JSONException {
+    private void parseWeatherDataFromJson(String forecastJsonStr, String locationSettings) throws JSONException {
         final String OWM_LIST = "list";
         final String OWM_WEATHER = "weather";
         final String OWM_TEMPERATURE = "temp";
@@ -127,7 +124,6 @@ public class FetchWeatherTask extends AsyncTask<String[], Void, ArrayList<String
 
         final long locationId = addLocation(locationSettings, cityName, cityLatitude, cityLongitude);
 
-        ArrayList<String> resultStrs = new ArrayList<>();
         Vector<ContentValues> cVVector = new Vector<>(weatherArray.length());
         for (int i = 0; i < weatherArray.length(); i++) {
             JSONObject dayForecast = weatherArray.getJSONObject(i);
@@ -160,17 +156,12 @@ public class FetchWeatherTask extends AsyncTask<String[], Void, ArrayList<String
             weatherValues.put(WeatherEntry.COLUMN_WEATHER_ID, weatherId);
 
             cVVector.add(weatherValues);
-
-            String highAndLow = formatHighLows(high, low, unitType);
-            String day = getReadableDateString(dateTime);
-            resultStrs.add(day + " - " + description + " - " + highAndLow);
         }
         if(cVVector.size() > 0) {
             ContentValues[] contentValues = new ContentValues[cVVector.size()];
             cVVector.toArray(contentValues);
             context.getContentResolver().bulkInsert(WeatherEntry.CONTENT_URI, contentValues);
         }
-        return resultStrs;
     }
 
     private long addLocation(final String locationSettings, final String cityName, final double cityLatitude, final double cityLongitude) {
@@ -187,21 +178,5 @@ public class FetchWeatherTask extends AsyncTask<String[], Void, ArrayList<String
         }else{
             return ContentUris.parseId(context.getContentResolver().insert(LocationEntry.CONTENT_URI, locationValues));
         }
-    }
-
-    private String getReadableDateString(long time) {
-        Date date = new Date(time * 1000);
-        SimpleDateFormat format = new SimpleDateFormat("E, MMM d");
-        return format.format(date);
-    }
-
-    private String formatHighLows(double high, double low, String unitType) {
-        if(unitType.equals("imperial")){
-            high = (high * 1.8) + 32;
-            low = (low * 1.8) + 32;
-        }
-        long roundedHigh = Math.round(high);
-        long roundedLow = Math.round(low);
-        return roundedHigh + "/" + roundedLow;
     }
 }

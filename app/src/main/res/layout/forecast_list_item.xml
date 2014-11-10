@@ -1,8 +1,43 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<TextView xmlns:android="http://schemas.android.com/apk/res/android"
-          android:layout_width="match_parent"
-          android:layout_height="wrap_content"
-          android:minHeight="?android:listPreferredItemHeight"
-          android:layout_gravity="center_vertical"
-          android:id="@+id/forecast_list_item"/>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:layout_width="fill_parent"
+              android:layout_height="fill_parent"
+              android:gravity="center_vertical"
+              android:minHeight="?android:attr/listPreferredItemHeight"
+              android:orientation="horizontal">
+
+    <TextView
+            android:id="@+id/list_item_date"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+
+    <TextView android:text=" - "
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+
+    <TextView
+            android:id="@+id/list_item_forecast"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+
+    <TextView android:text=" - "
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+
+    <TextView
+            android:id="@+id/list_item_max"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+
+    <TextView android:text="/"
+              android:layout_width="wrap_content"
+              android:layout_height="wrap_content"/>
+
+    <TextView
+            android:id="@+id/list_item_min"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+
+
+</LinearLayout>

@@ -2,26 +2,61 @@ package com.android.sunshine.app.fragments;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.database.Cursor;
+import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.LoaderManager;
+import android.support.v4.content.CursorLoader;
+import android.support.v4.content.Loader;
+import android.support.v4.widget.SimpleCursorAdapter;
 import android.view.*;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.ListView;
+import android.widget.TextView;
 import com.android.sunshine.app.R;
 import com.android.sunshine.app.activities.DetailActivity;
+import com.android.sunshine.app.model.WeatherContract;
 import com.android.sunshine.app.utils.FetchWeatherTask;
+import com.android.sunshine.app.utils.Utilities;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
-import java.util.concurrent.ExecutionException;
 
-public class ForecastFragment extends Fragment implements AdapterView.OnItemClickListener {
+import static com.android.sunshine.app.model.WeatherContract.LocationEntry;
+import static com.android.sunshine.app.model.WeatherContract.WeatherEntry;
 
-    private ArrayAdapter<String> adapter;
+public class ForecastFragment extends Fragment implements AdapterView.OnItemClickListener, LoaderManager.LoaderCallbacks<Cursor> {
 
-    public ForecastFragment() {}
+    public static final int FORECAST_LOADER = 0;
+    private SimpleCursorAdapter adapter;
+
+    private static final String[] FORECAST_COLUMNS = new String[]{
+            WeatherEntry.TABLE_NAME + "." + WeatherEntry._ID,
+            WeatherEntry.COLUMN_DATETEXT,
+            WeatherEntry.COLUMN_SHORT_DESC,
+            WeatherEntry.COLUMN_MAX_TEMP,
+            WeatherEntry.COLUMN_MIN_TEMP,
+            LocationEntry.COLUMN_LOCATION_SETTING
+    };
+
+    public static final int COL_WEATHER_ID = 0;
+    public static final int COL_WEATHER_DATE = 1;
+    public static final int COL_WEATHER_DESC = 2;
+    public static final int COL_WEATHER_MAX_TEMP = 3;
+    public static final int COL_WEATHER_MIN_TEMP = 4;
+    public static final int COL_LOCATION_SETTING = 5;
+
+    public ForecastFragment() {
+    }
+
+    @Override
+    public void onActivityCreated(Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+        getLoaderManager().initLoader(FORECAST_LOADER, null, this);
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -30,7 +65,36 @@ public class ForecastFragment extends Fragment implements AdapterView.OnItemClic
         final ListView forecastList = (ListView) view.findViewById(R.id.forecast_listview);
         forecastList.setOnItemClickListener(this);
         final List<String> adapterData = new ArrayList<>();
-        adapter = new ArrayAdapter<>(getActivity(), R.layout.forecast_list_item, R.id.forecast_list_item, adapterData);
+        adapter = new SimpleCursorAdapter(getActivity(), R.layout.forecast_list_item, null, new String[]{
+                WeatherEntry.COLUMN_DATETEXT,
+                WeatherEntry.COLUMN_SHORT_DESC,
+                WeatherEntry.COLUMN_MAX_TEMP,
+                WeatherEntry.COLUMN_MIN_TEMP
+        }, new int[]{
+                R.id.list_item_date,
+                R.id.list_item_forecast,
+                R.id.list_item_max,
+                R.id.list_item_min
+        }, 0);
+
+        adapter.setViewBinder(new SimpleCursorAdapter.ViewBinder() {
+            @Override
+            public boolean setViewValue(View view, Cursor cursor, int columnIndex) {
+                boolean isMetric = Utilities.isMetric(getActivity());
+                switch (columnIndex){
+                    case COL_WEATHER_MAX_TEMP:
+                    case COL_WEATHER_MIN_TEMP:
+                        ((TextView) view).setText(Utilities.formatTemperature(cursor.getDouble(columnIndex), isMetric));
+                        break;
+                    case COL_WEATHER_DATE:
+                        final String date = cursor.getString(columnIndex);
+                        ((TextView) view).setText(Utilities.formatDate(date));
+                        break;
+                }
+                return false;
+            }
+        });
+
         forecastList.setAdapter(adapter);
         return view;
     }
@@ -61,20 +125,34 @@ public class ForecastFragment extends Fragment implements AdapterView.OnItemClic
         startActivity(intent);
     }
 
+    @Override
+    public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+        String startDate = WeatherContract.getDbDateString(new Date());
+
+        String sortOrder = WeatherEntry.COLUMN_DATETEXT + " ASC";
+
+        final SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
+        final String location = sharedPreferences.getString(getString(R.string.pref_location_key), getString(R.string.location_default));
+        Uri weatherForLocationUri = WeatherEntry.buildWeatherLocationWithStartDate(location, startDate);
+
+        return new CursorLoader(getActivity(), weatherForLocationUri, FORECAST_COLUMNS, null, null, sortOrder);
+    }
+
+    @Override
+    public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+        adapter.swapCursor(data);
+    }
+
+    @Override
+    public void onLoaderReset(Loader<Cursor> loader) {
+        adapter.swapCursor(null);
+    }
+
     private void refreshWeatherData() {
         final FetchWeatherTask weatherRequester = new FetchWeatherTask(getActivity());
         final SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
         final String location = sharedPreferences.getString(getString(R.string.pref_location_key), getString(R.string.location_default));
         final String unit = sharedPreferences.getString(getString(R.string.pref_unit_key), getString(R.string.prefs_units_imperial));
         weatherRequester.execute(new String[]{location, unit});
-        try {
-            adapter.clear();
-            for (String s : weatherRequester.get()) {
-                adapter.add(s);
-            }
-        } catch (InterruptedException | ExecutionException e) {
-            // TODO: show error
-            e.printStackTrace();
-        }
     }
 }

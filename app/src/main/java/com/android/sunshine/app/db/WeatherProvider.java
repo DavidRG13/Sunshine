@@ -23,7 +23,9 @@ public class WeatherProvider extends ContentProvider {
     private static final String locationSettingsSelection = LocationEntry.TABLE_NAME + "." +
             LocationEntry.COLUMN_LOCATION_SETTING + " = ?";
     private static final String locationSettingsWithStartDateSelection = LocationEntry.TABLE_NAME + "." +
-            LocationEntry.COLUMN_LOCATION_SETTING + " = ? AND " + WeatherEntry.COLUMN_DATETEXT + ">= ? ";
+            LocationEntry.COLUMN_LOCATION_SETTING + " = ? AND " + WeatherEntry.COLUMN_DATETEXT + " >= ? ";
+    private static final String locationSettingsWithDaySelection = LocationEntry.TABLE_NAME + "." +
+            LocationEntry.COLUMN_LOCATION_SETTING + " = ? AND " + WeatherEntry.COLUMN_DATETEXT + " = ? ";
     private DBHelper dbHelper;
 
     private static SQLiteQueryBuilder weatherByLocationSettingsQueryBuilder;
@@ -51,10 +53,10 @@ public class WeatherProvider extends ContentProvider {
                 break;
             case WEATHER_WITH_LOCATION:
                 cursor = getWeatherByLocationSettings(uri, projection, sortOrder);
-//                cursor = null;
                 break;
-//            case WEATHER_WITH_LOCATION_AND_DATE:
-//                return WeatherEntry.CONTENT_ITEM_TYPE;
+            case WEATHER_WITH_LOCATION_AND_DATE:
+                cursor = getWeatherByLocationSettingsWithDate(uri, projection, sortOrder);
+                break;
             case LOCATION:
                 cursor = dbHelper.getReadableDatabase().query(LocationEntry.TABLE_NAME, projection, selection, selectionArgs, null, null, sortOrder);
                 break;
@@ -112,12 +114,20 @@ public class WeatherProvider extends ContentProvider {
         if (startDate == null) {
             selection = locationSettingsSelection;
             selectionArgs = new String[]{locationSetting};
-        }else{
+        } else {
             selection = locationSettingsWithStartDateSelection;
             selectionArgs = new String[]{locationSetting, startDate};
         }
         return weatherByLocationSettingsQueryBuilder.query(dbHelper.getReadableDatabase(),
                 projection, selection, selectionArgs, null, null, sortOrder);
+    }
+
+    private Cursor getWeatherByLocationSettingsWithDate(Uri uri, String[] projection, String sortOrder) {
+        final String locationSetting = WeatherEntry.getLocationSettingFromUri(uri);
+        final String startDate = WeatherEntry.getDateFromUri(uri);
+        return weatherByLocationSettingsQueryBuilder.query(dbHelper.getReadableDatabase(),
+                projection, locationSettingsWithDaySelection, new String[]{locationSetting, startDate},
+                null, null, sortOrder);
     }
 
     private static UriMatcher buildUriMatcher() {

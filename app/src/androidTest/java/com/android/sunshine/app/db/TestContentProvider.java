@@ -39,6 +39,53 @@ public class TestContentProvider extends AndroidTestCase {
         DbUtilities.validateCursor(weatherCursor, weatherValues);
     }
 
+    public void testFindForecastByLocation() {
+        ContentValues testValues = DbUtilities.createNorthPoleLocationValues();
+        long locationRowId = insertLocation(testValues);
+        ContentValues weatherValues = DbUtilities.createWeatherValues(locationRowId);
+        insertWeather(weatherValues);
+
+        Cursor weatherCursor = mContext.getContentResolver().query(WeatherEntry
+                .buildWeatherLocation(DbUtilities.DEFAULT_LOCATION_SETTINGS), null, null, null, null);
+        DbUtilities.validateCursor(weatherCursor, weatherValues);
+    }
+
+    public void testFindForecastByLocationWithStartDate() {
+        ContentValues testValues = DbUtilities.createNorthPoleLocationValues();
+        long locationRowId = insertLocation(testValues);
+        ContentValues weatherValues = DbUtilities.createWeatherValues(locationRowId);
+        insertWeather(weatherValues);
+
+        Cursor weatherCursor = mContext.getContentResolver().query(WeatherEntry
+                        .buildWeatherLocationWithStartDate(DbUtilities.DEFAULT_LOCATION_SETTINGS, DbUtilities.DEFAULT_DATE),
+                null, null, null, null);
+        DbUtilities.validateCursor(weatherCursor, weatherValues);
+    }
+
+    public void testFindForecastByLocationWithStartDateShouldFailIfForecastDateGreaterThanPassed() {
+        ContentValues testValues = DbUtilities.createNorthPoleLocationValues();
+        long locationRowId = insertLocation(testValues);
+        ContentValues weatherValues = DbUtilities.createWeatherValues(locationRowId);
+        insertWeather(weatherValues);
+
+        Cursor weatherCursor = mContext.getContentResolver().query(WeatherEntry
+                        .buildWeatherLocationWithStartDate(DbUtilities.DEFAULT_LOCATION_SETTINGS, "20151205"),
+                null, null, null, null);
+        DbUtilities.validateCursor(weatherCursor, weatherValues);
+    }
+
+    public void testFindForecastByLocationWithDaySelection() {
+        ContentValues testValues = DbUtilities.createNorthPoleLocationValues();
+        long locationRowId = insertLocation(testValues);
+        ContentValues weatherValues = DbUtilities.createWeatherValues(locationRowId);
+        insertWeather(weatherValues);
+
+        Cursor weatherCursor = mContext.getContentResolver().query(WeatherEntry
+                        .buildWeatherLocationWithDate(DbUtilities.DEFAULT_LOCATION_SETTINGS, DbUtilities.DEFAULT_DATE),
+                null, null, null, null);
+        DbUtilities.validateCursor(weatherCursor, weatherValues);
+    }
+
     public void testReadOneLocation() {
         ContentValues testValues = DbUtilities.createNorthPoleLocationValues();
         insertLocation(testValues);
@@ -88,13 +135,13 @@ public class TestContentProvider extends AndroidTestCase {
         assertEquals(LocationEntry.CONTENT_ITEM_TYPE, type);
     }
 
-    private long insertLocation(ContentValues contentValues){
+    private long insertLocation(ContentValues contentValues) {
         long locationRowId = db.insert(LocationEntry.TABLE_NAME, null, contentValues);
         assertTrue(locationRowId != -1);
         return locationRowId;
     }
 
-    private long insertWeather(ContentValues weatherValues){
+    private long insertWeather(ContentValues weatherValues) {
         long weatherRowId = db.insert(WeatherEntry.TABLE_NAME, null, weatherValues);
         assertTrue(weatherRowId != -1);
         return weatherRowId;

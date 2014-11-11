@@ -138,8 +138,8 @@ public class DetailActivity extends ActionBarActivity {
                 final TextView detailDescription = (TextView) getView().findViewById(R.id.detail_forecast);
                 final TextView detailMax = (TextView) getView().findViewById(R.id.detail_max);
                 final TextView detailMin = (TextView) getView().findViewById(R.id.detail_min);
-                final String max = String.valueOf(Utilities.formatTemperature(maxTemp, isMetric) + "\u00B0");
-                final String min = String.valueOf(Utilities.formatTemperature(minTemp, isMetric) + "\u00B0");
+                final String max = String.valueOf(Utilities.formatTemperature(getActivity(), maxTemp, isMetric));
+                final String min = String.valueOf(Utilities.formatTemperature(getActivity(), minTemp, isMetric));
 
                 detailDate.setText(date);
                 detailDescription.setText(description);

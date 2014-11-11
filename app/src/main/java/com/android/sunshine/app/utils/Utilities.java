@@ -14,14 +14,14 @@ import java.util.Date;
 
 public class Utilities {
 
-    public static String formatTemperature(final double temperature, final boolean isMetric) {
+    public static String formatTemperature(final Context context, final double temperature, final boolean isMetric) {
         double temp;
         if (isMetric){
             temp = temperature;
         }else {
             temp = 9 * temperature / 5 + 32;
         }
-        return String.format("%.0f", temp);
+        return context.getString(R.string.format_temperature, temp);
     }
 
     public static String formatDate(final String date){

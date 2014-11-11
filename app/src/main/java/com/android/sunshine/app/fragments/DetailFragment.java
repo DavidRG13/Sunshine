@@ -55,7 +55,13 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        getLoaderManager().initLoader(DETAIL_LOADER, null, this);
+        if(savedInstanceState != null) {
+            location = savedInstanceState.getString(LOCATION_KEY);
+        }
+        final Bundle arguments = getArguments();
+        if(arguments != null && arguments.containsKey(DetailActivity.DATE_KEY)) {
+            getLoaderManager().initLoader(DETAIL_LOADER, null, this);
+        }
     }
 
     @Override
@@ -84,7 +90,9 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
     @Override
     public void onResume() {
         super.onResume();
-        if (location != null && !location.equals(Utilities.getLocationSettings(getActivity()))) {
+        final Bundle arguments = getArguments();
+        if (arguments != null && !location.equals(Utilities.getLocationSettings(getActivity()))
+                && arguments.containsKey(DetailActivity.DATE_KEY)) {
             getLoaderManager().restartLoader(DETAIL_LOADER, null, this);
         }
     }
@@ -104,7 +112,7 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
 
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-        final String date = getActivity().getIntent().getStringExtra(DetailActivity.DATE_KEY);
+        final String date = getArguments().getString(DetailActivity.DATE_KEY);
         location = Utilities.getLocationSettings(getActivity());
         final Uri weatherUri = WeatherContract.WeatherEntry.buildWeatherLocationWithDate(location, date);
         return new CursorLoader(getActivity(), weatherUri, COLUMNS, null, null, WeatherContract.WeatherEntry.COLUMN_DATETEXT + " ASC");

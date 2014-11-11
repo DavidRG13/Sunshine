@@ -1,6 +1,5 @@
 package com.android.sunshine.app.fragments;
 
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.net.Uri;
@@ -14,8 +13,8 @@ import android.view.*;
 import android.widget.AdapterView;
 import android.widget.ListView;
 import com.android.sunshine.app.R;
-import com.android.sunshine.app.activities.DetailActivity;
 import com.android.sunshine.app.adapter.ForecastCursorAdapter;
+import com.android.sunshine.app.callbacks.ItemClickCallback;
 import com.android.sunshine.app.model.WeatherContract;
 import com.android.sunshine.app.utils.FetchWeatherTask;
 import com.android.sunshine.app.utils.Utilities;
@@ -84,14 +83,8 @@ public class ForecastFragment extends Fragment implements AdapterView.OnItemClic
 
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-        final Intent intent = new Intent(getActivity(), DetailActivity.class);
-        final Cursor cursor = adapter.getCursor();
-        String date = "";
-        if (cursor != null && cursor.moveToPosition(position)) {
-            date = cursor.getString(cursor.getColumnIndex(WeatherEntry.COLUMN_DATETEXT));
-        }
-        intent.putExtra(DetailActivity.DATE_KEY, date);
-        startActivity(intent);
+        ((ItemClickCallback) getActivity()).onItemSelected(adapter.getCursor()
+                .getString(adapter.getCursor().getColumnIndex(WeatherEntry.COLUMN_DATETEXT)));
     }
 
     @Override

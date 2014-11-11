@@ -27,7 +27,8 @@
                 android:value="com.android.sunshine.app.activities.MainActivity" />
         </activity>
         <activity android:name=".activities.SettingsActivity"
-                  android:label="@string/title_activity_settings"/>
+                  android:label="@string/title_activity_settings"
+                android:parentActivityName=".activities.MainActivity"/>
         <provider
                 android:exported="false"
                 android:authorities="com.android.sunshine.app"

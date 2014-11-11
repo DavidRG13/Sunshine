@@ -11,6 +11,7 @@ import android.support.v4.content.Loader;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v7.widget.ShareActionProvider;
 import android.view.*;
+import android.widget.ImageView;
 import android.widget.TextView;
 import com.android.sunshine.app.R;
 import com.android.sunshine.app.activities.DetailActivity;
@@ -38,6 +39,15 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
             WeatherContract.WeatherEntry.COLUMN_WEATHER_ID
     };
     private String date;
+    private TextView detailDate;
+    private TextView detailDescription;
+    private TextView detailMax;
+    private TextView detailMin;
+    private TextView detailDay;
+    private TextView detailWind;
+    private TextView detailPressure;
+    private TextView detailHumidity;
+    private ImageView detailIcon;
 
     public DetailFragment() {
         setHasOptionsMenu(true);
@@ -51,7 +61,17 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.fragment_detail, container, false);
+        final View view = inflater.inflate(R.layout.fragment_detail, container, false);
+        detailDate = (TextView) view.findViewById(R.id.detail_date);
+        detailDescription = (TextView) view.findViewById(R.id.detail_forecast);
+        detailMax = (TextView) view.findViewById(R.id.detail_max);
+        detailMin = (TextView) view.findViewById(R.id.detail_min);
+        detailDay = (TextView) view.findViewById(R.id.detail_day);
+        detailWind = (TextView) view.findViewById(R.id.detail_wind);
+        detailPressure = (TextView) view.findViewById(R.id.detail_pressure);
+        detailHumidity = (TextView) view.findViewById(R.id.detail_humidity);
+        detailIcon = (ImageView) view.findViewById(R.id.detail_icon);
+        return view;
     }
 
     @Override
@@ -94,17 +114,14 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
         if (data.moveToFirst()) {
+            final boolean isMetric = Utilities.isMetric(getActivity());
             final String description = data.getString(data.getColumnIndex(WeatherContract.WeatherEntry.COLUMN_SHORT_DESC));
             final String date = data.getString(data.getColumnIndex(WeatherContract.WeatherEntry.COLUMN_DATETEXT));
+            final String wind = data.getString(data.getColumnIndex(WeatherContract.WeatherEntry.COLUMN_WIND_SPEED));
+            final String pressure = data.getString(data.getColumnIndex(WeatherContract.WeatherEntry.COLUMN_PRESSURE));
+            final String humidity = data.getString(data.getColumnIndex(WeatherContract.WeatherEntry.COLUMN_HUMIDITY));
             final double maxTemp = data.getDouble(data.getColumnIndex(WeatherContract.WeatherEntry.COLUMN_MAX_TEMP));
             final double minTemp = data.getDouble(data.getColumnIndex(WeatherContract.WeatherEntry.COLUMN_MIN_TEMP));
-
-            final boolean isMetric = Utilities.isMetric(getActivity());
-
-            final TextView detailDate = (TextView) getView().findViewById(R.id.detail_date);
-            final TextView detailDescription = (TextView) getView().findViewById(R.id.detail_forecast);
-            final TextView detailMax = (TextView) getView().findViewById(R.id.detail_max);
-            final TextView detailMin = (TextView) getView().findViewById(R.id.detail_min);
             final String max = String.valueOf(Utilities.formatTemperature(getActivity(), maxTemp, isMetric));
             final String min = String.valueOf(Utilities.formatTemperature(getActivity(), minTemp, isMetric));
 
@@ -112,6 +129,11 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
             detailDescription.setText(description);
             detailMax.setText(max);
             detailMin.setText(min);
+            detailHumidity.setText(humidity);
+            detailWind.setText(wind);
+            detailPressure.setText(pressure);
+            detailDay.setText(Utilities.getDayName(getActivity(), date));
+            detailIcon.setImageResource(R.drawable.ic_launcher);
 
             weatherData = String.format(Locale.getDefault(), "%s - %s - %s/%s", date, description, max, min);
         }

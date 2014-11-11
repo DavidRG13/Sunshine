@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources>
+<resources xmlns:xliff="http://schemas.android.com/apk/res/android">
 
     <string name="app_name">Sunshine</string>
     <string name="hello_world">Hello world!</string>
@@ -15,6 +15,12 @@
     <string name="prefs_units_imperial">imperial</string>
     <string name="viewLocation">View current location</string>
     <string name="share">Share</string>
+    <string name="forecastIcon">forecast icon</string>
+    <string name="today">hoy</string>
+    <string name="tomorrow">manana</string>
+    <string name="format_full_friendly_date">
+        <xliff:g id="day_of_week">%1$s</xliff:g>, <xliff:g id="date">%2$s</xliff:g>
+    </string>
 
     <string-array name="pref_units_values">
         <item>imperial</item>

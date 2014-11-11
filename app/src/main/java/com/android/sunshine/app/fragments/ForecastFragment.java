@@ -10,13 +10,12 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
-import android.support.v4.widget.SimpleCursorAdapter;
 import android.view.*;
 import android.widget.AdapterView;
 import android.widget.ListView;
-import android.widget.TextView;
 import com.android.sunshine.app.R;
 import com.android.sunshine.app.activities.DetailActivity;
+import com.android.sunshine.app.adapter.ForecastCursorAdapter;
 import com.android.sunshine.app.model.WeatherContract;
 import com.android.sunshine.app.utils.FetchWeatherTask;
 import com.android.sunshine.app.utils.Utilities;
@@ -30,7 +29,7 @@ public class ForecastFragment extends Fragment implements AdapterView.OnItemClic
 
     public static final int FORECAST_LOADER = 0;
     private String location;
-    private SimpleCursorAdapter adapter;
+    private ForecastCursorAdapter adapter;
 
     private static final String[] FORECAST_COLUMNS = new String[]{
             WeatherEntry.TABLE_NAME + "." + WeatherEntry._ID,
@@ -48,8 +47,7 @@ public class ForecastFragment extends Fragment implements AdapterView.OnItemClic
     public static final int COL_WEATHER_MIN_TEMP = 4;
     public static final int COL_LOCATION_SETTING = 5;
 
-    public ForecastFragment() {
-    }
+    public ForecastFragment() {}
 
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
@@ -63,35 +61,7 @@ public class ForecastFragment extends Fragment implements AdapterView.OnItemClic
         final View view = inflater.inflate(R.layout.fragment_main, container, false);
         final ListView forecastList = (ListView) view.findViewById(R.id.forecast_listview);
         forecastList.setOnItemClickListener(this);
-        adapter = new SimpleCursorAdapter(getActivity(), R.layout.forecast_list_item, null, new String[]{
-                WeatherEntry.COLUMN_DATETEXT,
-                WeatherEntry.COLUMN_SHORT_DESC,
-                WeatherEntry.COLUMN_MAX_TEMP,
-                WeatherEntry.COLUMN_MIN_TEMP
-        }, new int[]{
-                R.id.list_item_date,
-                R.id.list_item_forecast,
-                R.id.list_item_max,
-                R.id.list_item_min
-        }, 0);
-
-        adapter.setViewBinder(new SimpleCursorAdapter.ViewBinder() {
-            @Override
-            public boolean setViewValue(View view, Cursor cursor, int columnIndex) {
-                boolean isMetric = Utilities.isMetric(getActivity());
-                switch (columnIndex) {
-                    case COL_WEATHER_MAX_TEMP:
-                    case COL_WEATHER_MIN_TEMP:
-                        ((TextView) view).setText(Utilities.formatTemperature(cursor.getDouble(columnIndex), isMetric));
-                        break;
-                    case COL_WEATHER_DATE:
-                        final String date = cursor.getString(columnIndex);
-                        ((TextView) view).setText(Utilities.formatDate(date));
-                        break;
-                }
-                return false;
-            }
-        });
+        adapter = new ForecastCursorAdapter(getActivity(), null, 0);
 
         forecastList.setAdapter(adapter);
         return view;

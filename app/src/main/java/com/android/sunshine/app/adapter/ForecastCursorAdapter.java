@@ -56,7 +56,6 @@ public class ForecastCursorAdapter extends CursorAdapter{
         viewHolder.max.setText(Utilities.formatTemperature(context, maxTemp, isMetric));
         viewHolder.min.setText(Utilities.formatTemperature(context, minTemp, isMetric));
 
-        System.out.println("weatherId = " + weatherId);
         if(getItemViewType(cursor.getPosition()) == TODAY_VIEW_TYPE){
             viewHolder.forecastIcon.setImageResource(Utilities.getArtResourceForWeatherCondition(weatherId));
         }else{

@@ -27,6 +27,7 @@ import static com.android.sunshine.app.model.WeatherContract.WeatherEntry;
 public class ForecastFragment extends Fragment implements AdapterView.OnItemClickListener, LoaderManager.LoaderCallbacks<Cursor> {
 
     public static final int FORECAST_LOADER = 0;
+    public static final String SCROLL_POSITION = "scrollPosition";
     private String location;
     private ForecastCursorAdapter adapter;
 
@@ -39,8 +40,11 @@ public class ForecastFragment extends Fragment implements AdapterView.OnItemClic
             WeatherEntry.COLUMN_WEATHER_ID,
             LocationEntry.COLUMN_LOCATION_SETTING
     };
+    private int scrollPosition;
+    private ListView forecastList;
 
-    public ForecastFragment() {}
+    public ForecastFragment() {
+    }
 
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
@@ -52,11 +56,13 @@ public class ForecastFragment extends Fragment implements AdapterView.OnItemClic
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         setHasOptionsMenu(true);
         final View view = inflater.inflate(R.layout.fragment_main, container, false);
-        final ListView forecastList = (ListView) view.findViewById(R.id.forecast_listview);
+        forecastList = (ListView) view.findViewById(R.id.forecast_listview);
         forecastList.setOnItemClickListener(this);
         adapter = new ForecastCursorAdapter(getActivity(), null, 0);
-
         forecastList.setAdapter(adapter);
+        if (savedInstanceState != null && savedInstanceState.containsKey(SCROLL_POSITION)) {
+            scrollPosition = savedInstanceState.getInt(SCROLL_POSITION);
+        }
         return view;
     }
 
@@ -82,7 +88,16 @@ public class ForecastFragment extends Fragment implements AdapterView.OnItemClic
     }
 
     @Override
+    public void onSaveInstanceState(Bundle outState) {
+        if (scrollPosition != ListView.INVALID_POSITION) {
+            outState.putInt(SCROLL_POSITION, scrollPosition);
+        }
+        super.onSaveInstanceState(outState);
+    }
+
+    @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+        this.scrollPosition = position;
         ((ItemClickCallback) getActivity()).onItemSelected(adapter.getCursor()
                 .getString(adapter.getCursor().getColumnIndex(WeatherEntry.COLUMN_DATETEXT)));
     }
@@ -102,6 +117,9 @@ public class ForecastFragment extends Fragment implements AdapterView.OnItemClic
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
         adapter.swapCursor(data);
+        if (scrollPosition != ListView.INVALID_POSITION) {
+            forecastList.setSelection(scrollPosition);
+        }
     }
 
     @Override

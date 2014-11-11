@@ -6,8 +6,13 @@ import android.preference.Preference;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceManager;
 import com.android.sunshine.app.R;
+import com.android.sunshine.app.utils.FetchWeatherTask;
+
+import static com.android.sunshine.app.model.WeatherContract.WeatherEntry;
 
 public class SettingsActivity extends PreferenceActivity implements Preference.OnPreferenceChangeListener {
+
+    private boolean bindingPreference;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -17,32 +22,38 @@ public class SettingsActivity extends PreferenceActivity implements Preference.O
         bindPreferenceSummaryToValue(findPreference(getString(R.string.pref_unit_key)));
     }
 
-    private void bindPreferenceSummaryToValue(Preference preference) {
-        preference.setOnPreferenceChangeListener(this);
-
-        // Trigger the listener immediately with the preference's current value.
-        onPreferenceChange(preference,
-                PreferenceManager
-                        .getDefaultSharedPreferences(preference.getContext())
-                        .getString(preference.getKey(), ""));
-    }
-
     @Override
     public boolean onPreferenceChange(Preference preference, Object value) {
         String stringValue = value.toString();
 
+        if (!bindingPreference) {
+            if(preference.getKey().equals(getString(R.string.pref_location_key))){
+                final FetchWeatherTask weatherRequester = new FetchWeatherTask(this);
+                weatherRequester.execute(stringValue);
+            }else{
+                getContentResolver().notifyChange(WeatherEntry.CONTENT_URI, null);
+            }
+        }
+
         if (preference instanceof ListPreference) {
-            // For list preferences, look up the correct display value in
-            // the preference's 'entries' list (since they have separate labels/values).
             ListPreference listPreference = (ListPreference) preference;
             int prefIndex = listPreference.findIndexOfValue(stringValue);
             if (prefIndex >= 0) {
                 preference.setSummary(listPreference.getEntries()[prefIndex]);
             }
         } else {
-            // For other preferences, set the summary to the value's simple string representation.
             preference.setSummary(stringValue);
         }
         return true;
+    }
+
+    private void bindPreferenceSummaryToValue(Preference preference) {
+        bindingPreference = true;
+        preference.setOnPreferenceChangeListener(this);
+        onPreferenceChange(preference,
+                PreferenceManager
+                        .getDefaultSharedPreferences(preference.getContext())
+                        .getString(preference.getKey(), ""));
+        bindingPreference = false;
     }
 }

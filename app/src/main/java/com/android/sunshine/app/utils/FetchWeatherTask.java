@@ -24,7 +24,7 @@ import java.util.Vector;
 import static com.android.sunshine.app.model.WeatherContract.LocationEntry;
 import static com.android.sunshine.app.model.WeatherContract.WeatherEntry;
 
-public class FetchWeatherTask extends AsyncTask<String[], Void, Void> {
+public class FetchWeatherTask extends AsyncTask<String, Void, Void> {
 
     public static final String QUERY_PARAM = "q";
     public static final String MODE_PARAM = "mode";
@@ -38,12 +38,12 @@ public class FetchWeatherTask extends AsyncTask<String[], Void, Void> {
     }
 
     @Override
-    protected Void doInBackground(String[]... params) {
+    protected Void doInBackground(String... params) {
         if (params.length == 0) {
             return null;
         }
 
-        final String locationSettings = params[0][0];
+        final String locationSettings = params[0];
         Uri.Builder builder = Uri.parse(BASE_URI).buildUpon()
                 .appendQueryParameter(QUERY_PARAM, locationSettings)
                 .appendQueryParameter(MODE_PARAM, "json")

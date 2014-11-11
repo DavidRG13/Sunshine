@@ -21,9 +21,7 @@ import com.android.sunshine.app.model.WeatherContract;
 import com.android.sunshine.app.utils.FetchWeatherTask;
 import com.android.sunshine.app.utils.Utilities;
 
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 import java.util.Locale;
 
 import static com.android.sunshine.app.model.WeatherContract.LocationEntry;
@@ -32,6 +30,7 @@ import static com.android.sunshine.app.model.WeatherContract.WeatherEntry;
 public class ForecastFragment extends Fragment implements AdapterView.OnItemClickListener, LoaderManager.LoaderCallbacks<Cursor> {
 
     public static final int FORECAST_LOADER = 0;
+    private String location;
     private SimpleCursorAdapter adapter;
 
     private static final String[] FORECAST_COLUMNS = new String[]{
@@ -65,7 +64,6 @@ public class ForecastFragment extends Fragment implements AdapterView.OnItemClic
         final View view = inflater.inflate(R.layout.fragment_main, container, false);
         final ListView forecastList = (ListView) view.findViewById(R.id.forecast_listview);
         forecastList.setOnItemClickListener(this);
-        final List<String> adapterData = new ArrayList<>();
         adapter = new SimpleCursorAdapter(getActivity(), R.layout.forecast_list_item, null, new String[]{
                 WeatherEntry.COLUMN_DATETEXT,
                 WeatherEntry.COLUMN_SHORT_DESC,
@@ -101,9 +99,11 @@ public class ForecastFragment extends Fragment implements AdapterView.OnItemClic
     }
 
     @Override
-    public void onStart() {
-        super.onStart();
-        refreshWeatherData();
+    public void onResume() {
+        super.onResume();
+        if (location != null && !Utilities.getLocationSettings(getActivity()).equals(location)) {
+            getLoaderManager().restartLoader(FORECAST_LOADER, null, this);
+        }
     }
 
     @Override
@@ -142,8 +142,7 @@ public class ForecastFragment extends Fragment implements AdapterView.OnItemClic
 
         String sortOrder = WeatherEntry.COLUMN_DATETEXT + " ASC";
 
-        final SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
-        final String location = sharedPreferences.getString(getString(R.string.pref_location_key), getString(R.string.location_default));
+        location = Utilities.getLocationSettings(getActivity());
         Uri weatherForLocationUri = WeatherEntry.buildWeatherLocationWithStartDate(location, startDate);
 
         return new CursorLoader(getActivity(), weatherForLocationUri, FORECAST_COLUMNS, null, null, sortOrder);
@@ -162,8 +161,7 @@ public class ForecastFragment extends Fragment implements AdapterView.OnItemClic
     private void refreshWeatherData() {
         final FetchWeatherTask weatherRequester = new FetchWeatherTask(getActivity());
         final SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
-        final String location = sharedPreferences.getString(getString(R.string.pref_location_key), getString(R.string.location_default));
-        final String unit = sharedPreferences.getString(getString(R.string.pref_unit_key), getString(R.string.prefs_units_imperial));
-        weatherRequester.execute(new String[]{location, unit});
+        location = sharedPreferences.getString(getString(R.string.pref_location_key), getString(R.string.location_default));
+        weatherRequester.execute(location);
     }
 }

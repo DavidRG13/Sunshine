@@ -22,7 +22,6 @@ import com.android.sunshine.app.utils.FetchWeatherTask;
 import com.android.sunshine.app.utils.Utilities;
 
 import java.util.Date;
-import java.util.Locale;
 
 import static com.android.sunshine.app.model.WeatherContract.LocationEntry;
 import static com.android.sunshine.app.model.WeatherContract.WeatherEntry;
@@ -123,16 +122,11 @@ public class ForecastFragment extends Fragment implements AdapterView.OnItemClic
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
         final Intent intent = new Intent(getActivity(), DetailActivity.class);
         final Cursor cursor = adapter.getCursor();
-        String forecast = "";
+        String date = "";
         if (cursor != null && cursor.moveToPosition(position)) {
-            boolean isMetric = Utilities.isMetric(getActivity());
-            forecast = String.format(Locale.getDefault(), "%s - %s - %s/%s",
-                    Utilities.formatDate(cursor.getString(COL_WEATHER_DATE)),
-                    cursor.getString(COL_WEATHER_DESC),
-                    Utilities.formatTemperature(cursor.getDouble(COL_WEATHER_MAX_TEMP), isMetric),
-                    Utilities.formatTemperature(cursor.getDouble(COL_WEATHER_MIN_TEMP), isMetric));
+            date = cursor.getString(COL_WEATHER_DATE);
         }
-        intent.putExtra(DetailActivity.PlaceholderFragment.WEATHER_DATA, forecast);
+        intent.putExtra(DetailActivity.DATE_KEY, date);
         startActivity(intent);
     }
 

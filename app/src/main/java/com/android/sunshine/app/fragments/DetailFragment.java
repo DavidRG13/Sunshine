@@ -38,7 +38,6 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
             WeatherContract.WeatherEntry.COLUMN_WIND_SPEED,
             WeatherContract.WeatherEntry.COLUMN_WEATHER_ID
     };
-    private String date;
     private TextView detailDate;
     private TextView detailDescription;
     private TextView detailMax;
@@ -105,7 +104,7 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
 
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-        date = getActivity().getIntent().getStringExtra(DetailActivity.DATE_KEY);
+        final String date = getActivity().getIntent().getStringExtra(DetailActivity.DATE_KEY);
         location = Utilities.getLocationSettings(getActivity());
         final Uri weatherUri = WeatherContract.WeatherEntry.buildWeatherLocationWithDate(location, date);
         return new CursorLoader(getActivity(), weatherUri, COLUMNS, null, null, WeatherContract.WeatherEntry.COLUMN_DATETEXT + " ASC");
@@ -115,6 +114,7 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
         if (data.moveToFirst()) {
             final boolean isMetric = Utilities.isMetric(getActivity());
+            final int weatherId = data.getInt(data.getColumnIndex(WeatherContract.WeatherEntry.COLUMN_WEATHER_ID));
             final String description = data.getString(data.getColumnIndex(WeatherContract.WeatherEntry.COLUMN_SHORT_DESC));
             final String date = data.getString(data.getColumnIndex(WeatherContract.WeatherEntry.COLUMN_DATETEXT));
             final String wind = data.getString(data.getColumnIndex(WeatherContract.WeatherEntry.COLUMN_WIND_SPEED));
@@ -133,7 +133,7 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
             detailWind.setText(wind);
             detailPressure.setText(pressure);
             detailDay.setText(Utilities.getDayName(getActivity(), date));
-            detailIcon.setImageResource(R.drawable.ic_launcher);
+            detailIcon.setImageResource(Utilities.getArtResourceForWeatherCondition(weatherId));
 
             weatherData = String.format(Locale.getDefault(), "%s - %s - %s/%s", date, description, max, min);
         }
@@ -150,6 +150,4 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
         shareIntent.setType("text/plain");
         shareIntent.putExtra(Intent.EXTRA_TEXT, weatherData + " #sunshine");
     }
-
-
 }

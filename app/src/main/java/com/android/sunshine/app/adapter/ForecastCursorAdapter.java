@@ -9,8 +9,9 @@ import android.widget.CursorAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 import com.android.sunshine.app.R;
-import com.android.sunshine.app.fragments.ForecastFragment;
 import com.android.sunshine.app.utils.Utilities;
+
+import static com.android.sunshine.app.model.WeatherContract.WeatherEntry;
 
 public class ForecastCursorAdapter extends CursorAdapter{
 
@@ -42,19 +43,25 @@ public class ForecastCursorAdapter extends CursorAdapter{
     @Override
     public void bindView(View view, Context context, Cursor cursor) {
         final boolean isMetric = Utilities.isMetric(context);
-        final int weatherId = cursor.getInt(ForecastFragment.COL_WEATHER_ID);
-        final String weatherDate = cursor.getString(ForecastFragment.COL_WEATHER_DATE);
-        final String descriptionWeather = cursor.getString(ForecastFragment.COL_WEATHER_DESC);
-        final float maxTemp = cursor.getFloat(ForecastFragment.COL_WEATHER_MAX_TEMP);
-        final float minTemp = cursor.getFloat(ForecastFragment.COL_WEATHER_MIN_TEMP);
+        final int weatherId = cursor.getInt(cursor.getColumnIndex(WeatherEntry.COLUMN_WEATHER_ID));
+        final String weatherDate = cursor.getString(cursor.getColumnIndex(WeatherEntry.COLUMN_DATETEXT));
+        final String descriptionWeather = cursor.getString(cursor.getColumnIndex(WeatherEntry.COLUMN_SHORT_DESC));
+        final float maxTemp = cursor.getFloat(cursor.getColumnIndex(WeatherEntry.COLUMN_MAX_TEMP));
+        final float minTemp = cursor.getFloat(cursor.getColumnIndex(WeatherEntry.COLUMN_MIN_TEMP));
 
         final ViewHolder viewHolder = (ViewHolder) view.getTag();
 
-        viewHolder.forecastIcon.setImageResource(R.drawable.ic_launcher);
         viewHolder.dateWeather.setText(Utilities.getFriendlyDay(context, weatherDate));
         viewHolder.forecastDescription.setText(descriptionWeather);
         viewHolder.max.setText(Utilities.formatTemperature(context, maxTemp, isMetric));
         viewHolder.min.setText(Utilities.formatTemperature(context, minTemp, isMetric));
+
+        System.out.println("weatherId = " + weatherId);
+        if(getItemViewType(cursor.getPosition()) == TODAY_VIEW_TYPE){
+            viewHolder.forecastIcon.setImageResource(Utilities.getArtResourceForWeatherCondition(weatherId));
+        }else{
+            viewHolder.forecastIcon.setImageResource(Utilities.getIconResourceForWeatherCondition(weatherId));
+        }
     }
 
     @Override

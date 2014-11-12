@@ -42,6 +42,7 @@ public class ForecastFragment extends Fragment implements AdapterView.OnItemClic
     };
     private int scrollPosition;
     private ListView forecastList;
+    private View rootView;
 
     public ForecastFragment() {
     }
@@ -55,15 +56,15 @@ public class ForecastFragment extends Fragment implements AdapterView.OnItemClic
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         setHasOptionsMenu(true);
-        final View view = inflater.inflate(R.layout.fragment_main, container, false);
-        forecastList = (ListView) view.findViewById(R.id.forecast_listview);
+        rootView = inflater.inflate(R.layout.fragment_main, container, false);
+        forecastList = (ListView) rootView.findViewById(R.id.forecast_listview);
         forecastList.setOnItemClickListener(this);
         adapter = new ForecastCursorAdapter(getActivity(), null, 0);
         forecastList.setAdapter(adapter);
         if (savedInstanceState != null && savedInstanceState.containsKey(SCROLL_POSITION)) {
             scrollPosition = savedInstanceState.getInt(SCROLL_POSITION);
         }
-        return view;
+        return rootView;
     }
 
     @Override
@@ -98,8 +99,7 @@ public class ForecastFragment extends Fragment implements AdapterView.OnItemClic
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
         this.scrollPosition = position;
-        ((ItemClickCallback) getActivity()).onItemSelected(adapter.getCursor()
-                .getString(adapter.getCursor().getColumnIndex(WeatherEntry.COLUMN_DATETEXT)));
+        ((ItemClickCallback) getActivity()).onItemSelected(adapter.getCursor().getString(adapter.getCursor().getColumnIndex(WeatherEntry.COLUMN_DATETEXT)));
     }
 
     @Override
@@ -118,7 +118,8 @@ public class ForecastFragment extends Fragment implements AdapterView.OnItemClic
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
         adapter.swapCursor(data);
         if (scrollPosition != ListView.INVALID_POSITION) {
-            forecastList.setSelection(scrollPosition);
+            forecastList.smoothScrollToPosition(scrollPosition);
+            forecastList.performItemClick(rootView, scrollPosition, forecastList.getAdapter().getItemId(scrollPosition));
         }
     }
 

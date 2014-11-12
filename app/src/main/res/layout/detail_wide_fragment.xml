@@ -14,17 +14,21 @@
         <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:orientation="vertical">
+                android:orientation="vertical"
+                android:minWidth="56dp">
 
             <TextView
                     android:id="@+id/detail_day"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"/>
+                    android:layout_height="wrap_content"
+                    android:minWidth="120dp"
+                    android:textSize="24sp"/>
 
             <TextView
                     android:id="@+id/detail_date"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content" />
+                    android:layout_height="wrap_content"
+                    android:textSize="20sp"/>
         </LinearLayout>
 
         <LinearLayout
@@ -36,34 +40,43 @@
             <TextView
                     android:id="@+id/detail_max"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content" />
+                    android:layout_height="wrap_content"
+                    android:textSize="96sp"/>
 
             <TextView
                     android:id="@+id/detail_min"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content" />
+                    android:layout_height="wrap_content"
+                    android:textSize="48sp"/>
 
             <TextView
                     android:id="@+id/detail_humidity"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content" />
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:textAppearance="?android:textAppearanceLarge"/>
 
             <TextView
                     android:id="@+id/detail_pressure"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content" />
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:textAppearance="?android:textAppearanceLarge"/>
 
             <TextView
                     android:id="@+id/detail_wind"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content" />
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:textAppearance="?android:textAppearanceLarge"/>
         </LinearLayout>
 
         <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:gravity="center_horizontal"
-                android:orientation="vertical">
+                android:orientation="vertical"
+                android:layout_marginLeft="16dp">
 
             <ImageView
                     android:id="@+id/detail_icon"
@@ -73,7 +86,8 @@
             <TextView
                     android:id="@+id/detail_forecast"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"/>
+                    android:layout_height="wrap_content"
+                    android:textAppearance="?android:textAppearanceLarge"/>
         </LinearLayout>
     </LinearLayout>
 </ScrollView>

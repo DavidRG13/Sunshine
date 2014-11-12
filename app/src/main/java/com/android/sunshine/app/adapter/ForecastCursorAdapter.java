@@ -78,6 +78,10 @@ public class ForecastCursorAdapter extends CursorAdapter{
         this.useTodayLayout = useTodayLayout;
     }
 
+    public boolean getUseTodayLayout() {
+        return useTodayLayout;
+    }
+
     private static class ViewHolder{
         public final ImageView forecastIcon;
         public final TextView dateWeather;

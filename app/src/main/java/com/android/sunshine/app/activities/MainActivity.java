@@ -74,7 +74,7 @@ public class MainActivity extends ActionBarActivity implements ItemClickCallback
             detailFragment.setArguments(args);
             getSupportFragmentManager().beginTransaction()
                     .replace(R.id.fragment_detail_container, detailFragment)
-                    .commit();
+                    .commitAllowingStateLoss();
         } else {
             final Intent intent = new Intent(this, DetailActivity.class);
             intent.putExtra(DetailActivity.DATE_KEY, date);

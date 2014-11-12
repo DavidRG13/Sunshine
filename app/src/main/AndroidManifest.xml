@@ -41,7 +41,6 @@
                 android:exported="false"
                 android:syncable="true" />
 
-        <service android:name=".services.FetchWeatherService"/>
         <service
                 android:name=".sync.AuthenticatorService">
             <intent-filter>
@@ -61,6 +60,5 @@
                     android:name="android.content.SyncAdapter"
                     android:resource="@xml/syncadapter" />
         </service>
-        <receiver android:name=".services.FetchWeatherService$AlarmReceiver"/>
     </application>
 </manifest>

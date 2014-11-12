@@ -38,5 +38,6 @@
                 android:name=".db.WeatherProvider"/>
 
         <service android:name=".services.FetchWeatherService"/>
+        <receiver android:name=".services.FetchWeatherService$AlarmReceiver"/>
     </application>
 </manifest>

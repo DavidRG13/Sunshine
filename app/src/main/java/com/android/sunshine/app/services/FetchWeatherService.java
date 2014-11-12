@@ -1,13 +1,12 @@
 package com.android.sunshine.app.services;
 
 import android.app.IntentService;
-import android.content.ContentUris;
-import android.content.ContentValues;
-import android.content.Intent;
+import android.content.*;
 import android.database.Cursor;
 import android.net.Uri;
 import android.util.Log;
 import com.android.sunshine.app.model.WeatherContract;
+import com.android.sunshine.app.utils.Utilities;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -74,7 +73,6 @@ public class FetchWeatherService extends IntentService{
             }
         } catch (IOException | JSONException e) {
             Log.e("WeatherRequester", "Error ", e);
-            return;
         } finally {
             if (urlConnection != null) {
                 urlConnection.disconnect();
@@ -87,7 +85,6 @@ public class FetchWeatherService extends IntentService{
                 }
             }
         }
-        return;
     }
 
     private void parseWeatherDataFromJson(String forecastJsonStr, String locationSettings) throws JSONException {
@@ -172,6 +169,16 @@ public class FetchWeatherService extends IntentService{
             return cursor.getColumnIndex(WeatherContract.LocationEntry._ID);
         }else{
             return ContentUris.parseId(getContentResolver().insert(WeatherContract.LocationEntry.CONTENT_URI, locationValues));
+        }
+    }
+
+    static public class AlarmReceiver extends BroadcastReceiver{
+
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            final Intent sendIntent = new Intent(context, FetchWeatherService.class);
+            sendIntent.putExtra(FetchWeatherService.LOCATION_QUERY_EXTRA, Utilities.getLocationSettings(context));
+            context.startService(sendIntent);
         }
     }
 }

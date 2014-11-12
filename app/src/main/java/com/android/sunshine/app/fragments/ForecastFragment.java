@@ -1,5 +1,6 @@
 package com.android.sunshine.app.fragments;
 
+import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
@@ -36,7 +37,10 @@ public class ForecastFragment extends Fragment implements AdapterView.OnItemClic
             WeatherEntry.COLUMN_MAX_TEMP,
             WeatherEntry.COLUMN_MIN_TEMP,
             WeatherEntry.COLUMN_WEATHER_ID,
-            LocationEntry.COLUMN_LOCATION_SETTING
+            WeatherEntry.COLUMN_WEATHER_ID,
+            LocationEntry.COLUMN_LOCATION_SETTING,
+            LocationEntry.COLUMN_COORD_LAT,
+            LocationEntry.COLUMN_COORD_LONG
     };
     private int scrollPosition;
     private ListView forecastList;
@@ -80,8 +84,12 @@ public class ForecastFragment extends Fragment implements AdapterView.OnItemClic
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        if (item.getItemId() == R.id.action_refresh) {
+        final int itemId = item.getItemId();
+        if (itemId == R.id.action_refresh) {
             refreshWeatherData();
+        } else if (itemId == R.id.viewLocation) {
+            showCurrentLocation();
+            return true;
         }
         return super.onOptionsItemSelected(item);
     }
@@ -117,7 +125,7 @@ public class ForecastFragment extends Fragment implements AdapterView.OnItemClic
         adapter.swapCursor(data);
         if (scrollPosition != ListView.INVALID_POSITION) {
             forecastList.smoothScrollToPosition(scrollPosition);
-            if(!adapter.getUseTodayLayout()) {
+            if (!adapter.getUseTodayLayout()) {
                 forecastList.performItemClick(rootView, scrollPosition, forecastList.getAdapter().getItemId(scrollPosition));
             }
         }
@@ -128,13 +136,31 @@ public class ForecastFragment extends Fragment implements AdapterView.OnItemClic
         adapter.swapCursor(null);
     }
 
+    public void setUseTodayLayout(boolean useTodayLayout) {
+        if (adapter != null) {
+            adapter.setUseTodayLayout(useTodayLayout);
+        }
+    }
+
     private void refreshWeatherData() {
         SyncAdapter.syncImmediately(getActivity());
     }
 
-    public void setUseTodayLayout(boolean useTodayLayout) {
-        if (adapter != null) {
-            adapter.setUseTodayLayout(useTodayLayout);
+    private void showCurrentLocation() {
+        if (null != adapter) {
+            Cursor c = adapter.getCursor();
+            if (null != c) {
+                c.moveToPosition(0);
+                String posLat = c.getString(c.getColumnIndex(LocationEntry.COLUMN_COORD_LAT));
+                String posLong = c.getString(c.getColumnIndex(LocationEntry.COLUMN_COORD_LONG));
+                Uri geoLocation = Uri.parse("geo:" + posLat + "," + posLong);
+
+                System.out.println("geoLocation = " + geoLocation);
+                Intent intent = new Intent(Intent.ACTION_VIEW);
+                intent.setData(geoLocation);
+
+                startActivity(intent);
+            }
         }
     }
 }

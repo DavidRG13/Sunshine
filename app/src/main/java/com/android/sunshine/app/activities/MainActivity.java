@@ -1,10 +1,7 @@
 package com.android.sunshine.app.activities;
 
 import android.content.Intent;
-import android.content.SharedPreferences;
-import android.net.Uri;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -45,25 +42,11 @@ public class MainActivity extends ActionBarActivity implements ItemClickCallback
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        int id = item.getItemId();
-        if (id == R.id.viewLocation) {
-            showCurrentLocation();
-            return true;
-        } else if (id == R.id.action_settings) {
+        if (item.getItemId() == R.id.action_settings) {
             startActivity(new Intent(this, SettingsActivity.class));
             return true;
         }
         return super.onOptionsItemSelected(item);
-    }
-
-    public void showCurrentLocation() {
-        Intent intent = new Intent(Intent.ACTION_VIEW);
-        final SharedPreferences defaultSharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
-        final String postalCode = defaultSharedPreferences.getString(getString(R.string.pref_location_key), getString(R.string.location_default));
-        intent.setData(Uri.parse("geo:0,0?q=" + postalCode + " usa"));
-        if (intent.resolveActivity(getPackageManager()) != null) {
-            startActivity(intent);
-        }
     }
 
     @Override

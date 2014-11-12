@@ -36,5 +36,7 @@
                 android:exported="false"
                 android:authorities="com.android.sunshine.app"
                 android:name=".db.WeatherProvider"/>
+
+        <service android:name=".services.FetchWeatherService"/>
     </application>
 </manifest>

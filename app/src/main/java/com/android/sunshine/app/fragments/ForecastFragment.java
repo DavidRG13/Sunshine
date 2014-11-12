@@ -1,10 +1,9 @@
 package com.android.sunshine.app.fragments;
 
-import android.content.SharedPreferences;
+import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
@@ -16,7 +15,7 @@ import com.android.sunshine.app.R;
 import com.android.sunshine.app.adapter.ForecastCursorAdapter;
 import com.android.sunshine.app.callbacks.ItemClickCallback;
 import com.android.sunshine.app.model.WeatherContract;
-import com.android.sunshine.app.utils.FetchWeatherTask;
+import com.android.sunshine.app.services.FetchWeatherService;
 import com.android.sunshine.app.utils.Utilities;
 
 import java.util.Date;
@@ -119,7 +118,9 @@ public class ForecastFragment extends Fragment implements AdapterView.OnItemClic
         adapter.swapCursor(data);
         if (scrollPosition != ListView.INVALID_POSITION) {
             forecastList.smoothScrollToPosition(scrollPosition);
-            forecastList.performItemClick(rootView, scrollPosition, forecastList.getAdapter().getItemId(scrollPosition));
+            if(!adapter.getUseTodayLayout()) {
+                forecastList.performItemClick(rootView, scrollPosition, forecastList.getAdapter().getItemId(scrollPosition));
+            }
         }
     }
 
@@ -129,10 +130,9 @@ public class ForecastFragment extends Fragment implements AdapterView.OnItemClic
     }
 
     private void refreshWeatherData() {
-        final FetchWeatherTask weatherRequester = new FetchWeatherTask(getActivity());
-        final SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
-        location = sharedPreferences.getString(getString(R.string.pref_location_key), getString(R.string.location_default));
-        weatherRequester.execute(location);
+        final Intent intent = new Intent(getActivity(), FetchWeatherService.class);
+        intent.putExtra(FetchWeatherService.LOCATION_QUERY_EXTRA, Utilities.getLocationSettings(getActivity()));
+        getActivity().startService(intent);
     }
 
     public void setUseTodayLayout(boolean useTodayLayout) {

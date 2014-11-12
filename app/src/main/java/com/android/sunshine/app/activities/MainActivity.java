@@ -12,6 +12,7 @@ import com.android.sunshine.app.R;
 import com.android.sunshine.app.callbacks.ItemClickCallback;
 import com.android.sunshine.app.fragments.DetailFragment;
 import com.android.sunshine.app.fragments.ForecastFragment;
+import com.android.sunshine.app.sync.SyncAdapter;
 
 public class MainActivity extends ActionBarActivity implements ItemClickCallback {
 
@@ -31,7 +32,7 @@ public class MainActivity extends ActionBarActivity implements ItemClickCallback
         } else {
             twoPane = false;
         }
-
+        SyncAdapter.initializeSyncAdapter(this);
         final ForecastFragment forecastFragment = (ForecastFragment) getSupportFragmentManager().findFragmentById(R.id.fragment_forecast);
         forecastFragment.setUseTodayLayout(!twoPane);
     }

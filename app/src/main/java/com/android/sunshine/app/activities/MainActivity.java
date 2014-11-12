@@ -11,6 +11,7 @@ import android.view.MenuItem;
 import com.android.sunshine.app.R;
 import com.android.sunshine.app.callbacks.ItemClickCallback;
 import com.android.sunshine.app.fragments.DetailFragment;
+import com.android.sunshine.app.fragments.ForecastFragment;
 
 public class MainActivity extends ActionBarActivity implements ItemClickCallback {
 
@@ -30,6 +31,9 @@ public class MainActivity extends ActionBarActivity implements ItemClickCallback
         } else {
             twoPane = false;
         }
+
+        final ForecastFragment forecastFragment = (ForecastFragment) getSupportFragmentManager().findFragmentById(R.id.fragment_forecast);
+        forecastFragment.setUseTodayLayout(!twoPane);
     }
 
     @Override

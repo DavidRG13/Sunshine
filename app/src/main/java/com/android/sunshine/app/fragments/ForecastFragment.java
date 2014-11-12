@@ -133,4 +133,10 @@ public class ForecastFragment extends Fragment implements AdapterView.OnItemClic
         location = sharedPreferences.getString(getString(R.string.pref_location_key), getString(R.string.location_default));
         weatherRequester.execute(location);
     }
+
+    public void setUseTodayLayout(boolean useTodayLayout) {
+        if (adapter != null) {
+            adapter.setUseTodayLayout(useTodayLayout);
+        }
+    }
 }

@@ -1,9 +1,5 @@
 package com.android.sunshine.app.fragments;
 
-import android.app.AlarmManager;
-import android.app.PendingIntent;
-import android.content.Context;
-import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
@@ -18,7 +14,7 @@ import com.android.sunshine.app.R;
 import com.android.sunshine.app.adapter.ForecastCursorAdapter;
 import com.android.sunshine.app.callbacks.ItemClickCallback;
 import com.android.sunshine.app.model.WeatherContract;
-import com.android.sunshine.app.services.FetchWeatherService;
+import com.android.sunshine.app.sync.SyncAdapter;
 import com.android.sunshine.app.utils.Utilities;
 
 import java.util.Date;
@@ -133,12 +129,7 @@ public class ForecastFragment extends Fragment implements AdapterView.OnItemClic
     }
 
     private void refreshWeatherData() {
-        final Intent alarmIntent = new Intent(getActivity(), FetchWeatherService.AlarmReceiver.class);
-        alarmIntent.putExtra(FetchWeatherService.LOCATION_QUERY_EXTRA, Utilities.getLocationSettings(getActivity()));
-
-        final PendingIntent pendingIntent = PendingIntent.getBroadcast(getActivity(), 0, alarmIntent, PendingIntent.FLAG_ONE_SHOT);
-        final AlarmManager alarmManager = (AlarmManager) getActivity().getSystemService(Context.ALARM_SERVICE);
-        alarmManager.set(AlarmManager.RTC_WAKEUP, System.currentTimeMillis() + 5000, pendingIntent);
+        SyncAdapter.syncImmediately(getActivity());
     }
 
     public void setUseTodayLayout(boolean useTodayLayout) {

@@ -44,7 +44,7 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
     private static final long DAY_IN_MILLIS = 1000 * 60 * 60 * 24;
     private static final int WEATHER_NOTIFICATION_ID = 3004;
 
-    private static final String[] NOTIFY_WEATHER_PROJECTION = new String[] {
+    private static final String[] NOTIFY_WEATHER_PROJECTION = new String[]{
             WeatherEntry.COLUMN_WEATHER_ID,
             WeatherEntry.COLUMN_MAX_TEMP,
             WeatherEntry.COLUMN_MIN_TEMP,
@@ -213,7 +213,7 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
 
             cVVector.add(weatherValues);
         }
-        if(cVVector.size() > 0) {
+        if (cVVector.size() > 0) {
             ContentValues[] contentValues = new ContentValues[cVVector.size()];
             cVVector.toArray(contentValues);
             getContext().getContentResolver().bulkInsert(WeatherEntry.CONTENT_URI, contentValues);
@@ -230,9 +230,9 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
 
         final Cursor cursor = getContext().getContentResolver().query(WeatherContract.LocationEntry.CONTENT_URI, new String[]{WeatherContract.LocationEntry._ID},
                 WeatherContract.LocationEntry.COLUMN_LOCATION_SETTING + " = ?", new String[]{locationSettings}, null);
-        if(cursor.moveToFirst()){
+        if (cursor.moveToFirst()) {
             return cursor.getColumnIndex(WeatherContract.LocationEntry._ID);
-        }else{
+        } else {
             return ContentUris.parseId(getContext().getContentResolver().insert(WeatherContract.LocationEntry.CONTENT_URI, locationValues));
         }
     }
@@ -244,46 +244,48 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
     }
 
     private void notifyWeather() {
-        long lastSync = Utilities.getLastNotification(getContext());
+        if (Utilities.displayNotifications(getContext())) {
+            long lastSync = Utilities.getLastNotification(getContext());
 
-        if (System.currentTimeMillis() - lastSync >= DAY_IN_MILLIS) {
-            String locationQuery = Utilities.getLocationSettings(getContext());
+            if (System.currentTimeMillis() - lastSync >= DAY_IN_MILLIS) {
+                String locationQuery = Utilities.getLocationSettings(getContext());
 
-            Uri weatherUri = WeatherEntry.buildWeatherLocationWithDate(locationQuery, WeatherContract.getDbDateString(new Date()));
+                Uri weatherUri = WeatherEntry.buildWeatherLocationWithDate(locationQuery, WeatherContract.getDbDateString(new Date()));
 
-            Cursor cursor = getContext().getContentResolver().query(weatherUri, NOTIFY_WEATHER_PROJECTION, null, null, null);
+                Cursor cursor = getContext().getContentResolver().query(weatherUri, NOTIFY_WEATHER_PROJECTION, null, null, null);
 
-            if (cursor.moveToFirst()) {
-                int weatherId = cursor.getInt(INDEX_WEATHER_ID);
-                double high = cursor.getDouble(INDEX_MAX_TEMP);
-                double low = cursor.getDouble(INDEX_MIN_TEMP);
-                String desc = cursor.getString(INDEX_SHORT_DESC);
+                if (cursor.moveToFirst()) {
+                    int weatherId = cursor.getInt(INDEX_WEATHER_ID);
+                    double high = cursor.getDouble(INDEX_MAX_TEMP);
+                    double low = cursor.getDouble(INDEX_MIN_TEMP);
+                    String desc = cursor.getString(INDEX_SHORT_DESC);
 
-                int iconId = Utilities.getIconResourceForWeatherCondition(weatherId);
-                String title = getContext().getString(R.string.app_name);
+                    int iconId = Utilities.getIconResourceForWeatherCondition(weatherId);
+                    String title = getContext().getString(R.string.app_name);
 
-                String contentText = String.format(getContext().getString(R.string.format_notification),
-                        desc,
-                        Utilities.formatTemperature(getContext(), high),
-                        Utilities.formatTemperature(getContext(), low));
+                    String contentText = String.format(getContext().getString(R.string.format_notification),
+                            desc,
+                            Utilities.formatTemperature(getContext(), high),
+                            Utilities.formatTemperature(getContext(), low));
 
-                NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(getContext())
-                                .setSmallIcon(iconId)
-                                .setContentTitle(title)
-                                .setContentText(contentText);
+                    NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(getContext())
+                            .setSmallIcon(iconId)
+                            .setContentTitle(title)
+                            .setContentText(contentText);
 
-                Intent resultIntent = new Intent(getContext(), MainActivity.class);
+                    Intent resultIntent = new Intent(getContext(), MainActivity.class);
 
-                TaskStackBuilder stackBuilder = TaskStackBuilder.create(getContext());
-                stackBuilder.addNextIntent(resultIntent);
-                PendingIntent resultPendingIntent = stackBuilder.getPendingIntent(0,
-                                PendingIntent.FLAG_UPDATE_CURRENT);
-                mBuilder.setContentIntent(resultPendingIntent);
+                    TaskStackBuilder stackBuilder = TaskStackBuilder.create(getContext());
+                    stackBuilder.addNextIntent(resultIntent);
+                    PendingIntent resultPendingIntent = stackBuilder.getPendingIntent(0,
+                            PendingIntent.FLAG_UPDATE_CURRENT);
+                    mBuilder.setContentIntent(resultPendingIntent);
 
-                NotificationManager mNotificationManager = (NotificationManager) getContext().getSystemService(Context.NOTIFICATION_SERVICE);
-                mNotificationManager.notify(WEATHER_NOTIFICATION_ID, mBuilder.build());
+                    NotificationManager mNotificationManager = (NotificationManager) getContext().getSystemService(Context.NOTIFICATION_SERVICE);
+                    mNotificationManager.notify(WEATHER_NOTIFICATION_ID, mBuilder.build());
 
-                Utilities.setLastNotification(getContext());
+                    Utilities.setLastNotification(getContext());
+                }
             }
         }
     }

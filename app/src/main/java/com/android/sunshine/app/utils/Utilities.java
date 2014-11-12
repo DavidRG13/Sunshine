@@ -49,6 +49,12 @@ public class Utilities {
         editor.apply();
     }
 
+    public static boolean displayNotifications(final Context context){
+        final SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+        String displayNotificationsKey = context.getString(R.string.pref_enable_notifications_key);
+        return prefs.getBoolean(displayNotificationsKey, Boolean.parseBoolean(context.getString(R.string.pref_enable_notifications_default)));
+    }
+
     public static String getFriendlyDay(Context context, String dateStr) {
         Date todayDate = new Date();
         String todayStr = WeatherContract.getDbDateString(todayDate);

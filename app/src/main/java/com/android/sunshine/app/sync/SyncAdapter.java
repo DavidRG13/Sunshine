@@ -2,13 +2,18 @@ package com.android.sunshine.app.sync;
 
 import android.accounts.Account;
 import android.accounts.AccountManager;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.*;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.v4.app.NotificationCompat;
+import android.support.v4.app.TaskStackBuilder;
 import android.util.Log;
 import com.android.sunshine.app.R;
+import com.android.sunshine.app.activities.MainActivity;
 import com.android.sunshine.app.model.WeatherContract;
 import com.android.sunshine.app.utils.Utilities;
 import org.json.JSONArray;
@@ -24,6 +29,8 @@ import java.net.URL;
 import java.util.Date;
 import java.util.Vector;
 
+import static com.android.sunshine.app.model.WeatherContract.WeatherEntry;
+
 public class SyncAdapter extends AbstractThreadedSyncAdapter {
 
     public static final int SYNC_INTERVAL = 60 * 180;
@@ -33,6 +40,22 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
     public static final String UNITS_PARAM = "units";
     public static final String DAYS_PARAM = "cnt";
     public static final String BASE_URI = "http://api.openweathermap.org/data/2.5/forecast/daily";
+
+    private static final long DAY_IN_MILLIS = 1000 * 60 * 60 * 24;
+    private static final int WEATHER_NOTIFICATION_ID = 3004;
+
+    private static final String[] NOTIFY_WEATHER_PROJECTION = new String[] {
+            WeatherEntry.COLUMN_WEATHER_ID,
+            WeatherEntry.COLUMN_MAX_TEMP,
+            WeatherEntry.COLUMN_MIN_TEMP,
+            WeatherEntry.COLUMN_SHORT_DESC
+    };
+
+    // these indices must match the projection
+    private static final int INDEX_WEATHER_ID = 0;
+    private static final int INDEX_MAX_TEMP = 1;
+    private static final int INDEX_MIN_TEMP = 2;
+    private static final int INDEX_SHORT_DESC = 3;
 
     public SyncAdapter(Context context, boolean autoInitialize) {
         super(context, autoInitialize);
@@ -177,23 +200,24 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
 
             ContentValues weatherValues = new ContentValues();
 
-            weatherValues.put(WeatherContract.WeatherEntry.COLUMN_LOC_KEY, locationId);
-            weatherValues.put(WeatherContract.WeatherEntry.COLUMN_DATETEXT, WeatherContract.getDbDateString(new Date(dateTime * 1000L)));
-            weatherValues.put(WeatherContract.WeatherEntry.COLUMN_HUMIDITY, humidity);
-            weatherValues.put(WeatherContract.WeatherEntry.COLUMN_PRESSURE, pressure);
-            weatherValues.put(WeatherContract.WeatherEntry.COLUMN_WIND_SPEED, windSpeed);
-            weatherValues.put(WeatherContract.WeatherEntry.COLUMN_DEGREES, windDirection);
-            weatherValues.put(WeatherContract.WeatherEntry.COLUMN_MAX_TEMP, high);
-            weatherValues.put(WeatherContract.WeatherEntry.COLUMN_MIN_TEMP, low);
-            weatherValues.put(WeatherContract.WeatherEntry.COLUMN_SHORT_DESC, description);
-            weatherValues.put(WeatherContract.WeatherEntry.COLUMN_WEATHER_ID, weatherId);
+            weatherValues.put(WeatherEntry.COLUMN_LOC_KEY, locationId);
+            weatherValues.put(WeatherEntry.COLUMN_DATETEXT, WeatherContract.getDbDateString(new Date(dateTime * 1000L)));
+            weatherValues.put(WeatherEntry.COLUMN_HUMIDITY, humidity);
+            weatherValues.put(WeatherEntry.COLUMN_PRESSURE, pressure);
+            weatherValues.put(WeatherEntry.COLUMN_WIND_SPEED, windSpeed);
+            weatherValues.put(WeatherEntry.COLUMN_DEGREES, windDirection);
+            weatherValues.put(WeatherEntry.COLUMN_MAX_TEMP, high);
+            weatherValues.put(WeatherEntry.COLUMN_MIN_TEMP, low);
+            weatherValues.put(WeatherEntry.COLUMN_SHORT_DESC, description);
+            weatherValues.put(WeatherEntry.COLUMN_WEATHER_ID, weatherId);
 
             cVVector.add(weatherValues);
         }
         if(cVVector.size() > 0) {
             ContentValues[] contentValues = new ContentValues[cVVector.size()];
             cVVector.toArray(contentValues);
-            getContext().getContentResolver().bulkInsert(WeatherContract.WeatherEntry.CONTENT_URI, contentValues);
+            getContext().getContentResolver().bulkInsert(WeatherEntry.CONTENT_URI, contentValues);
+            notifyWeather();
         }
     }
 
@@ -217,5 +241,50 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
         SyncAdapter.configurePeriodicSync(context, SYNC_INTERVAL, SYNC_FLEXTIME);
         ContentResolver.setSyncAutomatically(newAccount, context.getString(R.string.content_authority), true);
         syncImmediately(context);
+    }
+
+    private void notifyWeather() {
+        long lastSync = Utilities.getLastNotification(getContext());
+
+        if (System.currentTimeMillis() - lastSync >= DAY_IN_MILLIS) {
+            String locationQuery = Utilities.getLocationSettings(getContext());
+
+            Uri weatherUri = WeatherEntry.buildWeatherLocationWithDate(locationQuery, WeatherContract.getDbDateString(new Date()));
+
+            Cursor cursor = getContext().getContentResolver().query(weatherUri, NOTIFY_WEATHER_PROJECTION, null, null, null);
+
+            if (cursor.moveToFirst()) {
+                int weatherId = cursor.getInt(INDEX_WEATHER_ID);
+                double high = cursor.getDouble(INDEX_MAX_TEMP);
+                double low = cursor.getDouble(INDEX_MIN_TEMP);
+                String desc = cursor.getString(INDEX_SHORT_DESC);
+
+                int iconId = Utilities.getIconResourceForWeatherCondition(weatherId);
+                String title = getContext().getString(R.string.app_name);
+
+                String contentText = String.format(getContext().getString(R.string.format_notification),
+                        desc,
+                        Utilities.formatTemperature(getContext(), high),
+                        Utilities.formatTemperature(getContext(), low));
+
+                NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(getContext())
+                                .setSmallIcon(iconId)
+                                .setContentTitle(title)
+                                .setContentText(contentText);
+
+                Intent resultIntent = new Intent(getContext(), MainActivity.class);
+
+                TaskStackBuilder stackBuilder = TaskStackBuilder.create(getContext());
+                stackBuilder.addNextIntent(resultIntent);
+                PendingIntent resultPendingIntent = stackBuilder.getPendingIntent(0,
+                                PendingIntent.FLAG_UPDATE_CURRENT);
+                mBuilder.setContentIntent(resultPendingIntent);
+
+                NotificationManager mNotificationManager = (NotificationManager) getContext().getSystemService(Context.NOTIFICATION_SERVICE);
+                mNotificationManager.notify(WEATHER_NOTIFICATION_ID, mBuilder.build());
+
+                Utilities.setLastNotification(getContext());
+            }
+        }
     }
 }

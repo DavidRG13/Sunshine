@@ -3,14 +3,12 @@ package com.android.sunshine.app.db;
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
-
-import static com.android.sunshine.app.model.WeatherContract.LocationEntry;
-import static com.android.sunshine.app.model.WeatherContract.WeatherEntry;
+import com.android.sunshine.app.model.Contract;
 
 public class DBHelper extends SQLiteOpenHelper{
 
     private static final int DATABASE_VERSION = 1;
-    public static final String DATABASE_NAME = "weather.db";
+    public static final String DATABASE_NAME = "articles.db";
     private static final String DROP_TABLE_IF_EXISTS = "DROP TABLE IF EXISTS ";
 
     public DBHelper(Context context) {
@@ -20,40 +18,22 @@ public class DBHelper extends SQLiteOpenHelper{
     @Override
     public void onCreate(SQLiteDatabase sqLiteDatabase) {
 
-        final String SQL_CREATE_WEATHER_TABLE = "CREATE TABLE " + WeatherEntry.TABLE_NAME + " (" +
-                WeatherEntry._ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
-                WeatherEntry.COLUMN_LOC_KEY + " INTEGER NOT NULL, " +
-                WeatherEntry.COLUMN_DATETEXT + " TEXT NOT NULL, " +
-                WeatherEntry.COLUMN_SHORT_DESC + " TEXT NOT NULL, " +
-                WeatherEntry.COLUMN_WEATHER_ID + " INTEGER NOT NULL," +
-                WeatherEntry.COLUMN_MIN_TEMP + " REAL NOT NULL, " +
-                WeatherEntry.COLUMN_MAX_TEMP + " REAL NOT NULL, " +
-                WeatherEntry.COLUMN_HUMIDITY + " REAL NOT NULL, " +
-                WeatherEntry.COLUMN_PRESSURE + " REAL NOT NULL, " +
-                WeatherEntry.COLUMN_WIND_SPEED + " REAL NOT NULL, " +
-                WeatherEntry.COLUMN_DEGREES + " REAL NOT NULL, " +
-                " FOREIGN KEY (" + WeatherEntry.COLUMN_LOC_KEY + ") REFERENCES " +
-                LocationEntry.TABLE_NAME + " (" + LocationEntry._ID + "), " +
-                " UNIQUE (" + WeatherEntry.COLUMN_DATETEXT + ", " +
-                WeatherEntry.COLUMN_LOC_KEY + ") ON CONFLICT REPLACE);";
-
-        final String SQL_CREATE_LOCATION_TABLE = "CREATE TABLE " + LocationEntry.TABLE_NAME + " (" +
-                LocationEntry._ID + " INTEGER PRIMARY KEY, " +
-                LocationEntry.COLUMN_CITY_NAME + " TEXT NOT NULL, " +
-                LocationEntry.COLUMN_LOCATION_SETTING + " TEXT UNIQUE NOT NULL, " +
-                LocationEntry.COLUMN_COORD_LAT + " REAL NOT NULL, " +
-                LocationEntry.COLUMN_COORD_LONG + " REAL NOT NULL, " +
-                "UNIQUE (" + LocationEntry.COLUMN_LOCATION_SETTING + ") ON CONFLICT IGNORE" +
-                ");";
+        final String SQL_CREATE_WEATHER_TABLE = "CREATE TABLE " + Contract.ArticleEntry.TABLE_NAME + " (" +
+                Contract.ArticleEntry._ID + " TEXT PRIMARY KEY, " +
+                Contract.ArticleEntry.COLUMN_DATE + " TEXT NOT NULL, " +
+                Contract.ArticleEntry.COLUMN_SHORT_DESCRIPTION + " TEXT NOT NULL, " +
+                Contract.ArticleEntry.COLUMN_URL + " TEXT NOT NULL, " +
+                Contract.ArticleEntry.COLUMN_SECTION_NAME + " TEXT NOT NULL, " +
+                Contract.ArticleEntry.COLUMN_SNIPPET + " TEXT NOT NULL, " +
+                Contract.ArticleEntry.COLUMN_THUMBNAIL + " TEXT, " +
+                Contract.ArticleEntry.COLUMN_LARGE_IMAGE + " TEXT);";
 
         sqLiteDatabase.execSQL(SQL_CREATE_WEATHER_TABLE);
-        sqLiteDatabase.execSQL(SQL_CREATE_LOCATION_TABLE);
     }
 
     @Override
     public void onUpgrade(SQLiteDatabase sqLiteDatabase, int oldVersion, int newVersion) {
-        sqLiteDatabase.execSQL(DROP_TABLE_IF_EXISTS + LocationEntry.TABLE_NAME);
-        sqLiteDatabase.execSQL(DROP_TABLE_IF_EXISTS + WeatherEntry.TABLE_NAME);
+        sqLiteDatabase.execSQL(DROP_TABLE_IF_EXISTS + Contract.ArticleEntry.TABLE_NAME);
         onCreate(sqLiteDatabase);
     }
 }

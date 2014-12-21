@@ -4,8 +4,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 import com.android.sunshine.app.R;
-import com.android.sunshine.app.model.WeatherContract;
-
+import com.android.sunshine.app.model.Contract;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -57,8 +56,8 @@ public class Utilities {
 
     public static String getFriendlyDay(Context context, String dateStr) {
         Date todayDate = new Date();
-        String todayStr = WeatherContract.getDbDateString(todayDate);
-        Date inputDate = WeatherContract.getDateFromDb(dateStr);
+        String todayStr = Contract.getDbDateString(todayDate);
+        Date inputDate = Contract.getDateFromDb(dateStr);
 
         if (todayStr.equals(dateStr)) {
             String today = context.getString(R.string.today);
@@ -70,7 +69,7 @@ public class Utilities {
             Calendar cal = Calendar.getInstance();
             cal.setTime(todayDate);
             cal.add(Calendar.DATE, 7);
-            String weekFutureString = WeatherContract.getDbDateString(cal.getTime());
+            String weekFutureString = Contract.getDbDateString(cal.getTime());
 
             if (dateStr.compareTo(weekFutureString) < 0) {
                 return getDayName(context, dateStr);
@@ -82,18 +81,18 @@ public class Utilities {
     }
 
     public static String getDayName(Context context, String dateStr) {
-        SimpleDateFormat dbDateFormat = new SimpleDateFormat(WeatherContract.DATE_FORMAT);
+        SimpleDateFormat dbDateFormat = new SimpleDateFormat(Contract.DATE_FORMAT);
         try {
             Date inputDate = dbDateFormat.parse(dateStr);
             Date todayDate = new Date();
-            if (WeatherContract.getDbDateString(todayDate).equals(dateStr)) {
+            if (Contract.getDbDateString(todayDate).equals(dateStr)) {
                 return context.getString(R.string.today);
             } else {
                 Calendar cal = Calendar.getInstance();
                 cal.setTime(todayDate);
                 cal.add(Calendar.DATE, 1);
                 Date tomorrowDate = cal.getTime();
-                if (WeatherContract.getDbDateString(tomorrowDate).equals(
+                if (Contract.getDbDateString(tomorrowDate).equals(
                         dateStr)) {
                     return context.getString(R.string.tomorrow);
                 } else {
@@ -108,7 +107,7 @@ public class Utilities {
     }
 
     public static String getFormattedMonthDay(String dateStr) {
-        SimpleDateFormat dbDateFormat = new SimpleDateFormat(WeatherContract.DATE_FORMAT);
+        SimpleDateFormat dbDateFormat = new SimpleDateFormat(Contract.DATE_FORMAT);
         try {
             Date inputDate = dbDateFormat.parse(dateStr);
             SimpleDateFormat monthDayFormat = new SimpleDateFormat("MMMM dd");
@@ -117,59 +116,5 @@ public class Utilities {
             e.printStackTrace();
             return null;
         }
-    }
-
-    public static int getIconResourceForWeatherCondition(int weatherId) {
-        if (weatherId >= 200 && weatherId <= 232) {
-            return R.drawable.ic_storm;
-        } else if (weatherId >= 300 && weatherId <= 321) {
-            return R.drawable.ic_light_rain;
-        } else if (weatherId >= 500 && weatherId <= 504) {
-            return R.drawable.ic_rain;
-        } else if (weatherId == 511) {
-            return R.drawable.ic_snow;
-        } else if (weatherId >= 520 && weatherId <= 531) {
-            return R.drawable.ic_rain;
-        } else if (weatherId >= 600 && weatherId <= 622) {
-            return R.drawable.ic_snow;
-        } else if (weatherId >= 701 && weatherId <= 761) {
-            return R.drawable.ic_fog;
-        } else if (weatherId == 761 || weatherId == 781) {
-            return R.drawable.ic_storm;
-        } else if (weatherId == 800) {
-            return R.drawable.ic_clear;
-        } else if (weatherId == 801) {
-            return R.drawable.ic_light_clouds;
-        } else if (weatherId >= 802 && weatherId <= 804) {
-            return R.drawable.ic_cloudy;
-        }
-        return -1;
-    }
-
-    public static int getArtResourceForWeatherCondition(int weatherId) {
-        if (weatherId >= 200 && weatherId <= 232) {
-            return R.drawable.art_storm;
-        } else if (weatherId >= 300 && weatherId <= 321) {
-            return R.drawable.art_light_rain;
-        } else if (weatherId >= 500 && weatherId <= 504) {
-            return R.drawable.art_rain;
-        } else if (weatherId == 511) {
-            return R.drawable.art_snow;
-        } else if (weatherId >= 520 && weatherId <= 531) {
-            return R.drawable.art_rain;
-        } else if (weatherId >= 600 && weatherId <= 622) {
-            return R.drawable.art_rain;
-        } else if (weatherId >= 701 && weatherId <= 761) {
-            return R.drawable.art_fog;
-        } else if (weatherId == 761 || weatherId == 781) {
-            return R.drawable.art_storm;
-        } else if (weatherId == 800) {
-            return R.drawable.art_clear;
-        } else if (weatherId == 801) {
-            return R.drawable.art_light_clouds;
-        } else if (weatherId >= 802 && weatherId <= 804) {
-            return R.drawable.art_clouds;
-        }
-        return -1;
     }
 }

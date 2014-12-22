@@ -39,7 +39,7 @@ public class Contract {
         }
     }
 
-    public static String getDbDateString(final Date date){
+    public static String getDbDateString(final Date date) {
         final SimpleDateFormat dateFormat = new SimpleDateFormat(DATE_FORMAT);
         return dateFormat.format(date);
     }
@@ -52,7 +52,7 @@ public class Contract {
             return parsedDate;
         } catch (ParseException e) {
             e.printStackTrace();
+            return null;
         }
-        return parsedDate;
     }
 }

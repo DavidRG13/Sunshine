@@ -12,46 +12,9 @@ import java.util.Date;
 
 public class Utilities {
 
-    public static String formatTemperature(final Context context, final double temperature) {
-        return formatTemperature(context, temperature, isMetric(context));
-    }
-
-    public static String formatTemperature(final Context context, final double temperature, final boolean isMetric) {
-        double temp;
-        if (isMetric){
-            temp = temperature;
-        }else {
-            temp = 9 * temperature / 5 + 32;
-        }
-        return context.getString(R.string.format_temperature, temp);
-    }
-
-    public static boolean isMetric(final Context context) {
-        final SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
-        return prefs.getString(context.getString(R.string.pref_unit_key), context.getString(R.string.prefs_units_imperial)).equals(context.getString(R.string.prefs_units_imperial));
-    }
-
     public static String getLocationSettings(final Context context){
         final SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
         return sharedPreferences.getString(context.getString(R.string.pref_location_key), context.getString(R.string.location_default));
-    }
-
-    public static long getLastNotification(final Context context){
-        final SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
-        return prefs.getLong(context.getString(R.string.pref_last_notification), 0);
-    }
-
-    public static void setLastNotification(final Context context){
-        final SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
-        final SharedPreferences.Editor editor = prefs.edit();
-        editor.putLong(context.getString(R.string.pref_last_notification), System.currentTimeMillis());
-        editor.apply();
-    }
-
-    public static boolean displayNotifications(final Context context){
-        final SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
-        String displayNotificationsKey = context.getString(R.string.pref_enable_notifications_key);
-        return prefs.getBoolean(displayNotificationsKey, Boolean.parseBoolean(context.getString(R.string.pref_enable_notifications_default)));
     }
 
     public static String getFriendlyDay(Context context, String dateStr) {

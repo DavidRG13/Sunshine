@@ -1,6 +1,5 @@
 package com.android.sunshine.app.fragments;
 
-import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
@@ -8,20 +7,23 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
-import android.view.*;
+import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
+import android.view.View;
+import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ListView;
 import com.android.sunshine.app.R;
 import com.android.sunshine.app.adapter.ForecastCursorAdapter;
 import com.android.sunshine.app.callbacks.ItemClickCallback;
-import com.android.sunshine.app.model.WeatherContract;
+import com.android.sunshine.app.model.Contract;
 import com.android.sunshine.app.sync.SyncAdapter;
 import com.android.sunshine.app.utils.Utilities;
-
 import java.util.Date;
 
-import static com.android.sunshine.app.model.WeatherContract.LocationEntry;
-import static com.android.sunshine.app.model.WeatherContract.WeatherEntry;
+import static com.android.sunshine.app.model.Contract.ArticleEntry;
 
 public class ForecastFragment extends Fragment implements AdapterView.OnItemClickListener, LoaderManager.LoaderCallbacks<Cursor> {
 
@@ -31,16 +33,14 @@ public class ForecastFragment extends Fragment implements AdapterView.OnItemClic
     private ForecastCursorAdapter adapter;
 
     private static final String[] FORECAST_COLUMNS = new String[]{
-            WeatherEntry.TABLE_NAME + "." + WeatherEntry._ID,
-            WeatherEntry.COLUMN_DATETEXT,
-            WeatherEntry.COLUMN_SHORT_DESC,
-            WeatherEntry.COLUMN_MAX_TEMP,
-            WeatherEntry.COLUMN_MIN_TEMP,
-            WeatherEntry.COLUMN_WEATHER_ID,
-            WeatherEntry.COLUMN_WEATHER_ID,
-            LocationEntry.COLUMN_LOCATION_SETTING,
-            LocationEntry.COLUMN_COORD_LAT,
-            LocationEntry.COLUMN_COORD_LONG
+            ArticleEntry.TABLE_NAME + "." + ArticleEntry._ID,
+            ArticleEntry.COLUMN_URL,
+            ArticleEntry.COLUMN_SNIPPET,
+            ArticleEntry.COLUMN_DATE,
+            ArticleEntry.COLUMN_SECTION_NAME,
+            ArticleEntry.COLUMN_SHORT_DESCRIPTION,
+            ArticleEntry.COLUMN_THUMBNAIL,
+            ArticleEntry.COLUMN_LARGE_IMAGE
     };
     private int scrollPosition;
     private ListView forecastList;
@@ -87,9 +87,6 @@ public class ForecastFragment extends Fragment implements AdapterView.OnItemClic
         final int itemId = item.getItemId();
         if (itemId == R.id.action_refresh) {
             refreshWeatherData();
-        } else if (itemId == R.id.viewLocation) {
-            showCurrentLocation();
-            return true;
         }
         return super.onOptionsItemSelected(item);
     }
@@ -105,18 +102,16 @@ public class ForecastFragment extends Fragment implements AdapterView.OnItemClic
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
         this.scrollPosition = position;
-        ((ItemClickCallback) getActivity()).onItemSelected(adapter.getCursor().getString(adapter.getCursor().getColumnIndex(WeatherEntry.COLUMN_DATETEXT)));
+        ((ItemClickCallback) getActivity()).onItemSelected(adapter.getCursor().getString(adapter.getCursor().getColumnIndex(
+            ArticleEntry.COLUMN_DATE)));
     }
 
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-        String startDate = WeatherContract.getDbDateString(new Date());
-
-        String sortOrder = WeatherEntry.COLUMN_DATETEXT + " ASC";
-
+        String startDate = Contract.getDbDateString(new Date());
+        String sortOrder = ArticleEntry.COLUMN_DATE + " ASC";
         location = Utilities.getLocationSettings(getActivity());
-        Uri weatherForLocationUri = WeatherEntry.buildWeatherLocationWithStartDate(location, startDate);
-
+        Uri weatherForLocationUri = ArticleEntry.buildArticlesWithStartDate(startDate);
         return new CursorLoader(getActivity(), weatherForLocationUri, FORECAST_COLUMNS, null, null, sortOrder);
     }
 
@@ -144,23 +139,5 @@ public class ForecastFragment extends Fragment implements AdapterView.OnItemClic
 
     private void refreshWeatherData() {
         SyncAdapter.syncImmediately(getActivity());
-    }
-
-    private void showCurrentLocation() {
-        if (null != adapter) {
-            Cursor c = adapter.getCursor();
-            if (null != c) {
-                c.moveToPosition(0);
-                String posLat = c.getString(c.getColumnIndex(LocationEntry.COLUMN_COORD_LAT));
-                String posLong = c.getString(c.getColumnIndex(LocationEntry.COLUMN_COORD_LONG));
-                Uri geoLocation = Uri.parse("geo:" + posLat + "," + posLong);
-
-                System.out.println("geoLocation = " + geoLocation);
-                Intent intent = new Intent(Intent.ACTION_VIEW);
-                intent.setData(geoLocation);
-
-                startActivity(intent);
-            }
-        }
     }
 }

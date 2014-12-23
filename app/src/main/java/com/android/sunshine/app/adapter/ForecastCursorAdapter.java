@@ -9,11 +9,11 @@ import android.widget.CursorAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 import com.android.sunshine.app.R;
-import com.android.sunshine.app.utils.Utilities;
+import com.android.sunshine.app.utils.BitmapUtils;
 
-import static com.android.sunshine.app.model.WeatherContract.WeatherEntry;
+import static com.android.sunshine.app.model.Contract.ArticleEntry;
 
-public class ForecastCursorAdapter extends CursorAdapter{
+public class ForecastCursorAdapter extends CursorAdapter {
 
     private static final int TODAY_VIEW_TYPE = 0;
     private static final int FUTURE_DAY_VIEW_TYPE = 1;
@@ -27,7 +27,7 @@ public class ForecastCursorAdapter extends CursorAdapter{
     public View newView(Context context, Cursor cursor, ViewGroup parent) {
         final int itemViewType = getItemViewType(cursor.getPosition());
         int layoutId = -1;
-        switch (itemViewType){
+        switch (itemViewType) {
             case TODAY_VIEW_TYPE:
                 layoutId = R.layout.today_list_item;
                 break;
@@ -43,24 +43,31 @@ public class ForecastCursorAdapter extends CursorAdapter{
 
     @Override
     public void bindView(View view, Context context, Cursor cursor) {
-        final boolean isMetric = Utilities.isMetric(context);
-        final int weatherId = cursor.getInt(cursor.getColumnIndex(WeatherEntry.COLUMN_WEATHER_ID));
-        final String weatherDate = cursor.getString(cursor.getColumnIndex(WeatherEntry.COLUMN_DATETEXT));
-        final String descriptionWeather = cursor.getString(cursor.getColumnIndex(WeatherEntry.COLUMN_SHORT_DESC));
-        final float maxTemp = cursor.getFloat(cursor.getColumnIndex(WeatherEntry.COLUMN_MAX_TEMP));
-        final float minTemp = cursor.getFloat(cursor.getColumnIndex(WeatherEntry.COLUMN_MIN_TEMP));
+        final String date = cursor.getString(cursor.getColumnIndex(ArticleEntry.COLUMN_DATE));
+        final String descriptionWeather =
+            cursor.getString(cursor.getColumnIndex(ArticleEntry.COLUMN_SHORT_DESCRIPTION));
+        final String section =
+            cursor.getString(cursor.getColumnIndex(ArticleEntry.COLUMN_SECTION_NAME));
 
+        String url = cursor.getString(cursor.getColumnIndex(ArticleEntry.COLUMN_THUMBNAIL));
         final ViewHolder viewHolder = (ViewHolder) view.getTag();
+        if (getItemViewType(cursor.getPosition()) == TODAY_VIEW_TYPE) {
+            viewHolder.articleDescription.setText(descriptionWeather);
+            displayImage(url, viewHolder.articleThumbnail, R.drawable.art_clear);
+        } else {
+            displayImage(url, viewHolder.articleThumbnail, R.drawable.art_clear);
+            //viewHolder.articleDate.setText(Utilities.getFriendlyDay(context, date));
+            viewHolder.articleDate.setText(date);
+            viewHolder.articleDescription.setText(descriptionWeather);
+            viewHolder.section.setText(section);
+        }
+    }
 
-        viewHolder.dateWeather.setText(Utilities.getFriendlyDay(context, weatherDate));
-        viewHolder.forecastDescription.setText(descriptionWeather);
-        viewHolder.max.setText(Utilities.formatTemperature(context, maxTemp, isMetric));
-        viewHolder.min.setText(Utilities.formatTemperature(context, minTemp, isMetric));
-
-        if(getItemViewType(cursor.getPosition()) == TODAY_VIEW_TYPE){
-            viewHolder.forecastIcon.setImageResource(Utilities.getArtResourceForWeatherCondition(weatherId));
-        }else{
-            viewHolder.forecastIcon.setImageResource(Utilities.getIconResourceForWeatherCondition(weatherId));
+    private void displayImage(String url, ImageView imageView, int defaultBitmapResource) {
+        if (url == null) {
+            imageView.setImageResource(defaultBitmapResource);
+        } else {
+            BitmapUtils.displayImageIn(imageView, url);
         }
     }
 
@@ -82,19 +89,17 @@ public class ForecastCursorAdapter extends CursorAdapter{
         return useTodayLayout;
     }
 
-    private static class ViewHolder{
-        public final ImageView forecastIcon;
-        public final TextView dateWeather;
-        public final TextView forecastDescription;
-        public final TextView max;
-        public final TextView min;
+    private static class ViewHolder {
+        public final ImageView articleThumbnail;
+        public final TextView articleDate;
+        public final TextView articleDescription;
+        public final TextView section;
 
         private ViewHolder(View view) {
-            forecastIcon = (ImageView) view.findViewById(R.id.list_item_icon);
-            dateWeather = (TextView) view.findViewById(R.id.list_item_date);
-            forecastDescription = (TextView) view.findViewById(R.id.list_item_forecast);
-            max = (TextView) view.findViewById(R.id.list_item_max);
-            min = (TextView) view.findViewById(R.id.list_item_min);
+            articleThumbnail = (ImageView) view.findViewById(R.id.list_item_icon);
+            articleDate = (TextView) view.findViewById(R.id.list_item_date);
+            articleDescription = (TextView) view.findViewById(R.id.list_item_desc);
+            section = (TextView) view.findViewById(R.id.list_item_section);
         }
     }
 }

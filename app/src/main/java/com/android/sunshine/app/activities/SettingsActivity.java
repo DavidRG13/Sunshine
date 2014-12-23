@@ -9,9 +9,8 @@ import android.preference.Preference;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceManager;
 import com.android.sunshine.app.R;
+import com.android.sunshine.app.model.Contract;
 import com.android.sunshine.app.sync.SyncAdapter;
-
-import static com.android.sunshine.app.model.WeatherContract.WeatherEntry;
 
 public class SettingsActivity extends PreferenceActivity implements Preference.OnPreferenceChangeListener {
 
@@ -33,7 +32,7 @@ public class SettingsActivity extends PreferenceActivity implements Preference.O
             if(preference.getKey().equals(getString(R.string.pref_location_key))){
                 SyncAdapter.syncImmediately(this);
             }else{
-                getContentResolver().notifyChange(WeatherEntry.CONTENT_URI, null);
+                getContentResolver().notifyChange(Contract.ArticleEntry.CONTENT_URI, null);
             }
         }
 

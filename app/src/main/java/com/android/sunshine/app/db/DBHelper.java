@@ -7,7 +7,7 @@ import com.android.sunshine.app.model.Contract;
 
 public class DBHelper extends SQLiteOpenHelper{
 
-    private static final int DATABASE_VERSION = 1;
+    private static final int DATABASE_VERSION = 2;
     public static final String DATABASE_NAME = "articles.db";
     private static final String DROP_TABLE_IF_EXISTS = "DROP TABLE IF EXISTS ";
 

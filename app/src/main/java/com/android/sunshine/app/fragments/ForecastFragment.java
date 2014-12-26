@@ -1,7 +1,6 @@
 package com.android.sunshine.app.fragments;
 
 import android.database.Cursor;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
@@ -18,10 +17,8 @@ import android.widget.ListView;
 import com.android.sunshine.app.R;
 import com.android.sunshine.app.adapter.ForecastCursorAdapter;
 import com.android.sunshine.app.callbacks.ItemClickCallback;
-import com.android.sunshine.app.model.Contract;
 import com.android.sunshine.app.sync.SyncAdapter;
 import com.android.sunshine.app.utils.Utilities;
-import java.util.Date;
 
 import static com.android.sunshine.app.model.Contract.ArticleEntry;
 
@@ -108,11 +105,9 @@ public class ForecastFragment extends Fragment implements AdapterView.OnItemClic
 
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-        String startDate = Contract.getDbDateString(new Date());
         String sortOrder = ArticleEntry.COLUMN_DATE + " ASC";
         location = Utilities.getLocationSettings(getActivity());
-        Uri weatherForLocationUri = ArticleEntry.buildArticlesWithStartDate(startDate);
-        return new CursorLoader(getActivity(), weatherForLocationUri, FORECAST_COLUMNS, null, null, sortOrder);
+        return new CursorLoader(getActivity(), ArticleEntry.CONTENT_URI, FORECAST_COLUMNS, null, null, sortOrder);
     }
 
     @Override

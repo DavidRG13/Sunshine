@@ -39,19 +39,11 @@ public class ForecastCursorAdapter extends CursorAdapter {
 
         String url = cursor.getString(cursor.getColumnIndex(ArticleEntry.COLUMN_THUMBNAIL));
         final ViewHolder viewHolder = (ViewHolder) view.getTag();
-        displayImage(url, viewHolder.articleThumbnail, R.drawable.ic_default_article);
+        BitmapUtils.displayImage(url, viewHolder.articleThumbnail, R.drawable.ic_default_article);
         //viewHolder.articleDate.setText(Utilities.getFriendlyDay(context, date));
         viewHolder.articleDate.setText(date);
         viewHolder.articleDescription.setText(descriptionWeather);
         viewHolder.section.setText(section);
-    }
-
-    private void displayImage(String url, ImageView imageView, int defaultBitmapResource) {
-        if (url == null) {
-            imageView.setImageResource(defaultBitmapResource);
-        } else {
-            BitmapUtils.displayImageIn(imageView, url);
-        }
     }
 
     @Override

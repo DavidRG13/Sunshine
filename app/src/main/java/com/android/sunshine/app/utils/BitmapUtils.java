@@ -30,6 +30,14 @@ public class BitmapUtils {
         ImageLoader.getInstance().displayImage(getUriFromNYTimes(uri), imageView, displayOptions);
     }
 
+    public static void displayImage(String url, ImageView imageView, int defaultBitmapResource) {
+        if (url == null) {
+            imageView.setImageResource(defaultBitmapResource);
+        } else {
+            displayImageIn(imageView, url);
+        }
+    }
+
     private static String getUriFromNYTimes(String uri) {
         return NY_TIMES_IMAGES_BUCKET + uri;
     }

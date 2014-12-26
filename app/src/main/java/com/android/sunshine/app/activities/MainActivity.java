@@ -47,10 +47,10 @@ public class MainActivity extends ActionBarActivity implements ItemClickCallback
     }
 
     @Override
-    public void onItemSelected(String date) {
+    public void onItemSelected(String id) {
         if (twoPane) {
             final Bundle args = new Bundle();
-            args.putString(DetailActivity.DATE_KEY, date);
+            args.putString(DetailActivity.ID_KEY, id);
             final DetailFragment detailFragment = new DetailFragment();
             detailFragment.setArguments(args);
             getSupportFragmentManager().beginTransaction()
@@ -58,7 +58,7 @@ public class MainActivity extends ActionBarActivity implements ItemClickCallback
                     .commitAllowingStateLoss();
         } else {
             final Intent intent = new Intent(this, DetailActivity.class);
-            intent.putExtra(DetailActivity.DATE_KEY, date);
+            intent.putExtra(DetailActivity.ID_KEY, id);
             startActivity(intent);
         }
     }

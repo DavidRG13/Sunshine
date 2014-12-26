@@ -10,16 +10,16 @@ import com.android.sunshine.app.fragments.DetailFragment;
 
 public class DetailActivity extends ActionBarActivity {
 
-    public static final String DATE_KEY = "forecast_date";
+    public static final String ID_KEY = "article_id";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_detail);
         if (savedInstanceState == null) {
-            final String date = getIntent().getStringExtra(DATE_KEY);
+            final String date = getIntent().getStringExtra(ID_KEY);
             final Bundle bundle = new Bundle();
-            bundle.putString(DATE_KEY, date);
+            bundle.putString(ID_KEY, date);
             final DetailFragment detailFragment = new DetailFragment();
             detailFragment.setArguments(bundle);
             getSupportFragmentManager().beginTransaction()

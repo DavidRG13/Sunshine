@@ -60,7 +60,7 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
             location = savedInstanceState.getString(LOCATION_KEY);
         }
         final Bundle arguments = getArguments();
-        if(arguments != null && arguments.containsKey(DetailActivity.DATE_KEY)) {
+        if(arguments != null && arguments.containsKey(DetailActivity.ID_KEY)) {
             getLoaderManager().initLoader(DETAIL_LOADER, null, this);
         }
     }
@@ -90,7 +90,7 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
         super.onResume();
         final Bundle arguments = getArguments();
         if (arguments != null && !location.equals(Utilities.getLocationSettings(getActivity()))
-                && arguments.containsKey(DetailActivity.DATE_KEY)) {
+                && arguments.containsKey(DetailActivity.ID_KEY)) {
             getLoaderManager().restartLoader(DETAIL_LOADER, null, this);
         }
     }
@@ -110,7 +110,7 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
 
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-        final String date = getArguments().getString(DetailActivity.DATE_KEY);
+        final String date = getArguments().getString(DetailActivity.ID_KEY);
         location = Utilities.getLocationSettings(getActivity());
         final Uri weatherUri = ArticleEntry.buildArticlesWithStartDate(date);
         return new CursorLoader(getActivity(), weatherUri, COLUMNS, null, null, ArticleEntry.COLUMN_DATE + " ASC");

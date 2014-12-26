@@ -120,7 +120,8 @@ public class ForecastFragment extends Fragment implements AdapterView.OnItemClic
         adapter.swapCursor(data);
         if (scrollPosition != ListView.INVALID_POSITION) {
             forecastList.smoothScrollToPosition(scrollPosition);
-            if (!adapter.getUseTodayLayout()) {
+            //if (!adapter.getUseTodayLayout()) {
+            if (false) {
                 forecastList.performItemClick(rootView, scrollPosition, forecastList.getAdapter().getItemId(scrollPosition));
             }
         }

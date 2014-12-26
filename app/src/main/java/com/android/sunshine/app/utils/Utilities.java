@@ -14,7 +14,8 @@ public class Utilities {
 
     public static String getLocationSettings(final Context context){
         final SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
-        return sharedPreferences.getString(context.getString(R.string.pref_location_key), context.getString(R.string.location_default));
+        return sharedPreferences.getString(context.getString(R.string.pref_location_key),
+            context.getString(R.string.location_default));
     }
 
     public static String getFriendlyDay(Context context, String dateStr) {

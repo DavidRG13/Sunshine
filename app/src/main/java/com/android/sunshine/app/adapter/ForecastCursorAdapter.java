@@ -10,6 +10,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import com.android.sunshine.app.R;
 import com.android.sunshine.app.utils.BitmapUtils;
+import com.android.sunshine.app.utils.Utilities;
 
 import static com.android.sunshine.app.model.Contract.ArticleEntry;
 
@@ -38,8 +39,7 @@ public class ForecastCursorAdapter extends CursorAdapter {
         String url = cursor.getString(cursor.getColumnIndex(ArticleEntry.COLUMN_THUMBNAIL));
         final ViewHolder viewHolder = (ViewHolder) view.getTag();
         BitmapUtils.displayImage(url, viewHolder.articleThumbnail, R.drawable.ic_default_article);
-        //viewHolder.articleDate.setText(Utilities.getFriendlyDay(context, date));
-        viewHolder.articleDate.setText(date);
+        viewHolder.articleDate.setText(Utilities.getFriendlyDay(context, date));
         viewHolder.articleDescription.setText(descriptionWeather);
         viewHolder.section.setText(section);
     }

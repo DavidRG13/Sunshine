@@ -12,7 +12,7 @@ public class Contract {
     public static final String CONTENT_AUTHORITY = "com.android.sunshine.app";
     public static final Uri BASE_CONTENT_URI = Uri.parse("content://" + CONTENT_AUTHORITY);
     public static final String PATH_ARTICLES = "articles";
-    public static final String DATE_FORMAT = "yyyyMMdd";
+    public static final String DATE_FORMAT = "yyyy-MM-dd'T'HH:mm:SS'Z'";
 
     public static final class ArticleEntry implements BaseColumns {
 

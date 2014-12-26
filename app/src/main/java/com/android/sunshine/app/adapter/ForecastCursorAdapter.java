@@ -15,8 +15,6 @@ import static com.android.sunshine.app.model.Contract.ArticleEntry;
 
 public class ForecastCursorAdapter extends CursorAdapter {
 
-    private boolean useTodayLayout;
-
     public ForecastCursorAdapter(Context context, Cursor c, int flags) {
         super(context, c, flags);
     }
@@ -54,14 +52,6 @@ public class ForecastCursorAdapter extends CursorAdapter {
     @Override
     public int getViewTypeCount() {
         return 1;
-    }
-
-    public void setUseTodayLayout(boolean useTodayLayout) {
-        this.useTodayLayout = useTodayLayout;
-    }
-
-    public boolean getUseTodayLayout() {
-        return useTodayLayout;
     }
 
     private static class ViewHolder {

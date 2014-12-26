@@ -131,12 +131,6 @@ public class ForecastFragment extends Fragment implements AdapterView.OnItemClic
         adapter.swapCursor(null);
     }
 
-    public void setUseTodayLayout(boolean useTodayLayout) {
-        if (adapter != null) {
-            adapter.setUseTodayLayout(useTodayLayout);
-        }
-    }
-
     private void refreshWeatherData() {
         SyncAdapter.syncImmediately(getActivity());
     }

@@ -15,8 +15,6 @@ import static com.android.sunshine.app.model.Contract.ArticleEntry;
 
 public class ForecastCursorAdapter extends CursorAdapter {
 
-    private static final int TODAY_VIEW_TYPE = 0;
-    private static final int FUTURE_DAY_VIEW_TYPE = 1;
     private boolean useTodayLayout;
 
     public ForecastCursorAdapter(Context context, Cursor c, int flags) {
@@ -25,17 +23,7 @@ public class ForecastCursorAdapter extends CursorAdapter {
 
     @Override
     public View newView(Context context, Cursor cursor, ViewGroup parent) {
-        final int itemViewType = getItemViewType(cursor.getPosition());
-        int layoutId = -1;
-        switch (itemViewType) {
-            case TODAY_VIEW_TYPE:
-                layoutId = R.layout.today_list_item;
-                break;
-            case FUTURE_DAY_VIEW_TYPE:
-                layoutId = R.layout.forecast_list_item;
-                break;
-        }
-        final View view = LayoutInflater.from(context).inflate(layoutId, parent, false);
+        final View view = LayoutInflater.from(context).inflate(R.layout.forecast_list_item, parent, false);
         final ViewHolder viewHolder = new ViewHolder(view);
         view.setTag(viewHolder);
         return view;
@@ -51,16 +39,11 @@ public class ForecastCursorAdapter extends CursorAdapter {
 
         String url = cursor.getString(cursor.getColumnIndex(ArticleEntry.COLUMN_THUMBNAIL));
         final ViewHolder viewHolder = (ViewHolder) view.getTag();
-        if (getItemViewType(cursor.getPosition()) == TODAY_VIEW_TYPE) {
-            viewHolder.articleDescription.setText(descriptionWeather);
-            displayImage(url, viewHolder.articleThumbnail, R.drawable.art_clear);
-        } else {
-            displayImage(url, viewHolder.articleThumbnail, R.drawable.art_clear);
-            //viewHolder.articleDate.setText(Utilities.getFriendlyDay(context, date));
-            viewHolder.articleDate.setText(date);
-            viewHolder.articleDescription.setText(descriptionWeather);
-            viewHolder.section.setText(section);
-        }
+        displayImage(url, viewHolder.articleThumbnail, R.drawable.ic_default_article);
+        //viewHolder.articleDate.setText(Utilities.getFriendlyDay(context, date));
+        viewHolder.articleDate.setText(date);
+        viewHolder.articleDescription.setText(descriptionWeather);
+        viewHolder.section.setText(section);
     }
 
     private void displayImage(String url, ImageView imageView, int defaultBitmapResource) {
@@ -73,12 +56,12 @@ public class ForecastCursorAdapter extends CursorAdapter {
 
     @Override
     public int getItemViewType(int position) {
-        return (position == 0 && useTodayLayout) ? TODAY_VIEW_TYPE : FUTURE_DAY_VIEW_TYPE;
+        return 0;
     }
 
     @Override
     public int getViewTypeCount() {
-        return 2;
+        return 1;
     }
 
     public void setUseTodayLayout(boolean useTodayLayout) {

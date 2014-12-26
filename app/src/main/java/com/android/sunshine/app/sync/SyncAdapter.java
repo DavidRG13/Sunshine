@@ -162,7 +162,7 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
 
             ContentValues weatherValues = new ContentValues();
 
-            weatherValues.put(ArticleEntry._ID, article.getId());
+            weatherValues.put(ArticleEntry.COLUMN_ARTICLE_ID, article.getId());
             weatherValues.put(ArticleEntry.COLUMN_URL, article.getUrl());
             weatherValues.put(ArticleEntry.COLUMN_SNIPPET, article.getSnippet());
             weatherValues.put(ArticleEntry.COLUMN_SHORT_DESCRIPTION, article.getShortDescription());

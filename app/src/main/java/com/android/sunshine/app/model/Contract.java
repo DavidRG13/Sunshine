@@ -29,6 +29,7 @@ public class Contract {
         public static final String COLUMN_SHORT_DESCRIPTION = "short_description";
         public static final String COLUMN_THUMBNAIL = "thumbnail";
         public static final String COLUMN_LARGE_IMAGE = "large_image";
+        public static final String COLUMN_ARTICLE_ID = "article_id";
 
         public static Uri buildWeatherUri(long id) {
             return ContentUris.withAppendedId(CONTENT_URI, id);

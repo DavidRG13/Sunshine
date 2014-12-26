@@ -47,10 +47,10 @@ public class MainActivity extends ActionBarActivity implements ItemClickCallback
     }
 
     @Override
-    public void onItemSelected(String id) {
+    public void onItemSelected(long id) {
         if (twoPane) {
             final Bundle args = new Bundle();
-            args.putString(DetailActivity.ID_KEY, id);
+            args.putLong(DetailActivity.ID_KEY, id);
             final DetailFragment detailFragment = new DetailFragment();
             detailFragment.setArguments(args);
             getSupportFragmentManager().beginTransaction()

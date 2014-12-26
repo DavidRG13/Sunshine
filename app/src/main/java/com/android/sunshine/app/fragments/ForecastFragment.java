@@ -99,8 +99,8 @@ public class ForecastFragment extends Fragment implements AdapterView.OnItemClic
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
         this.scrollPosition = position;
-        ((ItemClickCallback) getActivity()).onItemSelected(adapter.getCursor().getString(adapter.getCursor().getColumnIndex(
-            ArticleEntry.COLUMN_DATE)));
+        ((ItemClickCallback) getActivity()).onItemSelected(adapter.getCursor().getLong(adapter.getCursor().getColumnIndex(
+            ArticleEntry._ID)));
     }
 
     @Override

@@ -14,7 +14,7 @@ import static com.android.sunshine.app.model.Contract.ArticleEntry;
 public class WeatherProvider extends ContentProvider {
 
     private static final int ARTICLE = 100;
-    private static final int ARTICLES_WITH_START_DATE = 200;
+    private static final int ARTICLE_WITH_ID = 200;
     private static final UriMatcher uriMatcher = buildUriMatcher();
     private DBHelper dbHelper;
 
@@ -31,6 +31,9 @@ public class WeatherProvider extends ContentProvider {
             case ARTICLE:
                 cursor = dbHelper.getReadableDatabase().query(ArticleEntry.TABLE_NAME, projection, selection, selectionArgs, null, null, sortOrder);
                 break;
+            case ARTICLE_WITH_ID:
+                cursor = dbHelper.getReadableDatabase().query(ArticleEntry.TABLE_NAME, projection, ArticleEntry._ID + "= ?", new String[]{ArticleEntry.getIdFromUri(uri)}, null, null, sortOrder);
+                break;
             default:
                 throw new UnsupportedOperationException("Unknown uri: " + uri);
         }
@@ -44,7 +47,7 @@ public class WeatherProvider extends ContentProvider {
         switch (match) {
             case ARTICLE:
                 return ArticleEntry.CONTENT_TYPE;
-            case ARTICLES_WITH_START_DATE:
+            case ARTICLE_WITH_ID:
                 return ArticleEntry.CONTENT_TYPE;
             default:
                 throw new UnsupportedOperationException("Unknown uri: " + uri);
@@ -139,7 +142,7 @@ public class WeatherProvider extends ContentProvider {
         final String authority = Contract.CONTENT_AUTHORITY;
 
         matcher.addURI(authority, Contract.PATH_ARTICLES, ARTICLE);
-        matcher.addURI(authority, Contract.PATH_ARTICLES + "/*", ARTICLES_WITH_START_DATE);
+        matcher.addURI(authority, Contract.PATH_ARTICLES + "/#", ARTICLE_WITH_ID);
 
         return matcher;
     }

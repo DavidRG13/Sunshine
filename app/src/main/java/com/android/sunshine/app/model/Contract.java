@@ -38,6 +38,10 @@ public class Contract {
         public static Uri buildArticlesWithStartDate(String startDate) {
             return CONTENT_URI.buildUpon().appendQueryParameter(ArticleEntry.COLUMN_DATE, startDate).build();
         }
+
+        public static String getIdFromUri(Uri uri) {
+            return String.valueOf(ContentUris.parseId(uri));
+        }
     }
 
     public static String getDbDateString(final Date date) {

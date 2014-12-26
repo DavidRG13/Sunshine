@@ -110,9 +110,9 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
 
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-        final String date = getArguments().getString(DetailActivity.ID_KEY);
+        final long articleId = getArguments().getLong(DetailActivity.ID_KEY);
         location = Utilities.getLocationSettings(getActivity());
-        final Uri weatherUri = ArticleEntry.buildArticlesWithStartDate(date);
+        final Uri weatherUri = ArticleEntry.buildWeatherUri(articleId);
         return new CursorLoader(getActivity(), weatherUri, COLUMNS, null, null, ArticleEntry.COLUMN_DATE + " ASC");
     }
 

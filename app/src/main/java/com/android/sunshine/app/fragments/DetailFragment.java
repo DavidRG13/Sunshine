@@ -39,6 +39,7 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
             ArticleEntry.COLUMN_SECTION_NAME,
             ArticleEntry.COLUMN_SHORT_DESCRIPTION,
             ArticleEntry.COLUMN_SNIPPET,
+            ArticleEntry.COLUMN_THUMBNAIL,
             ArticleEntry.COLUMN_URL,
     };
     private ImageView detailImage;

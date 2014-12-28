@@ -42,7 +42,6 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
     private TextView detailSection;
     private TextView detailDate;
     private TextView detailSnippet;
-    private Button detailLink;
     private String url;
 
     public DetailFragment() {
@@ -67,7 +66,7 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
         detailSnippet = (TextView) view.findViewById(R.id.detail_snippet);
         detailSection = (TextView) view.findViewById(R.id.detail_section);
         detailImage = (ImageView) view.findViewById(R.id.detail_image);
-        detailLink = (Button) view.findViewById(R.id.detail_link);
+        Button detailLink = (Button) view.findViewById(R.id.detail_link);
         detailLink.setOnClickListener(this);
         return view;
     }

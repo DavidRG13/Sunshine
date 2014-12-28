@@ -22,8 +22,7 @@ public class ForecastCursorAdapter extends CursorAdapter {
 
     @Override
     public View newView(Context context, Cursor cursor, ViewGroup parent) {
-        final View view =
-            LayoutInflater.from(context).inflate(R.layout.forecast_list_item, parent, false);
+        final View view = LayoutInflater.from(context).inflate(R.layout.forecast_list_item, parent, false);
         final ViewHolder viewHolder = new ViewHolder(view);
         view.setTag(viewHolder);
         return view;
@@ -32,10 +31,8 @@ public class ForecastCursorAdapter extends CursorAdapter {
     @Override
     public void bindView(View view, Context context, Cursor cursor) {
         final String date = cursor.getString(cursor.getColumnIndex(ArticleEntry.COLUMN_DATE));
-        final String descriptionWeather =
-            cursor.getString(cursor.getColumnIndex(ArticleEntry.COLUMN_SHORT_DESCRIPTION));
-        final String section =
-            cursor.getString(cursor.getColumnIndex(ArticleEntry.COLUMN_SECTION_NAME));
+        final String descriptionWeather = cursor.getString(cursor.getColumnIndex(ArticleEntry.COLUMN_SHORT_DESCRIPTION));
+        final String section = cursor.getString(cursor.getColumnIndex(ArticleEntry.COLUMN_SECTION_NAME));
 
         String url = cursor.getString(cursor.getColumnIndex(ArticleEntry.COLUMN_THUMBNAIL));
         final ViewHolder viewHolder = (ViewHolder) view.getTag();

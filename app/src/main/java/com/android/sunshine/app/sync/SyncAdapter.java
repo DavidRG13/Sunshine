@@ -43,6 +43,7 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
     private static final String SUBTYPE = "subtype";
     private static final String URL = "url";
     private static final String ID = "_id";
+    public static final String RESPONSE = "response";
 
     public SyncAdapter(Context context, boolean autoInitialize) {
         super(context, autoInitialize);
@@ -50,7 +51,6 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
 
     @Override
     public void onPerformSync(Account account, Bundle extras, String authority, ContentProviderClient provider, SyncResult syncResult) {
-        Log.d(this.getClass().getName(), "onPerformSync");
         HttpURLConnection urlConnection = null;
         BufferedReader reader = null;
         String forecastJsonStr = null;
@@ -102,7 +102,6 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
     }
 
     public static void initializeSyncAdapter(Context context) {
-        Log.d(SyncAdapter.class.getName(), "initializeSyncAdapter");
         getSyncAccount(context);
     }
 
@@ -132,9 +131,8 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
     }
 
     private void parseArticlesFrom(String jsonStr) throws JSONException {
-        JSONObject forecastJson = new JSONObject(jsonStr);
-        JSONObject response = forecastJson.getJSONObject("response");
-        JSONArray newsArray = response.getJSONArray(DOCS);
+        JSONObject jsonObject = new JSONObject(jsonStr);
+        JSONArray newsArray = jsonObject.getJSONObject(RESPONSE).getJSONArray(DOCS);
 
         Vector<ContentValues> cVVector = new Vector<>(newsArray.length());
 
@@ -177,12 +175,6 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
             ContentValues[] contentValues = new ContentValues[cVVector.size()];
             cVVector.toArray(contentValues);
             getContext().getContentResolver().bulkInsert(ArticleEntry.CONTENT_URI, contentValues);
-
-            //Calendar cal = Calendar.getInstance();
-            //cal.add(Calendar.DATE, -1);
-            //String yesterdayDate = Contract.getDbDateString(cal.getTime());
-            //getContext().getContentResolver().delete(ArticleEntry.CONTENT_URI,
-            //        ArticleEntry.COLUMN_DATE + " <= ?", new String[] {yesterdayDate});
         }
     }
 

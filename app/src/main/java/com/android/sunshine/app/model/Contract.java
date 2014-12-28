@@ -35,10 +35,6 @@ public class Contract {
             return ContentUris.withAppendedId(CONTENT_URI, id);
         }
 
-        public static Uri buildArticlesWithStartDate(String startDate) {
-            return CONTENT_URI.buildUpon().appendQueryParameter(ArticleEntry.COLUMN_DATE, startDate).build();
-        }
-
         public static String getIdFromUri(Uri uri) {
             return String.valueOf(ContentUris.parseId(uri));
         }
@@ -51,10 +47,8 @@ public class Contract {
 
     public static Date getDateFromDb(String date) {
         final SimpleDateFormat simpleDateFormat = new SimpleDateFormat(DATE_FORMAT);
-        Date parsedDate = null;
         try {
-            parsedDate = simpleDateFormat.parse(date);
-            return parsedDate;
+            return simpleDateFormat.parse(date);
         } catch (ParseException e) {
             e.printStackTrace();
             return null;

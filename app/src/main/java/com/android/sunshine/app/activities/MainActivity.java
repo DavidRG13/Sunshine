@@ -45,4 +45,8 @@ public class MainActivity extends ActionBarActivity implements ItemClickCallback
             startActivity(intent);
         }
     }
+
+    public boolean isTwoPaned(){
+        return twoPane;
+    }
 }

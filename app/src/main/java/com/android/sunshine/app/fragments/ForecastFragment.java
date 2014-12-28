@@ -15,6 +15,7 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ListView;
 import com.android.sunshine.app.R;
+import com.android.sunshine.app.activities.MainActivity;
 import com.android.sunshine.app.adapter.ForecastCursorAdapter;
 import com.android.sunshine.app.callbacks.ItemClickCallback;
 import com.android.sunshine.app.sync.SyncAdapter;
@@ -104,8 +105,7 @@ public class ForecastFragment extends Fragment implements AdapterView.OnItemClic
         adapter.swapCursor(data);
         if (scrollPosition != ListView.INVALID_POSITION) {
             forecastList.smoothScrollToPosition(scrollPosition);
-            //if (!adapter.getUseTodayLayout()) {
-            if (false) {
+            if (((MainActivity)getActivity()).isTwoPaned()) {
                 forecastList.performItemClick(rootView, scrollPosition, forecastList.getAdapter().getItemId(scrollPosition));
             }
         }

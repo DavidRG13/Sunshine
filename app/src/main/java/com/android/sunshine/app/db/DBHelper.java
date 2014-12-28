@@ -7,7 +7,7 @@ import com.android.sunshine.app.model.Contract;
 
 public class DBHelper extends SQLiteOpenHelper{
 
-    private static final int DATABASE_VERSION = 3;
+    private static final int DATABASE_VERSION = 4;
     public static final String DATABASE_NAME = "articles.db";
     private static final String DROP_TABLE_IF_EXISTS = "DROP TABLE IF EXISTS ";
 
@@ -20,7 +20,7 @@ public class DBHelper extends SQLiteOpenHelper{
 
         final String SQL_CREATE_WEATHER_TABLE = "CREATE TABLE " + Contract.ArticleEntry.TABLE_NAME + " (" +
                 Contract.ArticleEntry._ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
-                Contract.ArticleEntry.COLUMN_ARTICLE_ID + " TEXT NOT NULL, " +
+                Contract.ArticleEntry.COLUMN_ARTICLE_ID + " TEXT UNIQUE NOT NULL, " +
                 Contract.ArticleEntry.COLUMN_DATE + " TEXT NOT NULL, " +
                 Contract.ArticleEntry.COLUMN_SHORT_DESCRIPTION + " TEXT NOT NULL, " +
                 Contract.ArticleEntry.COLUMN_URL + " TEXT NOT NULL, " +

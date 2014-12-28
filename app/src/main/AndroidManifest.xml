@@ -9,7 +9,7 @@
 
     <application
             android:allowBackup="true"
-            android:icon="@mipmap/ic_launcher"
+            android:icon="@drawable/ic_default_article"
             android:label="@string/app_name"
         android:name=".SunshineApplication"
             android:theme="@style/AppTheme">

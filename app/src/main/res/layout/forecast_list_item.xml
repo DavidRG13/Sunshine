@@ -19,7 +19,7 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
         android:contentDescription="@string/forecastIcon"
-        tools:src="@drawable/art_clear"/>
+        tools:src="@drawable/ic_default_article"/>
   </FrameLayout>
 
   <LinearLayout

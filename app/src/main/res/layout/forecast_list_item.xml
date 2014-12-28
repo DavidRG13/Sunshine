@@ -49,6 +49,7 @@
           android:layout_height="wrap_content"
           android:fontFamily="sans=serif-condensed"
           android:layout_gravity="start"
+          android:textColor="@color/grey"
           android:textAppearance="?android:textAppearanceSmall"
           tools:text="forecast"/>
 
@@ -58,6 +59,7 @@
           android:layout_weight="1"
           android:layout_height="wrap_content"
           android:fontFamily="sans=serif-condensed"
+          android:textColor="@color/grey"
           android:textAppearance="?android:textAppearanceSmall"
           tools:text="min"/>
     </LinearLayout>

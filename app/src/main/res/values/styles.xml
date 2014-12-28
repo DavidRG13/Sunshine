@@ -8,17 +8,13 @@
     <!-- ActionBar style -->
     <style name="ActionBar.Solid.Sunshine" parent="@style/Widget.AppCompat.Light.ActionBar.Solid.Inverse">
         <item name="background">@color/sunshine_blue</item>
+      <!--<item name="displayOptions">useLogo|showHome</item>-->
+      <item name="logo">@drawable/ic_default_article</item>
     </style>
 
     <!-- Main activity theme -->
     <style name="ForecastTheme" parent="AppTheme">
-        <item name="actionBarStyle">@style/ActionBar.Solid.Sunshine.NoTitle</item>
-    </style>
-
-    <!-- Main activity action bar style -->
-    <style name="ActionBar.Solid.Sunshine.NoTitle" parent="@style/ActionBar.Solid.Sunshine">
-        <item name="displayOptions">useLogo|showHome</item>
-        <item name="logo">@drawable/ic_logo</item>
+        <item name="actionBarStyle">@style/ActionBar.Solid.Sunshine</item>
     </style>
 
     <color name="sunshine_blue">#ff1ca8f4</color>

@@ -22,7 +22,8 @@ public class ForecastCursorAdapter extends CursorAdapter {
 
     @Override
     public View newView(Context context, Cursor cursor, ViewGroup parent) {
-        final View view = LayoutInflater.from(context).inflate(R.layout.forecast_list_item, parent, false);
+        final View view =
+            LayoutInflater.from(context).inflate(R.layout.forecast_list_item, parent, false);
         final ViewHolder viewHolder = new ViewHolder(view);
         view.setTag(viewHolder);
         return view;
@@ -41,7 +42,10 @@ public class ForecastCursorAdapter extends CursorAdapter {
         BitmapUtils.displayImage(url, viewHolder.articleThumbnail, R.drawable.ic_default_article);
         viewHolder.articleDate.setText(Utilities.getFriendlyDay(context, date));
         viewHolder.articleDescription.setText(descriptionWeather);
-        viewHolder.section.setText(section);
+        viewHolder.section.setText("");
+        if (!"null".equals(section)) {
+            viewHolder.section.setText(section);
+        }
     }
 
     @Override

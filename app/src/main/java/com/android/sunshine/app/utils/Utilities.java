@@ -1,8 +1,6 @@
 package com.android.sunshine.app.utils;
 
 import android.content.Context;
-import android.content.SharedPreferences;
-import android.preference.PreferenceManager;
 import com.android.sunshine.app.R;
 import com.android.sunshine.app.model.Contract;
 import java.text.ParseException;
@@ -11,12 +9,6 @@ import java.util.Calendar;
 import java.util.Date;
 
 public class Utilities {
-
-    public static String getLocationSettings(final Context context){
-        final SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
-        return sharedPreferences.getString(context.getString(R.string.pref_location_key),
-            context.getString(R.string.location_default));
-    }
 
     public static String getFriendlyDay(Context context, String dateStr) {
         Date todayDate = new Date();

@@ -30,8 +30,6 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
     ShareActionProvider.OnShareTargetSelectedListener {
 
     public static final int DETAIL_LOADER = 0;
-    public static final String LOCATION_KEY = "location";
-    private String location;
     private Intent shareIntent;
     private static final String[] COLUMNS = new String[] {
         ArticleEntry.TABLE_NAME + "." + ArticleEntry._ID, ArticleEntry.COLUMN_DATE,
@@ -54,9 +52,6 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        if (savedInstanceState != null) {
-            location = savedInstanceState.getString(LOCATION_KEY);
-        }
         final Bundle arguments = getArguments();
         if (arguments != null && arguments.containsKey(DetailActivity.ID_KEY)) {
             getLoaderManager().initLoader(DETAIL_LOADER, null, this);
@@ -78,19 +73,10 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
     }
 
     @Override
-    public void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
-        if (location != null) {
-            outState.putString(LOCATION_KEY, location);
-        }
-    }
-
-    @Override
     public void onResume() {
         super.onResume();
         final Bundle arguments = getArguments();
-        if (arguments != null && !location.equals(Utilities.getLocationSettings(getActivity()))
-                && arguments.containsKey(DetailActivity.ID_KEY)) {
+        if (arguments != null && arguments.containsKey(DetailActivity.ID_KEY)) {
             getLoaderManager().restartLoader(DETAIL_LOADER, null, this);
         }
     }
@@ -112,7 +98,6 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
         final long articleId = getArguments().getLong(DetailActivity.ID_KEY);
-        location = Utilities.getLocationSettings(getActivity());
         final Uri weatherUri = ArticleEntry.buildWeatherUri(articleId);
         return new CursorLoader(getActivity(), weatherUri, COLUMNS, null, null, ArticleEntry.COLUMN_DATE + " ASC");
     }

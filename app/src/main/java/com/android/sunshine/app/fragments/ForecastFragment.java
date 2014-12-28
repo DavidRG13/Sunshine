@@ -18,7 +18,6 @@ import com.android.sunshine.app.R;
 import com.android.sunshine.app.adapter.ForecastCursorAdapter;
 import com.android.sunshine.app.callbacks.ItemClickCallback;
 import com.android.sunshine.app.sync.SyncAdapter;
-import com.android.sunshine.app.utils.Utilities;
 
 import static com.android.sunshine.app.model.Contract.ArticleEntry;
 
@@ -26,7 +25,6 @@ public class ForecastFragment extends Fragment implements AdapterView.OnItemClic
 
     public static final int FORECAST_LOADER = 0;
     public static final String SCROLL_POSITION = "scrollPosition";
-    private String location;
     private ForecastCursorAdapter adapter;
 
     private static final String[] FORECAST_COLUMNS = new String[]{
@@ -67,14 +65,6 @@ public class ForecastFragment extends Fragment implements AdapterView.OnItemClic
     }
 
     @Override
-    public void onResume() {
-        super.onResume();
-        if (location != null && !Utilities.getLocationSettings(getActivity()).equals(location)) {
-            getLoaderManager().restartLoader(FORECAST_LOADER, null, this);
-        }
-    }
-
-    @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater menuInflater) {
         menuInflater.inflate(R.menu.forecast_fragment, menu);
     }
@@ -106,7 +96,6 @@ public class ForecastFragment extends Fragment implements AdapterView.OnItemClic
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
         String sortOrder = ArticleEntry.COLUMN_DATE + " ASC";
-        location = Utilities.getLocationSettings(getActivity());
         return new CursorLoader(getActivity(), ArticleEntry.CONTENT_URI, FORECAST_COLUMNS, null, null, sortOrder);
     }
 

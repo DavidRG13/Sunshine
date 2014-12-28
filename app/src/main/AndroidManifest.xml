@@ -31,12 +31,8 @@
                     android:name="android.support.PARENT_ACTIVITY"
                     android:value="com.android.sunshine.app.activities.MainActivity"/>
         </activity>
-        <activity
-                android:name=".activities.SettingsActivity"
-                android:label="@string/title_activity_settings"
-                android:parentActivityName=".activities.MainActivity"/>
 
-        <provider
+      <provider
                 android:authorities="@string/content_authority"
                 android:name=".db.WeatherProvider"
                 android:exported="false"

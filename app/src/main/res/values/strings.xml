@@ -46,5 +46,6 @@
     <!-- SyncAdapter related -->
     <string name="sync_account_type">com.android.sunshine.app</string>
     <string name="content_authority">com.android.sunshine.app</string>
+  <string name="view_in_web">View in web</string>
 
 </resources>

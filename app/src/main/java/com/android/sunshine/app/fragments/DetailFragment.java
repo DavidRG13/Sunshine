@@ -16,6 +16,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 import com.android.sunshine.app.R;
@@ -25,29 +26,26 @@ import com.android.sunshine.app.utils.Utilities;
 
 import static com.android.sunshine.app.model.Contract.ArticleEntry;
 
-public class DetailFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
+public class DetailFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor>, View.OnClickListener,
+    ShareActionProvider.OnShareTargetSelectedListener {
 
     public static final int DETAIL_LOADER = 0;
     public static final String LOCATION_KEY = "location";
     private String location;
     private Intent shareIntent;
-    private String weatherData;
-    private static final String[] COLUMNS = new String[]{
-            ArticleEntry.TABLE_NAME + "." + ArticleEntry._ID,
-            ArticleEntry.COLUMN_DATE,
-            ArticleEntry.COLUMN_LARGE_IMAGE,
-            ArticleEntry.COLUMN_SECTION_NAME,
-            ArticleEntry.COLUMN_SHORT_DESCRIPTION,
-            ArticleEntry.COLUMN_SNIPPET,
-            ArticleEntry.COLUMN_THUMBNAIL,
-            ArticleEntry.COLUMN_URL,
+    private static final String[] COLUMNS = new String[] {
+        ArticleEntry.TABLE_NAME + "." + ArticleEntry._ID, ArticleEntry.COLUMN_DATE,
+        ArticleEntry.COLUMN_LARGE_IMAGE, ArticleEntry.COLUMN_SECTION_NAME,
+        ArticleEntry.COLUMN_SHORT_DESCRIPTION, ArticleEntry.COLUMN_SNIPPET,
+        ArticleEntry.COLUMN_THUMBNAIL, ArticleEntry.COLUMN_URL,
     };
     private ImageView detailImage;
     private TextView detailDescription;
     private TextView detailSection;
     private TextView detailDate;
     private TextView detailSnippet;
-    private TextView detailLink;
+    private Button detailLink;
+    private String url;
 
     public DetailFragment() {
         setHasOptionsMenu(true);
@@ -56,24 +54,26 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        if(savedInstanceState != null) {
+        if (savedInstanceState != null) {
             location = savedInstanceState.getString(LOCATION_KEY);
         }
         final Bundle arguments = getArguments();
-        if(arguments != null && arguments.containsKey(DetailActivity.ID_KEY)) {
+        if (arguments != null && arguments.containsKey(DetailActivity.ID_KEY)) {
             getLoaderManager().initLoader(DETAIL_LOADER, null, this);
         }
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+        Bundle savedInstanceState) {
         final View view = inflater.inflate(R.layout.fragment_detail, container, false);
         detailDate = (TextView) view.findViewById(R.id.detail_date);
         detailDescription = (TextView) view.findViewById(R.id.detail_description);
-        detailLink = (TextView) view.findViewById(R.id.detail_link);
         detailSnippet = (TextView) view.findViewById(R.id.detail_snippet);
         detailSection = (TextView) view.findViewById(R.id.detail_section);
         detailImage = (ImageView) view.findViewById(R.id.detail_image);
+        detailLink = (Button) view.findViewById(R.id.detail_link);
+        detailLink.setOnClickListener(this);
         return view;
     }
 
@@ -105,6 +105,7 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
                 createShareIntent();
             }
             actionProvider.setShareIntent(shareIntent);
+            actionProvider.setOnShareTargetSelectedListener(this);
         }
     }
 
@@ -123,21 +124,19 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
             final String date = data.getString(data.getColumnIndex(ArticleEntry.COLUMN_DATE));
             final String section = data.getString(data.getColumnIndex(ArticleEntry.COLUMN_SECTION_NAME));
             final String snippet = data.getString(data.getColumnIndex(ArticleEntry.COLUMN_SNIPPET));
-            final String url = data.getString(data.getColumnIndex(ArticleEntry.COLUMN_URL));
+            url = data.getString(data.getColumnIndex(ArticleEntry.COLUMN_URL));
             final String thumbnail = data.getString(data.getColumnIndex(ArticleEntry.COLUMN_THUMBNAIL));
             final String largeImage = data.getString(data.getColumnIndex(ArticleEntry.COLUMN_LARGE_IMAGE));
 
-            detailDate.setText(date);
+            detailDate.setText(Utilities.getFriendlyDay(getActivity(), date));
             detailDescription.setText(description);
             detailSection.setText(section);
             detailSnippet.setText(snippet);
-            detailLink.setText(url);
-            if(largeImage == null){
-                BitmapUtils.displayImageIn(detailImage, thumbnail);
-            }else{
-                BitmapUtils.displayImageIn(detailImage, largeImage);
+            if (largeImage == null) {
+                BitmapUtils.displayImage(thumbnail, detailImage, R.drawable.ic_default_article);
+            } else {
+                BitmapUtils.displayImage(largeImage, detailImage, R.drawable.ic_default_article);
             }
-
         }
     }
 
@@ -150,6 +149,22 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
         shareIntent = new Intent(Intent.ACTION_SEND);
         shareIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET);
         shareIntent.setType("text/plain");
-        shareIntent.putExtra(Intent.EXTRA_TEXT, weatherData + " #sunshine");
+        shareIntent.putExtra(Intent.EXTRA_TEXT, url + " #NYTReader");
+    }
+
+    @Override
+    public void onClick(View v) {
+        if (v.getId() == R.id.detail_link) {
+            Intent i = new Intent(Intent.ACTION_VIEW);
+            i.setData(Uri.parse(url));
+            startActivity(i);
+        }
+    }
+
+    @Override
+    public boolean onShareTargetSelected(ShareActionProvider shareActionProvider, Intent intent) {
+        createShareIntent();
+        shareActionProvider.setShareIntent(shareIntent);
+        return false;
     }
 }

@@ -7,14 +7,16 @@
       android:layout_width="match_parent"
       android:layout_height="wrap_content"
       android:orientation="vertical"
-      android:gravity="center_vertical">
+      android:gravity="center_vertical"
+      android:padding="16dp">
 
     <ImageView
         android:id="@+id/detail_image"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:contentDescription="@string/forecastIcon"
-        tools:src="@drawable/art_clear"/>
+        tools:src="@drawable/ic_default_article"
+        android:paddingBottom="16dp"/>
 
     <TextView
         android:id="@+id/detail_description"
@@ -35,6 +37,7 @@
           android:layout_weight="3"
           android:layout_height="wrap_content"
           android:fontFamily="sans=serif-condensed"
+          android:textColor="@color/grey"
           android:layout_gravity="start"
           android:textAppearance="?android:textAppearanceSmall"
           tools:text="forecast"/>
@@ -45,6 +48,7 @@
           android:layout_weight="1"
           android:layout_height="wrap_content"
           android:fontFamily="sans=serif-condensed"
+          android:textColor="@color/grey"
           android:textAppearance="?android:textAppearanceSmall"
           tools:text="min"/>
     </LinearLayout>
@@ -56,12 +60,11 @@
         android:textAppearance="?android:textAppearanceLarge"
         tools:text="Snippet"/>
 
-    <TextView
-        android:id="@+id/detail_link"
+    <Button android:id="@+id/detail_link"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="right"
-        android:textAppearance="?android:textAppearanceLarge"
-        tools:text="link"/>
+        android:textAppearance="?android:textAppearanceMedium"
+        android:text="@string/view_in_web"/>
   </LinearLayout>
 </ScrollView>

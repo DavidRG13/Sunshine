@@ -14,7 +14,7 @@
         android:id="@+id/detail_image"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:contentDescription="@string/forecastIcon"
+        android:contentDescription="@string/articleImage"
         tools:src="@drawable/ic_default_article"
         android:paddingBottom="16dp"/>
 

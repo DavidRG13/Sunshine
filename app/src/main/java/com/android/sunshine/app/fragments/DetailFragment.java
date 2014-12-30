@@ -114,7 +114,9 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
 
             detailDate.setText(Utilities.getFriendlyDay(getActivity(), date));
             detailDescription.setText(description);
-            detailSection.setText(section);
+            if (!"null".equals(section)) {
+                detailSection.setText(section);
+            }
             detailSnippet.setText(snippet);
             if (largeImage == null) {
                 BitmapUtils.displayImage(thumbnail, detailImage, R.drawable.ic_default_article);

@@ -16,19 +16,19 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 import com.android.sunshine.app.R;
 import com.android.sunshine.app.activities.MainActivity;
-import com.android.sunshine.app.adapter.ForecastCursorAdapter;
+import com.android.sunshine.app.adapter.ArticlesCursorAdapter;
 import com.android.sunshine.app.callbacks.ItemClickCallback;
 import com.android.sunshine.app.sync.SyncAdapter;
 
 import static com.android.sunshine.app.model.Contract.ArticleEntry;
 
-public class ForecastFragment extends Fragment implements AdapterView.OnItemClickListener, LoaderManager.LoaderCallbacks<Cursor> {
+public class ArticlesFragment extends Fragment implements AdapterView.OnItemClickListener, LoaderManager.LoaderCallbacks<Cursor> {
 
-    public static final int FORECAST_LOADER = 0;
+    public static final int LOADER = 0;
     public static final String SCROLL_POSITION = "scrollPosition";
-    private ForecastCursorAdapter adapter;
+    private ArticlesCursorAdapter adapter;
 
-    private static final String[] FORECAST_COLUMNS = new String[]{
+    private static final String[] COLUMNS = new String[]{
             ArticleEntry.TABLE_NAME + "." + ArticleEntry._ID,
             ArticleEntry.COLUMN_URL,
             ArticleEntry.COLUMN_SNIPPET,
@@ -39,26 +39,27 @@ public class ForecastFragment extends Fragment implements AdapterView.OnItemClic
             ArticleEntry.COLUMN_LARGE_IMAGE
     };
     private int scrollPosition;
-    private ListView forecastList;
+    private ListView listView;
     private View rootView;
 
-    public ForecastFragment() {
+    public ArticlesFragment() {
     }
 
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        getLoaderManager().initLoader(FORECAST_LOADER, null, this);
+        getLoaderManager().initLoader(LOADER, null, this);
+        refreshData();
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         setHasOptionsMenu(true);
         rootView = inflater.inflate(R.layout.fragment_main, container, false);
-        forecastList = (ListView) rootView.findViewById(R.id.forecast_listview);
-        forecastList.setOnItemClickListener(this);
-        adapter = new ForecastCursorAdapter(getActivity(), null, 0);
-        forecastList.setAdapter(adapter);
+        listView = (ListView) rootView.findViewById(R.id.article_listview);
+        listView.setOnItemClickListener(this);
+        adapter = new ArticlesCursorAdapter(getActivity(), null, 0);
+        listView.setAdapter(adapter);
         if (savedInstanceState != null && savedInstanceState.containsKey(SCROLL_POSITION)) {
             scrollPosition = savedInstanceState.getInt(SCROLL_POSITION);
         }
@@ -67,14 +68,14 @@ public class ForecastFragment extends Fragment implements AdapterView.OnItemClic
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater menuInflater) {
-        menuInflater.inflate(R.menu.forecast_fragment, menu);
+        menuInflater.inflate(R.menu.list_fragment, menu);
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         final int itemId = item.getItemId();
         if (itemId == R.id.action_refresh) {
-            refreshWeatherData();
+            refreshData();
         }
         return super.onOptionsItemSelected(item);
     }
@@ -97,16 +98,17 @@ public class ForecastFragment extends Fragment implements AdapterView.OnItemClic
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
         String sortOrder = ArticleEntry.COLUMN_DATE + " ASC";
-        return new CursorLoader(getActivity(), ArticleEntry.CONTENT_URI, FORECAST_COLUMNS, null, null, sortOrder);
+        return new CursorLoader(getActivity(), ArticleEntry.CONTENT_URI, COLUMNS, null, null, sortOrder);
     }
 
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
         adapter.swapCursor(data);
         if (scrollPosition != ListView.INVALID_POSITION) {
-            forecastList.smoothScrollToPosition(scrollPosition);
-            if (((MainActivity)getActivity()).isTwoPaned()) {
-                forecastList.performItemClick(rootView, scrollPosition, forecastList.getAdapter().getItemId(scrollPosition));
+            listView.smoothScrollToPosition(scrollPosition);
+            if (((MainActivity)getActivity()).isTwoPaned() && data.getCount() > 0) {
+                listView.performItemClick(rootView, scrollPosition,
+                    listView.getAdapter().getItemId(scrollPosition));
             }
         }
     }
@@ -116,7 +118,7 @@ public class ForecastFragment extends Fragment implements AdapterView.OnItemClic
         adapter.swapCursor(null);
     }
 
-    private void refreshWeatherData() {
+    private void refreshData() {
         SyncAdapter.syncImmediately(getActivity());
     }
 }

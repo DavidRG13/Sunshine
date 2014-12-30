@@ -14,15 +14,15 @@ import com.android.sunshine.app.utils.Utilities;
 
 import static com.android.sunshine.app.model.Contract.ArticleEntry;
 
-public class ForecastCursorAdapter extends CursorAdapter {
+public class ArticlesCursorAdapter extends CursorAdapter {
 
-    public ForecastCursorAdapter(Context context, Cursor c, int flags) {
+    public ArticlesCursorAdapter(Context context, Cursor c, int flags) {
         super(context, c, flags);
     }
 
     @Override
     public View newView(Context context, Cursor cursor, ViewGroup parent) {
-        final View view = LayoutInflater.from(context).inflate(R.layout.forecast_list_item, parent, false);
+        final View view = LayoutInflater.from(context).inflate(R.layout.article_list_item, parent, false);
         final ViewHolder viewHolder = new ViewHolder(view);
         view.setTag(viewHolder);
         return view;

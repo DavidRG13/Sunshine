@@ -5,7 +5,7 @@
     tools:context=".MainActivity$PlaceholderFragment">
 
     <ListView
-            android:id="@+id/forecast_listview"
+            android:id="@+id/article_listview"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:choiceMode="singleChoice"/>

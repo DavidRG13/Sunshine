@@ -9,7 +9,7 @@
 
     <fragment
             android:id="@+id/fragment_forecast"
-            android:name="com.android.sunshine.app.fragments.ForecastFragment"
+            android:name="com.android.sunshine.app.fragments.ArticlesFragment"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="2"

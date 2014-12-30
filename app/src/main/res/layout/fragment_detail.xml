@@ -60,7 +60,8 @@
         android:textAppearance="?android:textAppearanceLarge"
         tools:text="Snippet"/>
 
-    <Button android:id="@+id/detail_link"
+    <com.android.sunshine.app.views.ViewInWebButton
+        android:id="@+id/detail_link"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="right"

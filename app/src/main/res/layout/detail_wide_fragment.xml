@@ -49,7 +49,7 @@
                     android:textSize="20sp"
                     tools:text="date"/>
 
-                <Button
+                <com.android.sunshine.app.views.ViewInWebButton
                     android:id="@+id/detail_link"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"

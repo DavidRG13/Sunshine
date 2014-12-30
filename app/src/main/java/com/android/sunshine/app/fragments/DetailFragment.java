@@ -16,17 +16,17 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 import com.android.sunshine.app.R;
 import com.android.sunshine.app.activities.DetailActivity;
 import com.android.sunshine.app.utils.BitmapUtils;
 import com.android.sunshine.app.utils.Utilities;
+import com.android.sunshine.app.views.ViewInWebButton;
 
 import static com.android.sunshine.app.model.Contract.ArticleEntry;
 
-public class DetailFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor>, View.OnClickListener,
+public class DetailFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor>,
     ShareActionProvider.OnShareTargetSelectedListener {
 
     public static final int DETAIL_LOADER = 0;
@@ -43,6 +43,7 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
     private TextView detailDate;
     private TextView detailSnippet;
     private String url;
+    private ViewInWebButton detailLink;
 
     public DetailFragment() {
         setHasOptionsMenu(true);
@@ -66,8 +67,7 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
         detailSnippet = (TextView) view.findViewById(R.id.detail_snippet);
         detailSection = (TextView) view.findViewById(R.id.detail_section);
         detailImage = (ImageView) view.findViewById(R.id.detail_image);
-        Button detailLink = (Button) view.findViewById(R.id.detail_link);
-        detailLink.setOnClickListener(this);
+        detailLink = (ViewInWebButton) view.findViewById(R.id.detail_link);
         return view;
     }
 
@@ -114,6 +114,7 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
 
             detailDate.setText(Utilities.getFriendlyDay(getActivity(), date));
             detailDescription.setText(description);
+            detailLink.setUrl(url);
             if (!"null".equals(section)) {
                 detailSection.setText(section);
             }
@@ -136,15 +137,6 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
         shareIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET);
         shareIntent.setType("text/plain");
         shareIntent.putExtra(Intent.EXTRA_TEXT, url + " #NYTReader");
-    }
-
-    @Override
-    public void onClick(View v) {
-        if (v.getId() == R.id.detail_link) {
-            Intent i = new Intent(Intent.ACTION_VIEW);
-            i.setData(Uri.parse(url));
-            startActivity(i);
-        }
     }
 
     @Override

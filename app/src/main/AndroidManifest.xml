@@ -11,7 +11,7 @@
             android:allowBackup="true"
             android:icon="@drawable/ic_default_article"
             android:label="@string/app_name"
-        android:name=".SunshineApplication"
+        android:name=".NYTReaderApplication"
             android:theme="@style/AppTheme">
         <activity
                 android:name=".activities.MainActivity"

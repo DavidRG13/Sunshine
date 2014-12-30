@@ -10,7 +10,7 @@ import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
 import com.nostra13.universalimageloader.core.assist.QueueProcessingType;
 import java.lang.reflect.Field;
 
-public class SunshineApplication extends Application {
+public class NYTReaderApplication extends Application {
 
     @Override
     public void onCreate() {

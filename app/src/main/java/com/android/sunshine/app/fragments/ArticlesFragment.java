@@ -7,9 +7,6 @@ import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -64,20 +61,6 @@ public class ArticlesFragment extends Fragment implements AdapterView.OnItemClic
             scrollPosition = savedInstanceState.getInt(SCROLL_POSITION);
         }
         return rootView;
-    }
-
-    @Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater menuInflater) {
-        menuInflater.inflate(R.menu.list_fragment, menu);
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        final int itemId = item.getItemId();
-        if (itemId == R.id.action_refresh) {
-            refreshData();
-        }
-        return super.onOptionsItemSelected(item);
     }
 
     @Override

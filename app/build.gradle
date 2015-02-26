@@ -3,10 +3,12 @@ buildscript {
         jcenter()
     }
     dependencies {
+        classpath 'org.jetbrains.kotlin:kotlin-gradle-plugin:0.10.+'
         classpath 'com.android.tools.build:gradle:0.12.2'
     }
 }
 apply plugin: 'com.android.application'
+apply plugin: 'kotlin-android'
 
 repositories {
     jcenter()
@@ -34,9 +36,13 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
+    sourceSets {
+        main.java.srcDirs += 'src/main/kotlin'
+    }
 }
 
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
     compile 'com.android.support:appcompat-v7:19.+'
+    compile 'org.jetbrains.kotlin:kotlin-stdlib:0.10.+'
 }

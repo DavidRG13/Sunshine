@@ -10,14 +10,18 @@ import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v7.widget.ShareActionProvider;
-import android.view.*;
+import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
+import android.view.View;
+import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 import com.android.sunshine.app.R;
 import com.android.sunshine.app.activities.DetailActivity;
-import com.android.sunshine.app.model.WeatherContract;
+import com.android.sunshine.app.model.WeatherContract.WeatherEntry;
 import com.android.sunshine.app.utils.Utilities;
-
 import java.util.Locale;
 
 public class DetailFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
@@ -27,17 +31,6 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
     private String location;
     private Intent shareIntent;
     private String weatherData;
-    private static final String[] COLUMNS = new String[]{
-            WeatherContract.WeatherEntry.TABLE_NAME + "." + WeatherContract.WeatherEntry._ID,
-            WeatherContract.WeatherEntry.COLUMN_DATETEXT,
-            WeatherContract.WeatherEntry.COLUMN_SHORT_DESC,
-            WeatherContract.WeatherEntry.COLUMN_MAX_TEMP,
-            WeatherContract.WeatherEntry.COLUMN_MIN_TEMP,
-            WeatherContract.WeatherEntry.COLUMN_HUMIDITY,
-            WeatherContract.WeatherEntry.COLUMN_PRESSURE,
-            WeatherContract.WeatherEntry.COLUMN_WIND_SPEED,
-            WeatherContract.WeatherEntry.COLUMN_WEATHER_ID
-    };
     private TextView detailDate;
     private TextView detailDescription;
     private TextView detailMax;
@@ -114,24 +107,23 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
         final String date = getArguments().getString(DetailActivity.DATE_KEY);
         location = Utilities.getLocationSettings(getActivity());
-        final Uri weatherUri = WeatherContract.WeatherEntry.buildWeatherLocationWithDate(location, date);
-        return new CursorLoader(getActivity(), weatherUri, COLUMNS, null, null, WeatherContract.WeatherEntry.COLUMN_DATETEXT + " ASC");
+        final Uri weatherUri = WeatherEntry.buildWeatherLocationWithDate(location, date);
+        return new CursorLoader(getActivity(), weatherUri, WeatherEntry.DETAIL_COLUMNS, null, null, WeatherEntry.COLUMN_DATETEXT + " ASC");
     }
 
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
         if (data.moveToFirst()) {
-            final boolean isMetric = Utilities.isMetric(getActivity());
-            final int weatherId = data.getInt(data.getColumnIndex(WeatherContract.WeatherEntry.COLUMN_WEATHER_ID));
-            final String description = data.getString(data.getColumnIndex(WeatherContract.WeatherEntry.COLUMN_SHORT_DESC));
-            final String date = data.getString(data.getColumnIndex(WeatherContract.WeatherEntry.COLUMN_DATETEXT));
-            final String wind = data.getString(data.getColumnIndex(WeatherContract.WeatherEntry.COLUMN_WIND_SPEED));
-            final String pressure = data.getString(data.getColumnIndex(WeatherContract.WeatherEntry.COLUMN_PRESSURE));
-            final String humidity = data.getString(data.getColumnIndex(WeatherContract.WeatherEntry.COLUMN_HUMIDITY));
-            final double maxTemp = data.getDouble(data.getColumnIndex(WeatherContract.WeatherEntry.COLUMN_MAX_TEMP));
-            final double minTemp = data.getDouble(data.getColumnIndex(WeatherContract.WeatherEntry.COLUMN_MIN_TEMP));
-            final String max = String.valueOf(Utilities.formatTemperature(getActivity(), maxTemp, isMetric));
-            final String min = String.valueOf(Utilities.formatTemperature(getActivity(), minTemp, isMetric));
+            final int weatherId = data.getInt(data.getColumnIndex(WeatherEntry.COLUMN_WEATHER_ID));
+            final String description = data.getString(data.getColumnIndex(WeatherEntry.COLUMN_SHORT_DESC));
+            final String date = data.getString(data.getColumnIndex(WeatherEntry.COLUMN_DATETEXT));
+            final String wind = data.getString(data.getColumnIndex(WeatherEntry.COLUMN_WIND_SPEED));
+            final String pressure = data.getString(data.getColumnIndex(WeatherEntry.COLUMN_PRESSURE));
+            final String humidity = data.getString(data.getColumnIndex(WeatherEntry.COLUMN_HUMIDITY));
+            final double maxTemp = data.getDouble(data.getColumnIndex(WeatherEntry.COLUMN_MAX_TEMP));
+            final double minTemp = data.getDouble(data.getColumnIndex(WeatherEntry.COLUMN_MIN_TEMP));
+            final String max = String.valueOf(Utilities.formatTemperature(getActivity(), maxTemp));
+            final String min = String.valueOf(Utilities.formatTemperature(getActivity(), minTemp));
 
             detailDate.setText(date);
             detailDescription.setText(description);

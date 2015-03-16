@@ -14,12 +14,8 @@ import java.util.Date;
 public class Utilities {
 
     public static String formatTemperature(final Context context, final double temperature) {
-        return formatTemperature(context, temperature, isMetric(context));
-    }
-
-    public static String formatTemperature(final Context context, final double temperature, final boolean isMetric) {
         double temp;
-        if (isMetric){
+        if (isMetric(context)){
             temp = temperature;
         }else {
             temp = 9 * temperature / 5 + 32;

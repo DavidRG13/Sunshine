@@ -9,9 +9,10 @@ import static com.android.sunshine.app.model.WeatherContract.WeatherEntry;
 
 public class DBHelper extends SQLiteOpenHelper{
 
-    private static final int DATABASE_VERSION = 1;
     public static final String DATABASE_NAME = "weather.db";
+    private static final int DATABASE_VERSION = 1;
     private static final String DROP_TABLE_IF_EXISTS = "DROP TABLE IF EXISTS ";
+    private static final String REAL_NOT_NULL = " REAL NOT NULL, ";
 
     public DBHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -26,12 +27,12 @@ public class DBHelper extends SQLiteOpenHelper{
                 WeatherEntry.COLUMN_DATETEXT + " TEXT NOT NULL, " +
                 WeatherEntry.COLUMN_SHORT_DESC + " TEXT NOT NULL, " +
                 WeatherEntry.COLUMN_WEATHER_ID + " INTEGER NOT NULL," +
-                WeatherEntry.COLUMN_MIN_TEMP + " REAL NOT NULL, " +
-                WeatherEntry.COLUMN_MAX_TEMP + " REAL NOT NULL, " +
-                WeatherEntry.COLUMN_HUMIDITY + " REAL NOT NULL, " +
-                WeatherEntry.COLUMN_PRESSURE + " REAL NOT NULL, " +
-                WeatherEntry.COLUMN_WIND_SPEED + " REAL NOT NULL, " +
-                WeatherEntry.COLUMN_DEGREES + " REAL NOT NULL, " +
+                WeatherEntry.COLUMN_MIN_TEMP + REAL_NOT_NULL +
+                WeatherEntry.COLUMN_MAX_TEMP + REAL_NOT_NULL +
+                WeatherEntry.COLUMN_HUMIDITY + REAL_NOT_NULL +
+                WeatherEntry.COLUMN_PRESSURE + REAL_NOT_NULL +
+                WeatherEntry.COLUMN_WIND_SPEED + REAL_NOT_NULL +
+                WeatherEntry.COLUMN_DEGREES + REAL_NOT_NULL +
                 " FOREIGN KEY (" + WeatherEntry.COLUMN_LOC_KEY + ") REFERENCES " +
                 LocationEntry.TABLE_NAME + " (" + LocationEntry._ID + "), " +
                 " UNIQUE (" + WeatherEntry.COLUMN_DATETEXT + ", " +
@@ -41,10 +42,9 @@ public class DBHelper extends SQLiteOpenHelper{
                 LocationEntry._ID + " INTEGER PRIMARY KEY, " +
                 LocationEntry.COLUMN_CITY_NAME + " TEXT NOT NULL, " +
                 LocationEntry.COLUMN_LOCATION_SETTING + " TEXT UNIQUE NOT NULL, " +
-                LocationEntry.COLUMN_COORD_LAT + " REAL NOT NULL, " +
-                LocationEntry.COLUMN_COORD_LONG + " REAL NOT NULL, " +
-                "UNIQUE (" + LocationEntry.COLUMN_LOCATION_SETTING + ") ON CONFLICT IGNORE" +
-                ");";
+                LocationEntry.COLUMN_COORD_LAT + REAL_NOT_NULL +
+                LocationEntry.COLUMN_COORD_LONG + REAL_NOT_NULL +
+                "UNIQUE (" + LocationEntry.COLUMN_LOCATION_SETTING + ") ON CONFLICT IGNORE);";
 
         sqLiteDatabase.execSQL(SQL_CREATE_WEATHER_TABLE);
         sqLiteDatabase.execSQL(SQL_CREATE_LOCATION_TABLE);

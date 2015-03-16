@@ -29,19 +29,6 @@ public class ForecastFragment extends Fragment implements AdapterView.OnItemClic
     public static final String SCROLL_POSITION = "scrollPosition";
     private String location;
     private ForecastCursorAdapter adapter;
-
-    private static final String[] FORECAST_COLUMNS = new String[]{
-            WeatherEntry.TABLE_NAME + "." + WeatherEntry._ID,
-            WeatherEntry.COLUMN_DATETEXT,
-            WeatherEntry.COLUMN_SHORT_DESC,
-            WeatherEntry.COLUMN_MAX_TEMP,
-            WeatherEntry.COLUMN_MIN_TEMP,
-            WeatherEntry.COLUMN_WEATHER_ID,
-            WeatherEntry.COLUMN_WEATHER_ID,
-            LocationEntry.COLUMN_LOCATION_SETTING,
-            LocationEntry.COLUMN_COORD_LAT,
-            LocationEntry.COLUMN_COORD_LONG
-    };
     private int scrollPosition;
     private ListView forecastList;
     private View rootView;
@@ -111,13 +98,11 @@ public class ForecastFragment extends Fragment implements AdapterView.OnItemClic
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
         String startDate = WeatherContract.getDbDateString(new Date());
-
         String sortOrder = WeatherEntry.COLUMN_DATETEXT + " ASC";
-
         location = Utilities.getLocationSettings(getActivity());
         Uri weatherForLocationUri = WeatherEntry.buildWeatherLocationWithStartDate(location, startDate);
 
-        return new CursorLoader(getActivity(), weatherForLocationUri, FORECAST_COLUMNS, null, null, sortOrder);
+        return new CursorLoader(getActivity(), weatherForLocationUri, WeatherEntry.FORECAST_COLUMNS, null, null, sortOrder);
     }
 
     @Override
@@ -148,14 +133,13 @@ public class ForecastFragment extends Fragment implements AdapterView.OnItemClic
 
     private void showCurrentLocation() {
         if (null != adapter) {
-            Cursor c = adapter.getCursor();
-            if (null != c) {
-                c.moveToPosition(0);
-                String posLat = c.getString(c.getColumnIndex(LocationEntry.COLUMN_COORD_LAT));
-                String posLong = c.getString(c.getColumnIndex(LocationEntry.COLUMN_COORD_LONG));
+            Cursor cursor = adapter.getCursor();
+            if (null != cursor) {
+                cursor.moveToPosition(0);
+                String posLat = cursor.getString(cursor.getColumnIndex(LocationEntry.COLUMN_COORD_LAT));
+                String posLong = cursor.getString(cursor.getColumnIndex(LocationEntry.COLUMN_COORD_LONG));
                 Uri geoLocation = Uri.parse("geo:" + posLat + "," + posLong);
 
-                System.out.println("geoLocation = " + geoLocation);
                 Intent intent = new Intent(Intent.ACTION_VIEW);
                 intent.setData(geoLocation);
 

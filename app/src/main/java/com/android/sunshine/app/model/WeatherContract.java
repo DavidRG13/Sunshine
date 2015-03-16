@@ -34,6 +34,32 @@ public class WeatherContract {
         public static final String COLUMN_PRESSURE = "pressure";
         public static final String COLUMN_WIND_SPEED = "wind";
         public static final String COLUMN_DEGREES = "degrees";
+
+        public static final String[] FORECAST_COLUMNS = new String[]{
+            WeatherEntry.TABLE_NAME + "." + WeatherEntry._ID,
+            WeatherEntry.COLUMN_DATETEXT,
+            WeatherEntry.COLUMN_SHORT_DESC,
+            WeatherEntry.COLUMN_MAX_TEMP,
+            WeatherEntry.COLUMN_MIN_TEMP,
+            WeatherEntry.COLUMN_WEATHER_ID,
+            WeatherEntry.COLUMN_WEATHER_ID,
+            LocationEntry.COLUMN_LOCATION_SETTING,
+            LocationEntry.COLUMN_COORD_LAT,
+            LocationEntry.COLUMN_COORD_LONG
+        };
+
+        public static final String[] DETAIL_COLUMNS = new String[]{
+            WeatherContract.WeatherEntry.TABLE_NAME + "." + WeatherContract.WeatherEntry._ID,
+            WeatherContract.WeatherEntry.COLUMN_DATETEXT,
+            WeatherContract.WeatherEntry.COLUMN_SHORT_DESC,
+            WeatherContract.WeatherEntry.COLUMN_MAX_TEMP,
+            WeatherContract.WeatherEntry.COLUMN_MIN_TEMP,
+            WeatherContract.WeatherEntry.COLUMN_HUMIDITY,
+            WeatherContract.WeatherEntry.COLUMN_PRESSURE,
+            WeatherContract.WeatherEntry.COLUMN_WIND_SPEED,
+            WeatherContract.WeatherEntry.COLUMN_WEATHER_ID
+        };
+
         public static Uri buildWeatherUri(long id) {
             return ContentUris.withAppendedId(CONTENT_URI, id);
         }
@@ -90,7 +116,6 @@ public class WeatherContract {
         Date parsedDate = null;
         try {
             parsedDate = simpleDateFormat.parse(date);
-            return parsedDate;
         } catch (ParseException e) {
             e.printStackTrace();
         }

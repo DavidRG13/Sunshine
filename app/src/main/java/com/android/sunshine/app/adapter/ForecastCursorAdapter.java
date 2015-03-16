@@ -43,7 +43,6 @@ public class ForecastCursorAdapter extends CursorAdapter{
 
     @Override
     public void bindView(View view, Context context, Cursor cursor) {
-        final boolean isMetric = Utilities.isMetric(context);
         final int weatherId = cursor.getInt(cursor.getColumnIndex(WeatherEntry.COLUMN_WEATHER_ID));
         final String weatherDate = cursor.getString(cursor.getColumnIndex(WeatherEntry.COLUMN_DATETEXT));
         final String descriptionWeather = cursor.getString(cursor.getColumnIndex(WeatherEntry.COLUMN_SHORT_DESC));
@@ -54,8 +53,8 @@ public class ForecastCursorAdapter extends CursorAdapter{
 
         viewHolder.dateWeather.setText(Utilities.getFriendlyDay(context, weatherDate));
         viewHolder.forecastDescription.setText(descriptionWeather);
-        viewHolder.max.setText(Utilities.formatTemperature(context, maxTemp, isMetric));
-        viewHolder.min.setText(Utilities.formatTemperature(context, minTemp, isMetric));
+        viewHolder.max.setText(Utilities.formatTemperature(context, maxTemp));
+        viewHolder.min.setText(Utilities.formatTemperature(context, minTemp));
 
         if(getItemViewType(cursor.getPosition()) == TODAY_VIEW_TYPE){
             viewHolder.forecastIcon.setImageResource(Utilities.getArtResourceForWeatherCondition(weatherId));

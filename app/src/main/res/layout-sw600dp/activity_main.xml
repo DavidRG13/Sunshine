@@ -5,7 +5,7 @@
               android:baselineAligned="false"
               android:divider="?android:attr/dividerHorizontal"
               android:orientation="horizontal"
-              tools:context="com.android.sunshine.app.activities.MainActivity">
+              tools:context="com.android.sunshine.app.com.android.sunshine.app.activities.MainActivity">
 
     <fragment
             android:id="@+id/fragment_forecast"

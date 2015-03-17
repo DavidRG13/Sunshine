@@ -12,18 +12,23 @@ import android.view.*;
 import android.widget.AdapterView;
 import android.widget.ListView;
 import com.android.sunshine.app.R;
+import com.android.sunshine.app.SunshineApplication;
 import com.android.sunshine.app.adapter.ForecastCursorAdapter;
 import com.android.sunshine.app.callbacks.ItemClickCallback;
 import com.android.sunshine.app.model.WeatherContract;
+import com.android.sunshine.app.repository.PreferenceRepository;
 import com.android.sunshine.app.sync.SyncAdapter;
-import com.android.sunshine.app.utils.Utilities;
 
 import java.util.Date;
+import javax.inject.Inject;
 
 import static com.android.sunshine.app.model.WeatherContract.LocationEntry;
 import static com.android.sunshine.app.model.WeatherContract.WeatherEntry;
 
 public class ForecastFragment extends Fragment implements AdapterView.OnItemClickListener, LoaderManager.LoaderCallbacks<Cursor> {
+
+    @Inject
+    PreferenceRepository preferenceRepository;
 
     public static final int FORECAST_LOADER = 0;
     public static final String SCROLL_POSITION = "scrollPosition";
@@ -39,6 +44,7 @@ public class ForecastFragment extends Fragment implements AdapterView.OnItemClic
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
+        ((SunshineApplication) getActivity().getApplication()).getObjectGraph().inject(this);
         getLoaderManager().initLoader(FORECAST_LOADER, null, this);
     }
 
@@ -59,7 +65,7 @@ public class ForecastFragment extends Fragment implements AdapterView.OnItemClic
     @Override
     public void onResume() {
         super.onResume();
-        if (location != null && !Utilities.getLocationSettings(getActivity()).equals(location)) {
+        if (location != null && ! preferenceRepository.getLocation().equals(location)) {
             getLoaderManager().restartLoader(FORECAST_LOADER, null, this);
         }
     }
@@ -99,7 +105,7 @@ public class ForecastFragment extends Fragment implements AdapterView.OnItemClic
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
         String startDate = WeatherContract.getDbDateString(new Date());
         String sortOrder = WeatherEntry.COLUMN_DATETEXT + " ASC";
-        location = Utilities.getLocationSettings(getActivity());
+        location = preferenceRepository.getLocation();
         Uri weatherForLocationUri = WeatherEntry.buildWeatherLocationWithStartDate(location, startDate);
 
         return new CursorLoader(getActivity(), weatherForLocationUri, WeatherEntry.FORECAST_COLUMNS, null, null, sortOrder);

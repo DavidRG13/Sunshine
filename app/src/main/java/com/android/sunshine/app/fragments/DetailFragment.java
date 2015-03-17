@@ -19,12 +19,18 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 import com.android.sunshine.app.R;
+import com.android.sunshine.app.SunshineApplication;
 import com.android.sunshine.app.activities.DetailActivity;
 import com.android.sunshine.app.model.WeatherContract.WeatherEntry;
+import com.android.sunshine.app.repository.PreferenceRepository;
 import com.android.sunshine.app.utils.Utilities;
 import java.util.Locale;
+import javax.inject.Inject;
 
 public class DetailFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
+
+    @Inject
+    PreferenceRepository preferenceRepository;
 
     public static final int DETAIL_LOADER = 0;
     public static final String LOCATION_KEY = "location";
@@ -48,6 +54,9 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
+
+        ((SunshineApplication) getActivity().getApplication()).getObjectGraph().inject(this);
+
         if(savedInstanceState != null) {
             location = savedInstanceState.getString(LOCATION_KEY);
         }
@@ -84,7 +93,7 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
     public void onResume() {
         super.onResume();
         final Bundle arguments = getArguments();
-        if (arguments != null && !location.equals(Utilities.getLocationSettings(getActivity()))
+        if (arguments != null && !location.equals(preferenceRepository.getLocation())
                 && arguments.containsKey(DetailActivity.DATE_KEY)) {
             getLoaderManager().restartLoader(DETAIL_LOADER, null, this);
         }
@@ -106,7 +115,7 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
         final String date = getArguments().getString(DetailActivity.DATE_KEY);
-        location = Utilities.getLocationSettings(getActivity());
+        location = preferenceRepository.getLocation();
         final Uri weatherUri = WeatherEntry.buildWeatherLocationWithDate(location, date);
         return new CursorLoader(getActivity(), weatherUri, WeatherEntry.DETAIL_COLUMNS, null, null, WeatherEntry.COLUMN_DATETEXT + " ASC");
     }

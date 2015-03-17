@@ -4,7 +4,15 @@ import android.accounts.Account;
 import android.accounts.AccountManager;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
-import android.content.*;
+import android.content.AbstractThreadedSyncAdapter;
+import android.content.ContentProviderClient;
+import android.content.ContentResolver;
+import android.content.ContentUris;
+import android.content.ContentValues;
+import android.content.Context;
+import android.content.Intent;
+import android.content.SyncRequest;
+import android.content.SyncResult;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Build;
@@ -15,11 +23,8 @@ import android.util.Log;
 import com.android.sunshine.app.R;
 import com.android.sunshine.app.activities.MainActivity;
 import com.android.sunshine.app.model.WeatherContract;
+import com.android.sunshine.app.repository.PreferenceRepository;
 import com.android.sunshine.app.utils.Utilities;
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -29,6 +34,9 @@ import java.net.URL;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Vector;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import static com.android.sunshine.app.model.WeatherContract.WeatherEntry;
 
@@ -57,14 +65,16 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
     private static final int INDEX_MAX_TEMP = 1;
     private static final int INDEX_MIN_TEMP = 2;
     private static final int INDEX_SHORT_DESC = 3;
+    private final PreferenceRepository preferenceRepository;
 
-    public SyncAdapter(Context context, boolean autoInitialize) {
+    public SyncAdapter(Context context, boolean autoInitialize, final PreferenceRepository preferenceRepository) {
         super(context, autoInitialize);
+        this.preferenceRepository = preferenceRepository;
     }
 
     @Override
     public void onPerformSync(Account account, Bundle extras, String authority, ContentProviderClient provider, SyncResult syncResult) {
-        final String locationSettings = Utilities.getLocationSettings(getContext());
+        final String locationSettings = preferenceRepository.getLocation();
 
         Uri.Builder builder = Uri.parse(BASE_URI).buildUpon()
                 .appendQueryParameter(QUERY_PARAM, locationSettings)
@@ -251,11 +261,11 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
     }
 
     private void notifyWeather() {
-        if (Utilities.displayNotifications(getContext())) {
-            long lastSync = Utilities.getLastNotification(getContext());
+        if (preferenceRepository.shouldDisplayNotifications()) {
+            long lastSync = preferenceRepository.getLastNotification();
 
             if (System.currentTimeMillis() - lastSync >= DAY_IN_MILLIS) {
-                String locationQuery = Utilities.getLocationSettings(getContext());
+                String locationQuery = preferenceRepository.getLocation();
 
                 Uri weatherUri = WeatherEntry.buildWeatherLocationWithDate(locationQuery, WeatherContract.getDbDateString(new Date()));
 
@@ -291,7 +301,7 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
                     NotificationManager mNotificationManager = (NotificationManager) getContext().getSystemService(Context.NOTIFICATION_SERVICE);
                     mNotificationManager.notify(WEATHER_NOTIFICATION_ID, mBuilder.build());
 
-                    Utilities.setLastNotification(getContext());
+                    preferenceRepository.saveLastNotification();
                 }
             }
         }

@@ -1,0 +1,27 @@
+package com.android.sunshine.app;
+
+import android.content.Context;
+import com.android.sunshine.app.fragments.DetailFragment;
+import com.android.sunshine.app.fragments.ForecastFragment;
+import com.android.sunshine.app.sync.SyncService;
+import dagger.Module;
+import dagger.Provides;
+
+@Module(
+    injects = {
+        SunshineApplication.class, ForecastFragment.class, DetailFragment.class, SyncService.class
+    },
+    library = true)
+public class AppModule {
+
+    private Context appContext;
+
+    public AppModule(final Context context) {
+        appContext = context;
+    }
+
+    @Provides
+    public Context providesContext() {
+        return appContext;
+    }
+}

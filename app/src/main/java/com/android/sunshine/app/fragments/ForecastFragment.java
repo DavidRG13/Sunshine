@@ -13,6 +13,7 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 import com.android.sunshine.app.R;
 import com.android.sunshine.app.SunshineApplication;
+import com.android.sunshine.app.utils.DateFormatter;
 import com.android.sunshine.app.adapter.ForecastCursorAdapter;
 import com.android.sunshine.app.callbacks.ItemClickCallback;
 import com.android.sunshine.app.repository.WeatherContract;
@@ -30,6 +31,9 @@ public class ForecastFragment extends Fragment implements AdapterView.OnItemClic
     @Inject
     PreferenceRepository preferenceRepository;
 
+    @Inject
+    DateFormatter dateFormatter;
+
     public static final int FORECAST_LOADER = 0;
     public static final String SCROLL_POSITION = "scrollPosition";
     private String location;
@@ -44,17 +48,17 @@ public class ForecastFragment extends Fragment implements AdapterView.OnItemClic
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        ((SunshineApplication) getActivity().getApplication()).getObjectGraph().inject(this);
         getLoaderManager().initLoader(FORECAST_LOADER, null, this);
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        ((SunshineApplication) getActivity().getApplication()).getObjectGraph().inject(this);
         setHasOptionsMenu(true);
         rootView = inflater.inflate(R.layout.fragment_main, container, false);
         forecastList = (ListView) rootView.findViewById(R.id.forecast_listview);
         forecastList.setOnItemClickListener(this);
-        adapter = new ForecastCursorAdapter(getActivity(), null, 0);
+        adapter = new ForecastCursorAdapter(getActivity(), null, 0, dateFormatter);
         forecastList.setAdapter(adapter);
         if (savedInstanceState != null && savedInstanceState.containsKey(SCROLL_POSITION)) {
             scrollPosition = savedInstanceState.getInt(SCROLL_POSITION);

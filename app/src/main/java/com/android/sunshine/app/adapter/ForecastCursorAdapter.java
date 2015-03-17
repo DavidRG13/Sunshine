@@ -9,6 +9,7 @@ import android.widget.CursorAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 import com.android.sunshine.app.R;
+import com.android.sunshine.app.utils.DateFormatter;
 import com.android.sunshine.app.utils.Utilities;
 
 import static com.android.sunshine.app.repository.WeatherContract.WeatherEntry;
@@ -17,10 +18,12 @@ public class ForecastCursorAdapter extends CursorAdapter{
 
     private static final int TODAY_VIEW_TYPE = 0;
     private static final int FUTURE_DAY_VIEW_TYPE = 1;
+    private final DateFormatter dateFormatter;
     private boolean useTodayLayout;
 
-    public ForecastCursorAdapter(Context context, Cursor c, int flags) {
+    public ForecastCursorAdapter(Context context, Cursor c, int flags, final DateFormatter dateFormatter) {
         super(context, c, flags);
+        this.dateFormatter = dateFormatter;
     }
 
     @Override
@@ -51,7 +54,7 @@ public class ForecastCursorAdapter extends CursorAdapter{
 
         final ViewHolder viewHolder = (ViewHolder) view.getTag();
 
-        viewHolder.dateWeather.setText(Utilities.getFriendlyDay(context, weatherDate));
+        viewHolder.dateWeather.setText(dateFormatter.getFriendlyDay(weatherDate));
         viewHolder.forecastDescription.setText(descriptionWeather);
         viewHolder.max.setText(Utilities.formatTemperature(context, maxTemp));
         viewHolder.min.setText(Utilities.formatTemperature(context, minTemp));

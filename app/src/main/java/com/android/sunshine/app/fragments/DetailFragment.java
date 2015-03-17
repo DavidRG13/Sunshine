@@ -21,6 +21,7 @@ import android.widget.TextView;
 import com.android.sunshine.app.R;
 import com.android.sunshine.app.SunshineApplication;
 import com.android.sunshine.app.activities.DetailActivity;
+import com.android.sunshine.app.utils.DateFormatter;
 import com.android.sunshine.app.repository.WeatherContract.WeatherEntry;
 import com.android.sunshine.app.repository.PreferenceRepository;
 import com.android.sunshine.app.utils.Utilities;
@@ -31,6 +32,9 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
 
     @Inject
     PreferenceRepository preferenceRepository;
+
+    @Inject
+    DateFormatter dateFormatter;
 
     public static final int DETAIL_LOADER = 0;
     public static final String LOCATION_KEY = "location";
@@ -141,7 +145,7 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
             detailHumidity.setText(humidity);
             detailWind.setText(wind);
             detailPressure.setText(pressure);
-            detailDay.setText(Utilities.getDayName(getActivity(), date));
+            detailDay.setText(dateFormatter.getDayName(date));
             detailIcon.setImageResource(Utilities.getArtResourceForWeatherCondition(weatherId));
 
             weatherData = String.format(Locale.getDefault(), "%s - %s - %s/%s", date, description, max, min);

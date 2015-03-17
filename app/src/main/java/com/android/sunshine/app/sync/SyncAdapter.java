@@ -22,7 +22,7 @@ import android.support.v4.app.TaskStackBuilder;
 import android.util.Log;
 import com.android.sunshine.app.R;
 import com.android.sunshine.app.activities.MainActivity;
-import com.android.sunshine.app.model.WeatherContract;
+import com.android.sunshine.app.repository.WeatherContract;
 import com.android.sunshine.app.repository.PreferenceRepository;
 import com.android.sunshine.app.utils.Utilities;
 import java.io.BufferedReader;
@@ -38,7 +38,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import static com.android.sunshine.app.model.WeatherContract.WeatherEntry;
+import static com.android.sunshine.app.repository.WeatherContract.WeatherEntry;
 
 public class SyncAdapter extends AbstractThreadedSyncAdapter {
 

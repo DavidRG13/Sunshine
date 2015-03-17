@@ -1,11 +1,11 @@
-package com.android.sunshine.app.db;
+package com.android.sunshine.app.repository;
 
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
-import static com.android.sunshine.app.model.WeatherContract.LocationEntry;
-import static com.android.sunshine.app.model.WeatherContract.WeatherEntry;
+import static com.android.sunshine.app.repository.WeatherContract.LocationEntry;
+import static com.android.sunshine.app.repository.WeatherContract.WeatherEntry;
 
 public class DBHelper extends SQLiteOpenHelper{
 

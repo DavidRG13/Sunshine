@@ -15,15 +15,15 @@ import com.android.sunshine.app.R;
 import com.android.sunshine.app.SunshineApplication;
 import com.android.sunshine.app.adapter.ForecastCursorAdapter;
 import com.android.sunshine.app.callbacks.ItemClickCallback;
-import com.android.sunshine.app.model.WeatherContract;
+import com.android.sunshine.app.repository.WeatherContract;
 import com.android.sunshine.app.repository.PreferenceRepository;
 import com.android.sunshine.app.sync.SyncAdapter;
 
 import java.util.Date;
 import javax.inject.Inject;
 
-import static com.android.sunshine.app.model.WeatherContract.LocationEntry;
-import static com.android.sunshine.app.model.WeatherContract.WeatherEntry;
+import static com.android.sunshine.app.repository.WeatherContract.LocationEntry;
+import static com.android.sunshine.app.repository.WeatherContract.WeatherEntry;
 
 public class ForecastFragment extends Fragment implements AdapterView.OnItemClickListener, LoaderManager.LoaderCallbacks<Cursor> {
 

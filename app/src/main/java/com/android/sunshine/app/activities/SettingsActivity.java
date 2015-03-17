@@ -11,7 +11,7 @@ import android.preference.PreferenceManager;
 import com.android.sunshine.app.R;
 import com.android.sunshine.app.sync.SyncAdapter;
 
-import static com.android.sunshine.app.model.WeatherContract.WeatherEntry;
+import static com.android.sunshine.app.repository.WeatherContract.WeatherEntry;
 
 public class SettingsActivity extends PreferenceActivity implements Preference.OnPreferenceChangeListener {
 

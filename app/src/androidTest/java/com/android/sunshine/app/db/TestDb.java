@@ -4,9 +4,10 @@ import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.test.AndroidTestCase;
+import com.android.sunshine.app.repository.DBHelper;
 
-import static com.android.sunshine.app.model.WeatherContract.LocationEntry;
-import static com.android.sunshine.app.model.WeatherContract.WeatherEntry;
+import static com.android.sunshine.app.repository.WeatherContract.LocationEntry;
+import static com.android.sunshine.app.repository.WeatherContract.WeatherEntry;
 
 public class TestDb extends AndroidTestCase {
 

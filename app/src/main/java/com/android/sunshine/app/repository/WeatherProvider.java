@@ -1,4 +1,4 @@
-package com.android.sunshine.app.db;
+package com.android.sunshine.app.repository;
 
 import android.content.ContentProvider;
 import android.content.ContentUris;
@@ -9,10 +9,9 @@ import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteQueryBuilder;
 import android.net.Uri;
-import com.android.sunshine.app.model.WeatherContract;
 
-import static com.android.sunshine.app.model.WeatherContract.LocationEntry;
-import static com.android.sunshine.app.model.WeatherContract.WeatherEntry;
+import static com.android.sunshine.app.repository.WeatherContract.LocationEntry;
+import static com.android.sunshine.app.repository.WeatherContract.WeatherEntry;
 
 public class WeatherProvider extends ContentProvider {
 

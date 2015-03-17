@@ -4,7 +4,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 import com.android.sunshine.app.R;
-import com.android.sunshine.app.model.WeatherContract;
+import com.android.sunshine.app.repository.WeatherContract;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;

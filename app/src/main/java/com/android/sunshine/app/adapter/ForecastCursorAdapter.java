@@ -11,7 +11,7 @@ import android.widget.TextView;
 import com.android.sunshine.app.R;
 import com.android.sunshine.app.utils.Utilities;
 
-import static com.android.sunshine.app.model.WeatherContract.WeatherEntry;
+import static com.android.sunshine.app.repository.WeatherContract.WeatherEntry;
 
 public class ForecastCursorAdapter extends CursorAdapter{
 

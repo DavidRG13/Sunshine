@@ -38,7 +38,7 @@
 
         <provider
                 android:authorities="@string/content_authority"
-                android:name=".db.WeatherProvider"
+                android:name=".repository.WeatherProvider"
                 android:exported="false"
                 android:syncable="true" />
 

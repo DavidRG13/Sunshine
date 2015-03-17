@@ -1,4 +1,4 @@
-package com.android.sunshine.app.model;
+package com.android.sunshine.app.repository;
 
 import android.content.ContentUris;
 import android.net.Uri;

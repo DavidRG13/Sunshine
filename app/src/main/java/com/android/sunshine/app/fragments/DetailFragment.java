@@ -21,7 +21,7 @@ import android.widget.TextView;
 import com.android.sunshine.app.R;
 import com.android.sunshine.app.SunshineApplication;
 import com.android.sunshine.app.activities.DetailActivity;
-import com.android.sunshine.app.model.WeatherContract.WeatherEntry;
+import com.android.sunshine.app.repository.WeatherContract.WeatherEntry;
 import com.android.sunshine.app.repository.PreferenceRepository;
 import com.android.sunshine.app.utils.Utilities;
 import java.util.Locale;

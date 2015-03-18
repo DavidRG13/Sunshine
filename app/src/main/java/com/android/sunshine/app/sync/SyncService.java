@@ -20,6 +20,9 @@ public class SyncService extends Service{
     @Inject
     ForecastRepository forecastRepository;
 
+    @Inject
+    WeatherDataSource weatherDataSource;
+
     private static final Object sSyncAdapterLock = new Object();
     private static SyncAdapter sSunshineSyncAdapter = null;
 
@@ -28,7 +31,7 @@ public class SyncService extends Service{
         ((SunshineApplication) getApplication()).getObjectGraph().inject(this);
         synchronized (sSyncAdapterLock) {
             if (sSunshineSyncAdapter == null) {
-                sSunshineSyncAdapter = new SyncAdapter(getApplicationContext(), true, preferenceRepository, weatherJsonParser, forecastRepository);
+                sSunshineSyncAdapter = new SyncAdapter(getApplicationContext(), true, preferenceRepository, weatherJsonParser, forecastRepository, weatherDataSource);
             }
         }
     }

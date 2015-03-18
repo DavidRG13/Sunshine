@@ -17,7 +17,6 @@ import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.TaskStackBuilder;
-import android.util.Log;
 import com.android.sunshine.app.R;
 import com.android.sunshine.app.activities.MainActivity;
 import com.android.sunshine.app.repository.ForecastRepository;
@@ -26,12 +25,6 @@ import com.android.sunshine.app.repository.WeatherContract;
 import com.android.sunshine.app.utils.Utilities;
 import com.android.sunshine.app.utils.Weather;
 import com.android.sunshine.app.utils.WeatherJsonParser;
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.Date;
 
@@ -41,12 +34,6 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
 
     public static final int SYNC_INTERVAL = 60 * 180;
     public static final int SYNC_FLEXTIME = SYNC_INTERVAL / 3;
-    public static final String QUERY_PARAM = "q";
-    public static final String MODE_PARAM = "mode";
-    public static final String UNITS_PARAM = "units";
-    public static final String DAYS_PARAM = "cnt";
-    public static final String BASE_URI = "http://api.openweathermap.org/data/2.5/forecast/daily";
-
     private static final long DAY_IN_MILLIS = 1000 * 60 * 60 * 24;
     private static final int WEATHER_NOTIFICATION_ID = 3004;
 
@@ -66,68 +53,24 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
     private final PreferenceRepository preferenceRepository;
     private final WeatherJsonParser weatherJsonParser;
     private final ForecastRepository forecastRepository;
+    private final WeatherDataSource weatherDataSource;
 
-    public SyncAdapter(final Context context, final boolean autoInitialize, final PreferenceRepository preferenceRepository, final WeatherJsonParser weatherJsonParser, final ForecastRepository forecastRepository) {
+    public SyncAdapter(final Context context, final boolean autoInitialize, final PreferenceRepository preferenceRepository, final WeatherJsonParser weatherJsonParser, final ForecastRepository forecastRepository, final WeatherDataSource weatherDataSource) {
         super(context, autoInitialize);
         this.preferenceRepository = preferenceRepository;
         this.weatherJsonParser = weatherJsonParser;
         this.forecastRepository = forecastRepository;
+        this.weatherDataSource = weatherDataSource;
     }
 
     @Override
     public void onPerformSync(Account account, Bundle extras, String authority, ContentProviderClient provider, SyncResult syncResult) {
         final String locationSettings = preferenceRepository.getLocation();
-
-        Uri.Builder builder = Uri.parse(BASE_URI).buildUpon()
-                .appendQueryParameter(QUERY_PARAM, locationSettings)
-                .appendQueryParameter(MODE_PARAM, "json")
-                .appendQueryParameter(UNITS_PARAM, "metric")
-                .appendQueryParameter(DAYS_PARAM, "14");
-
-        HttpURLConnection urlConnection = null;
-        BufferedReader reader = null;
-        String forecastJsonStr = null;
-
-        try {
-            final String uri = builder.build().toString();
-            URL url = new URL(uri);
-
-            urlConnection = (HttpURLConnection) url.openConnection();
-            urlConnection.setRequestMethod("GET");
-            urlConnection.connect();
-
-            InputStream inputStream = urlConnection.getInputStream();
-            StringBuilder buffer = new StringBuilder();
-            if (inputStream != null) {
-                reader = new BufferedReader(new InputStreamReader(inputStream));
-
-                String line;
-                while ((line = reader.readLine()) != null) {
-                    buffer.append(line).append("\n");
-                }
-
-                if (buffer.length() > 0) {
-                    forecastJsonStr = buffer.toString();
-                }
-                long locationId = forecastRepository.addLocation(weatherJsonParser.parseLocation(forecastJsonStr, locationSettings));
-                ArrayList<Weather> weathers = weatherJsonParser.parseWeatherDataFromJson(forecastJsonStr, locationId);
-                forecastRepository.saveWeathers(weathers);
-                notifyWeather();
-            }
-        } catch (IOException e) {
-            Log.e("WeatherRequester", "Error ", e);
-        } finally {
-            if (urlConnection != null) {
-                urlConnection.disconnect();
-            }
-            if (reader != null) {
-                try {
-                    reader.close();
-                } catch (final IOException e) {
-                    Log.e("PlaceholderFragment", "Error closing stream", e);
-                }
-            }
-        }
+        String jsonResponse = weatherDataSource.getForecastFor(locationSettings);
+        long locationId = forecastRepository.addLocation(weatherJsonParser.parseLocation(jsonResponse, locationSettings));
+        ArrayList<Weather> weathers = weatherJsonParser.parseWeatherDataFromJson(jsonResponse, locationId);
+        forecastRepository.saveWeathers(weathers);
+        notifyWeather();
     }
 
     public static void syncImmediately(Context context) {

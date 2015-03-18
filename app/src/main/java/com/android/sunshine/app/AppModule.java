@@ -4,8 +4,11 @@ import android.content.Context;
 import com.android.sunshine.app.fragments.DetailFragment;
 import com.android.sunshine.app.fragments.ForecastFragment;
 import com.android.sunshine.app.repository.ForecastRepository;
+import com.android.sunshine.app.repository.PreferenceRepository;
 import com.android.sunshine.app.repository.SQLiteRepository;
 import com.android.sunshine.app.sync.Downloader;
+import com.android.sunshine.app.sync.NotificationsNotifier;
+import com.android.sunshine.app.sync.Notifier;
 import com.android.sunshine.app.sync.OWMDataSource;
 import com.android.sunshine.app.sync.SyncService;
 import com.android.sunshine.app.sync.WeatherDataSource;
@@ -45,5 +48,10 @@ public class AppModule {
     @Provides
     public WeatherDataSource providesWeatherDataSource(final Downloader downloader) {
         return new OWMDataSource(downloader);
+    }
+
+    @Provides
+    public Notifier providesNotifier(final PreferenceRepository preferenceRepository){
+        return new NotificationsNotifier(preferenceRepository, appContext);
     }
 }

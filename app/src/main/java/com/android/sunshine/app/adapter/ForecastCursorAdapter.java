@@ -10,6 +10,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import com.android.sunshine.app.R;
 import com.android.sunshine.app.utils.DateFormatter;
+import com.android.sunshine.app.utils.TemperatureFormatter;
 import com.android.sunshine.app.utils.Utilities;
 
 import static com.android.sunshine.app.repository.WeatherContract.WeatherEntry;
@@ -19,11 +20,15 @@ public class ForecastCursorAdapter extends CursorAdapter{
     private static final int TODAY_VIEW_TYPE = 0;
     private static final int FUTURE_DAY_VIEW_TYPE = 1;
     private final DateFormatter dateFormatter;
+    private final TemperatureFormatter temperatureFormatter;
+    private final boolean isMetric;
     private boolean useTodayLayout;
 
-    public ForecastCursorAdapter(Context context, Cursor c, int flags, final DateFormatter dateFormatter) {
+    public ForecastCursorAdapter(Context context, Cursor c, int flags, final DateFormatter dateFormatter, final TemperatureFormatter temperatureFormatter, final boolean isMetric) {
         super(context, c, flags);
         this.dateFormatter = dateFormatter;
+        this.temperatureFormatter = temperatureFormatter;
+        this.isMetric = isMetric;
     }
 
     @Override
@@ -56,8 +61,8 @@ public class ForecastCursorAdapter extends CursorAdapter{
 
         viewHolder.dateWeather.setText(dateFormatter.getFriendlyDay(weatherDate));
         viewHolder.forecastDescription.setText(descriptionWeather);
-        viewHolder.max.setText(Utilities.formatTemperature(context, maxTemp));
-        viewHolder.min.setText(Utilities.formatTemperature(context, minTemp));
+        viewHolder.max.setText(temperatureFormatter.format(maxTemp, isMetric));
+        viewHolder.min.setText(temperatureFormatter.format(minTemp, isMetric));
 
         if(getItemViewType(cursor.getPosition()) == TODAY_VIEW_TYPE){
             viewHolder.forecastIcon.setImageResource(Utilities.getArtResourceForWeatherCondition(weatherId));

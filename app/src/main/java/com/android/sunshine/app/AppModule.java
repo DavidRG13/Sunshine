@@ -13,6 +13,7 @@ import com.android.sunshine.app.sync.OWMDataSource;
 import com.android.sunshine.app.sync.SyncService;
 import com.android.sunshine.app.sync.WeatherDataSource;
 import com.android.sunshine.app.utils.ManualWeatherJsonParser;
+import com.android.sunshine.app.utils.TemperatureFormatter;
 import com.android.sunshine.app.utils.WeatherJsonParser;
 import dagger.Module;
 import dagger.Provides;
@@ -51,7 +52,7 @@ public class AppModule {
     }
 
     @Provides
-    public Notifier providesNotifier(final PreferenceRepository preferenceRepository){
-        return new NotificationsNotifier(preferenceRepository, appContext);
+    public Notifier providesNotifier(final PreferenceRepository preferenceRepository, final TemperatureFormatter temperatureFormatter){
+        return new NotificationsNotifier(preferenceRepository, appContext, temperatureFormatter);
     }
 }

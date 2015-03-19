@@ -24,6 +24,7 @@ import com.android.sunshine.app.activities.DetailActivity;
 import com.android.sunshine.app.utils.DateFormatter;
 import com.android.sunshine.app.repository.WeatherContract.WeatherEntry;
 import com.android.sunshine.app.repository.PreferenceRepository;
+import com.android.sunshine.app.utils.TemperatureFormatter;
 import com.android.sunshine.app.utils.Utilities;
 import java.util.Locale;
 import javax.inject.Inject;
@@ -35,6 +36,9 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
 
     @Inject
     DateFormatter dateFormatter;
+
+    @Inject
+    TemperatureFormatter temperatureFormatter;
 
     public static final int DETAIL_LOADER = 0;
     public static final String LOCATION_KEY = "location";
@@ -135,8 +139,8 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
             final String humidity = data.getString(data.getColumnIndex(WeatherEntry.COLUMN_HUMIDITY));
             final double maxTemp = data.getDouble(data.getColumnIndex(WeatherEntry.COLUMN_MAX_TEMP));
             final double minTemp = data.getDouble(data.getColumnIndex(WeatherEntry.COLUMN_MIN_TEMP));
-            final String max = String.valueOf(Utilities.formatTemperature(getActivity(), maxTemp));
-            final String min = String.valueOf(Utilities.formatTemperature(getActivity(), minTemp));
+            final String max = String.valueOf(temperatureFormatter.format(maxTemp, preferenceRepository.isMetric()));
+            final String min = String.valueOf(temperatureFormatter.format(minTemp, preferenceRepository.isMetric()));
 
             detailDate.setText(date);
             detailDescription.setText(description);

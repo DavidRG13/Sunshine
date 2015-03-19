@@ -35,4 +35,8 @@ public class PreferenceRepository {
         String displayNotificationsKey = context.getString(R.string.pref_enable_notifications_key);
         return sharedPreferences.getBoolean(displayNotificationsKey, Boolean.parseBoolean(context.getString(R.string.pref_enable_notifications_default)));
     }
+
+    public boolean isMetric() {
+        return sharedPreferences.getString(context.getString(R.string.pref_unit_key), context.getString(R.string.prefs_units_imperial)).equals(context.getString(R.string.prefs_units_imperial));
+    }
 }

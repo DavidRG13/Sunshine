@@ -20,6 +20,7 @@ import com.android.sunshine.app.repository.WeatherContract;
 import com.android.sunshine.app.repository.PreferenceRepository;
 import com.android.sunshine.app.sync.SyncAdapter;
 
+import com.android.sunshine.app.utils.TemperatureFormatter;
 import java.util.Date;
 import javax.inject.Inject;
 
@@ -33,6 +34,9 @@ public class ForecastFragment extends Fragment implements AdapterView.OnItemClic
 
     @Inject
     DateFormatter dateFormatter;
+
+    @Inject
+    TemperatureFormatter temperatureFormatter;
 
     public static final int FORECAST_LOADER = 0;
     public static final String SCROLL_POSITION = "scrollPosition";
@@ -58,7 +62,7 @@ public class ForecastFragment extends Fragment implements AdapterView.OnItemClic
         rootView = inflater.inflate(R.layout.fragment_main, container, false);
         forecastList = (ListView) rootView.findViewById(R.id.forecast_listview);
         forecastList.setOnItemClickListener(this);
-        adapter = new ForecastCursorAdapter(getActivity(), null, 0, dateFormatter);
+        adapter = new ForecastCursorAdapter(getActivity(), null, 0, dateFormatter, temperatureFormatter, preferenceRepository.isMetric());
         forecastList.setAdapter(adapter);
         if (savedInstanceState != null && savedInstanceState.containsKey(SCROLL_POSITION)) {
             scrollPosition = savedInstanceState.getInt(SCROLL_POSITION);

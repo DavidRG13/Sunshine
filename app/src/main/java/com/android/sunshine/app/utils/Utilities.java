@@ -1,32 +1,8 @@
 package com.android.sunshine.app.utils;
 
-import android.content.Context;
-import android.content.SharedPreferences;
-import android.preference.PreferenceManager;
 import com.android.sunshine.app.R;
-import com.android.sunshine.app.repository.WeatherContract;
-
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Date;
 
 public class Utilities {
-
-    public static String formatTemperature(final Context context, final double temperature) {
-        double temp;
-        if (isMetric(context)){
-            temp = temperature;
-        }else {
-            temp = 9 * temperature / 5 + 32;
-        }
-        return context.getString(R.string.format_temperature, temp);
-    }
-
-    public static boolean isMetric(final Context context) {
-        final SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
-        return prefs.getString(context.getString(R.string.pref_unit_key), context.getString(R.string.prefs_units_imperial)).equals(context.getString(R.string.prefs_units_imperial));
-    }
 
     public static int getIconResourceForWeatherCondition(int weatherId) {
         if (weatherId >= 200 && weatherId <= 232) {

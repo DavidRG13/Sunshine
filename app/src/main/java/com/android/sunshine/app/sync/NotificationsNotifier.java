@@ -12,6 +12,7 @@ import com.android.sunshine.app.R;
 import com.android.sunshine.app.activities.MainActivity;
 import com.android.sunshine.app.repository.PreferenceRepository;
 import com.android.sunshine.app.repository.WeatherContract;
+import com.android.sunshine.app.utils.TemperatureFormatter;
 import com.android.sunshine.app.utils.Utilities;
 import java.util.Date;
 import javax.inject.Inject;
@@ -36,11 +37,13 @@ public class NotificationsNotifier implements Notifier {
 
     private PreferenceRepository preferenceRepository;
     private Context context;
+    private TemperatureFormatter temperatureFormatter;
 
     @Inject
-    public NotificationsNotifier(final PreferenceRepository preferenceRepository, final Context context){
+    public NotificationsNotifier(final PreferenceRepository preferenceRepository, final Context context, final TemperatureFormatter temperatureFormatter){
         this.preferenceRepository = preferenceRepository;
         this.context = context;
+        this.temperatureFormatter = temperatureFormatter;
     }
 
     @Override
@@ -66,8 +69,8 @@ public class NotificationsNotifier implements Notifier {
 
                     String contentText = String.format(context.getString(R.string.format_notification),
                         desc,
-                        Utilities.formatTemperature(context, high),
-                        Utilities.formatTemperature(context, low));
+                        temperatureFormatter.format(high, preferenceRepository.isMetric()),
+                        temperatureFormatter.format(low, preferenceRepository.isMetric()));
 
                     NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(context)
                         .setSmallIcon(iconId)

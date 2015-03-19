@@ -13,7 +13,7 @@ import com.android.sunshine.app.activities.MainActivity;
 import com.android.sunshine.app.repository.PreferenceRepository;
 import com.android.sunshine.app.repository.WeatherContract;
 import com.android.sunshine.app.utils.TemperatureFormatter;
-import com.android.sunshine.app.utils.Utilities;
+import com.android.sunshine.app.utils.WeatherImageProvider;
 import java.util.Date;
 import javax.inject.Inject;
 
@@ -38,12 +38,14 @@ public class NotificationsNotifier implements Notifier {
     private PreferenceRepository preferenceRepository;
     private Context context;
     private TemperatureFormatter temperatureFormatter;
+    private WeatherImageProvider weatherImageProvider;
 
     @Inject
-    public NotificationsNotifier(final PreferenceRepository preferenceRepository, final Context context, final TemperatureFormatter temperatureFormatter){
+    public NotificationsNotifier(final PreferenceRepository preferenceRepository, final Context context, final TemperatureFormatter temperatureFormatter, final WeatherImageProvider weatherImageProvider){
         this.preferenceRepository = preferenceRepository;
         this.context = context;
         this.temperatureFormatter = temperatureFormatter;
+        this.weatherImageProvider = weatherImageProvider;
     }
 
     @Override
@@ -64,7 +66,7 @@ public class NotificationsNotifier implements Notifier {
                     double low = cursor.getDouble(INDEX_MIN_TEMP);
                     String desc = cursor.getString(INDEX_SHORT_DESC);
 
-                    int iconId = Utilities.getIconResourceForWeatherCondition(weatherId);
+                    int iconId = weatherImageProvider.getIconResourceForWeatherCondition(weatherId);
                     String title = context.getString(R.string.app_name);
 
                     String contentText = String.format(context.getString(R.string.format_notification),

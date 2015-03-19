@@ -21,11 +21,11 @@ import android.widget.TextView;
 import com.android.sunshine.app.R;
 import com.android.sunshine.app.SunshineApplication;
 import com.android.sunshine.app.activities.DetailActivity;
-import com.android.sunshine.app.utils.DateFormatter;
-import com.android.sunshine.app.repository.WeatherContract.WeatherEntry;
 import com.android.sunshine.app.repository.PreferenceRepository;
+import com.android.sunshine.app.repository.WeatherContract.WeatherEntry;
+import com.android.sunshine.app.utils.DateFormatter;
 import com.android.sunshine.app.utils.TemperatureFormatter;
-import com.android.sunshine.app.utils.Utilities;
+import com.android.sunshine.app.utils.WeatherImageProvider;
 import java.util.Locale;
 import javax.inject.Inject;
 
@@ -39,6 +39,9 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
 
     @Inject
     TemperatureFormatter temperatureFormatter;
+
+    @Inject
+    WeatherImageProvider weatherImageProvider;
 
     public static final int DETAIL_LOADER = 0;
     public static final String LOCATION_KEY = "location";
@@ -150,7 +153,7 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
             detailWind.setText(wind);
             detailPressure.setText(pressure);
             detailDay.setText(dateFormatter.getDayName(date));
-            detailIcon.setImageResource(Utilities.getArtResourceForWeatherCondition(weatherId));
+            detailIcon.setImageResource(weatherImageProvider.getArtResourceForWeatherCondition(weatherId));
 
             weatherData = String.format(Locale.getDefault(), "%s - %s - %s/%s", date, description, max, min);
         }

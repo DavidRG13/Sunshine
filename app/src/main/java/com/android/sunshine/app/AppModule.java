@@ -9,12 +9,13 @@ import com.android.sunshine.app.repository.SQLiteRepository;
 import com.android.sunshine.app.sync.Downloader;
 import com.android.sunshine.app.sync.NotificationsNotifier;
 import com.android.sunshine.app.sync.Notifier;
-import com.android.sunshine.app.sync.OWMDataSource;
+import com.android.sunshine.app.sync.OWM;
 import com.android.sunshine.app.sync.SyncService;
 import com.android.sunshine.app.sync.WeatherDataSource;
 import com.android.sunshine.app.utils.ManualWeatherJsonParser;
 import com.android.sunshine.app.utils.TemperatureFormatter;
 import com.android.sunshine.app.utils.WeatherJsonParser;
+import com.android.sunshine.app.utils.WeatherImageProvider;
 import dagger.Module;
 import dagger.Provides;
 
@@ -48,11 +49,16 @@ public class AppModule {
 
     @Provides
     public WeatherDataSource providesWeatherDataSource(final Downloader downloader) {
-        return new OWMDataSource(downloader);
+        return new OWM(downloader);
     }
 
     @Provides
-    public Notifier providesNotifier(final PreferenceRepository preferenceRepository, final TemperatureFormatter temperatureFormatter){
-        return new NotificationsNotifier(preferenceRepository, appContext, temperatureFormatter);
+    public WeatherImageProvider providesWeatherResourceProvider(final Downloader downloader){
+        return new OWM(downloader);
+    }
+
+    @Provides
+    public Notifier providesNotifier(final PreferenceRepository preferenceRepository, final TemperatureFormatter temperatureFormatter, final WeatherImageProvider weatherImageProvider){
+        return new NotificationsNotifier(preferenceRepository, appContext, temperatureFormatter, weatherImageProvider);
     }
 }

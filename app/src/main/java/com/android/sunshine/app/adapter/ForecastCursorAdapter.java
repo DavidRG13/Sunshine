@@ -11,7 +11,7 @@ import android.widget.TextView;
 import com.android.sunshine.app.R;
 import com.android.sunshine.app.utils.DateFormatter;
 import com.android.sunshine.app.utils.TemperatureFormatter;
-import com.android.sunshine.app.utils.Utilities;
+import com.android.sunshine.app.utils.WeatherImageProvider;
 
 import static com.android.sunshine.app.repository.WeatherContract.WeatherEntry;
 
@@ -22,13 +22,15 @@ public class ForecastCursorAdapter extends CursorAdapter{
     private final DateFormatter dateFormatter;
     private final TemperatureFormatter temperatureFormatter;
     private final boolean isMetric;
+    private final WeatherImageProvider weatherImageProvider;
     private boolean useTodayLayout;
 
-    public ForecastCursorAdapter(Context context, Cursor c, int flags, final DateFormatter dateFormatter, final TemperatureFormatter temperatureFormatter, final boolean isMetric) {
+    public ForecastCursorAdapter(Context context, Cursor c, int flags, final DateFormatter dateFormatter, final TemperatureFormatter temperatureFormatter, final boolean isMetric, final WeatherImageProvider weatherImageProvider) {
         super(context, c, flags);
         this.dateFormatter = dateFormatter;
         this.temperatureFormatter = temperatureFormatter;
         this.isMetric = isMetric;
+        this.weatherImageProvider = weatherImageProvider;
     }
 
     @Override
@@ -65,9 +67,9 @@ public class ForecastCursorAdapter extends CursorAdapter{
         viewHolder.min.setText(temperatureFormatter.format(minTemp, isMetric));
 
         if(getItemViewType(cursor.getPosition()) == TODAY_VIEW_TYPE){
-            viewHolder.forecastIcon.setImageResource(Utilities.getArtResourceForWeatherCondition(weatherId));
+            viewHolder.forecastIcon.setImageResource(weatherImageProvider.getArtResourceForWeatherCondition(weatherId));
         }else{
-            viewHolder.forecastIcon.setImageResource(Utilities.getIconResourceForWeatherCondition(weatherId));
+            viewHolder.forecastIcon.setImageResource(weatherImageProvider.getIconResourceForWeatherCondition(weatherId));
         }
     }
 

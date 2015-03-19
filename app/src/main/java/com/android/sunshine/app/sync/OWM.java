@@ -1,10 +1,36 @@
-package com.android.sunshine.app.utils;
+package com.android.sunshine.app.sync;
 
+import android.net.Uri;
 import com.android.sunshine.app.R;
+import com.android.sunshine.app.utils.WeatherImageProvider;
 
-public class Utilities {
+public class OWM implements WeatherDataSource, WeatherImageProvider {
 
-    public static int getIconResourceForWeatherCondition(int weatherId) {
+    public static final String QUERY_PARAM = "q";
+    public static final String MODE_PARAM = "mode";
+    public static final String UNITS_PARAM = "units";
+    public static final String DAYS_PARAM = "cnt";
+    public static final String BASE_URI = "http://api.openweathermap.org/data/2.5/forecast/daily";
+
+    private Downloader downloader;
+
+    public OWM(final Downloader downloader) {
+        this.downloader = downloader;
+    }
+
+    @Override
+    public String getForecastFor(final String location) {
+        Uri.Builder builder = Uri.parse(BASE_URI).buildUpon()
+            .appendQueryParameter(QUERY_PARAM, location)
+            .appendQueryParameter(MODE_PARAM, "json")
+            .appendQueryParameter(UNITS_PARAM, "metric")
+            .appendQueryParameter(DAYS_PARAM, "14");
+
+        return downloader.fromUri(builder.build());
+    }
+
+    @Override
+    public int getIconResourceForWeatherCondition(int weatherId) {
         if (weatherId >= 200 && weatherId <= 232) {
             return R.drawable.ic_storm;
         } else if (weatherId >= 300 && weatherId <= 321) {
@@ -31,7 +57,8 @@ public class Utilities {
         return -1;
     }
 
-    public static int getArtResourceForWeatherCondition(int weatherId) {
+    @Override
+    public int getArtResourceForWeatherCondition(int weatherId) {
         if (weatherId >= 200 && weatherId <= 232) {
             return R.drawable.art_storm;
         } else if (weatherId >= 300 && weatherId <= 321) {

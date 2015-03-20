@@ -1,7 +1,5 @@
 package com.android.sunshine.app.utils;
 
-import android.content.Context;
-import com.android.sunshine.app.R;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -12,11 +10,11 @@ public class DateFormatter {
 
     public static final String DATE_FORMAT = "yyyyMMdd";
 
-    private Context context;
+    private StringFormatter stringFormatter;
 
     @Inject
-    public DateFormatter(final Context context) {
-        this.context = context;
+    public DateFormatter(final StringFormatter stringFormatter) {
+        this.stringFormatter = stringFormatter;
     }
 
     public String getFriendlyDay(String dateStr) {
@@ -25,10 +23,7 @@ public class DateFormatter {
         Date inputDate = getDateFromDb(dateStr);
 
         if (todayStr.equals(dateStr)) {
-            return context.getString(
-                R.string.format_full_friendly_date,
-                context.getString(R.string.today),
-                getFormattedMonthDay(dateStr));
+            return stringFormatter.getFriendlyToday(getFormattedMonthDay(dateStr));
         } else {
             Calendar cal = Calendar.getInstance();
             cal.setTime(todayDate);
@@ -50,7 +45,7 @@ public class DateFormatter {
             Date inputDate = dbDateFormat.parse(dateStr);
             Date todayDate = new Date();
             if (getDbDateString(todayDate).equals(dateStr)) {
-                return context.getString(R.string.today);
+                return stringFormatter.getToday();
             } else {
                 Calendar cal = Calendar.getInstance();
                 cal.setTime(todayDate);
@@ -58,7 +53,7 @@ public class DateFormatter {
                 Date tomorrowDate = cal.getTime();
                 if (getDbDateString(tomorrowDate).equals(
                     dateStr)) {
-                    return context.getString(R.string.tomorrow);
+                    return stringFormatter.getTomorrow();
                 } else {
                     SimpleDateFormat dayFormat = new SimpleDateFormat("EEEE");
                     return dayFormat.format(inputDate);

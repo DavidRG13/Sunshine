@@ -12,6 +12,7 @@ import com.android.sunshine.app.sync.Notifier;
 import com.android.sunshine.app.sync.OWM;
 import com.android.sunshine.app.sync.SyncService;
 import com.android.sunshine.app.sync.WeatherDataSource;
+import com.android.sunshine.app.utils.DateFormatter;
 import com.android.sunshine.app.utils.ManualWeatherJsonParser;
 import com.android.sunshine.app.utils.TemperatureFormatter;
 import com.android.sunshine.app.utils.WeatherJsonParser;
@@ -38,13 +39,13 @@ public class AppModule {
     }
 
     @Provides
-    public ForecastRepository providesForecastRepository() {
-        return new SQLiteRepository(appContext);
+    public ForecastRepository providesForecastRepository(final DateFormatter dateFormatter) {
+        return new SQLiteRepository(appContext, dateFormatter);
     }
 
     @Provides
-    public WeatherJsonParser providesWeatherJsonParser() {
-        return new ManualWeatherJsonParser();
+    public WeatherJsonParser providesWeatherJsonParser(final DateFormatter dateFormatter) {
+        return new ManualWeatherJsonParser(dateFormatter);
     }
 
     @Provides
@@ -58,7 +59,7 @@ public class AppModule {
     }
 
     @Provides
-    public Notifier providesNotifier(final PreferenceRepository preferenceRepository, final TemperatureFormatter temperatureFormatter, final WeatherImageProvider weatherImageProvider){
-        return new NotificationsNotifier(preferenceRepository, appContext, temperatureFormatter, weatherImageProvider);
+    public Notifier providesNotifier(final PreferenceRepository preferenceRepository, final TemperatureFormatter temperatureFormatter, final WeatherImageProvider weatherImageProvider, final DateFormatter dateFormatter){
+        return new NotificationsNotifier(preferenceRepository, appContext, temperatureFormatter, weatherImageProvider, dateFormatter);
     }
 }

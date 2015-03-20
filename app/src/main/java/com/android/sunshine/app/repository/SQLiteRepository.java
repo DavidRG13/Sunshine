@@ -4,6 +4,7 @@ import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
+import com.android.sunshine.app.utils.DateFormatter;
 import com.android.sunshine.app.utils.LocationProperties;
 import com.android.sunshine.app.utils.Weather;
 import java.util.Calendar;
@@ -14,10 +15,12 @@ import javax.inject.Inject;
 public class SQLiteRepository implements ForecastRepository {
 
     private Context context;
+    private DateFormatter dateFormatter;
 
     @Inject
-    public SQLiteRepository(final Context context) {
+    public SQLiteRepository(final Context context, final DateFormatter dateFormatter) {
         this.context = context;
+        this.dateFormatter = dateFormatter;
     }
 
     @Override
@@ -27,7 +30,7 @@ public class SQLiteRepository implements ForecastRepository {
 
             Calendar cal = Calendar.getInstance();
             cal.add(Calendar.DATE, -1);
-            String yesterdayDate = WeatherContract.getDbDateString(cal.getTime());
+            String yesterdayDate = dateFormatter.getDbDateString(cal.getTime());
             context.getContentResolver().delete(WeatherContract.WeatherEntry.CONTENT_URI,
                 WeatherContract.WeatherEntry.COLUMN_DATETEXT + " <= ?", new String[] {yesterdayDate});
         }

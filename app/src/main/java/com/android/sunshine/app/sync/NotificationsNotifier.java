@@ -12,6 +12,7 @@ import com.android.sunshine.app.R;
 import com.android.sunshine.app.activities.MainActivity;
 import com.android.sunshine.app.repository.PreferenceRepository;
 import com.android.sunshine.app.repository.WeatherContract;
+import com.android.sunshine.app.utils.DateFormatter;
 import com.android.sunshine.app.utils.TemperatureFormatter;
 import com.android.sunshine.app.utils.WeatherImageProvider;
 import java.util.Date;
@@ -39,13 +40,16 @@ public class NotificationsNotifier implements Notifier {
     private Context context;
     private TemperatureFormatter temperatureFormatter;
     private WeatherImageProvider weatherImageProvider;
+    private DateFormatter dateFormatter;
 
     @Inject
-    public NotificationsNotifier(final PreferenceRepository preferenceRepository, final Context context, final TemperatureFormatter temperatureFormatter, final WeatherImageProvider weatherImageProvider){
+    public NotificationsNotifier(final PreferenceRepository preferenceRepository, final Context context, final TemperatureFormatter temperatureFormatter, final WeatherImageProvider weatherImageProvider, final
+        DateFormatter dateFormatter){
         this.preferenceRepository = preferenceRepository;
         this.context = context;
         this.temperatureFormatter = temperatureFormatter;
         this.weatherImageProvider = weatherImageProvider;
+        this.dateFormatter = dateFormatter;
     }
 
     @Override
@@ -56,7 +60,7 @@ public class NotificationsNotifier implements Notifier {
             if (System.currentTimeMillis() - lastSync >= DAY_IN_MILLIS) {
                 String locationQuery = preferenceRepository.getLocation();
 
-                Uri weatherUri = WeatherContract.WeatherEntry.buildWeatherLocationWithDate(locationQuery, WeatherContract.getDbDateString(new Date()));
+                Uri weatherUri = WeatherContract.WeatherEntry.buildWeatherLocationWithDate(locationQuery, dateFormatter.getDbDateString(new Date()));
 
                 Cursor cursor = context.getContentResolver().query(weatherUri, NOTIFY_WEATHER_PROJECTION, null, null, null);
 

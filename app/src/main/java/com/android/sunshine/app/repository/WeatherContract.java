@@ -4,17 +4,12 @@ import android.content.ContentUris;
 import android.net.Uri;
 import android.provider.BaseColumns;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-
 public class WeatherContract {
 
     public static final String CONTENT_AUTHORITY = "com.android.sunshine.app";
     public static final Uri BASE_CONTENT_URI = Uri.parse("content://" + CONTENT_AUTHORITY);
     public static final String PATH_WEATHER = "weather";
     public static final String PATH_LOCATION = "location";
-    public static final String DATE_FORMAT = "yyyyMMdd";
 
     public static final class WeatherEntry implements BaseColumns {
 
@@ -88,8 +83,8 @@ public class WeatherContract {
         public static String getStartDateFromUri(Uri uri) {
             return uri.getQueryParameter(COLUMN_DATETEXT);
         }
-
     }
+
     public static final class LocationEntry implements  BaseColumns{
 
         public static final Uri CONTENT_URI = BASE_CONTENT_URI.buildUpon().appendPath(PATH_LOCATION).build();
@@ -101,24 +96,9 @@ public class WeatherContract {
         public static final String COLUMN_CITY_NAME = "city_name";
         public static final String COLUMN_COORD_LAT = "coord_lat";
         public static final String COLUMN_COORD_LONG = "coord_long";
+
         public static Uri buildLocationUri(long id){
             return ContentUris.withAppendedId(CONTENT_URI, id);
         }
-
-    }
-    public static String getDbDateString(final Date date){
-        final SimpleDateFormat dateFormat = new SimpleDateFormat(DATE_FORMAT);
-        return dateFormat.format(date);
-    }
-
-    public static Date getDateFromDb(String date) {
-        final SimpleDateFormat simpleDateFormat = new SimpleDateFormat(DATE_FORMAT);
-        Date parsedDate = null;
-        try {
-            parsedDate = simpleDateFormat.parse(date);
-        } catch (ParseException e) {
-            e.printStackTrace();
-        }
-        return parsedDate;
     }
 }

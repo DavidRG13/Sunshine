@@ -1,9 +1,9 @@
 package com.android.sunshine.app.utils;
 
 import android.util.Log;
-import com.android.sunshine.app.repository.WeatherContract;
 import java.util.ArrayList;
 import java.util.Date;
+import javax.inject.Inject;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -27,6 +27,12 @@ public class ManualWeatherJsonParser implements WeatherJsonParser {
     private final String OWM_WINDSPEED = "speed";
     private final String OWM_WIND_DIRECTION = "deg";
     private final String OWM_WEATHER_ID = "id";
+    private DateFormatter dateFormatter;
+
+    @Inject
+    public ManualWeatherJsonParser(final DateFormatter dateFormatter) {
+        this.dateFormatter = dateFormatter;
+    }
 
     @Override
     public ArrayList<Weather> parseWeatherDataFromJson(final String forecast, final long locationId) {
@@ -51,7 +57,7 @@ public class ManualWeatherJsonParser implements WeatherJsonParser {
                 double high = temperatureObject.getDouble(OWM_MAX);
                 double low = temperatureObject.getDouble(OWM_MIN);
 
-                Weather weather = new Weather(weatherId, description, WeatherContract.getDbDateString(new Date(dateTime * 1000l)), humidity, pressure, windSpeed, windDirection, high, low, locationId);
+                Weather weather = new Weather(weatherId, description, dateFormatter.getDbDateString(new Date(dateTime * 1000l)), humidity, pressure, windSpeed, windDirection, high, low, locationId);
                 weathers.add(weather);
             }
         } catch (JSONException e) {

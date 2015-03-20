@@ -8,18 +8,21 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
-import android.view.*;
+import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
+import android.view.View;
+import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ListView;
 import com.android.sunshine.app.R;
 import com.android.sunshine.app.SunshineApplication;
-import com.android.sunshine.app.utils.DateFormatter;
 import com.android.sunshine.app.adapter.ForecastCursorAdapter;
 import com.android.sunshine.app.callbacks.ItemClickCallback;
-import com.android.sunshine.app.repository.WeatherContract;
 import com.android.sunshine.app.repository.PreferenceRepository;
 import com.android.sunshine.app.sync.SyncAdapter;
-
+import com.android.sunshine.app.utils.DateFormatter;
 import com.android.sunshine.app.utils.TemperatureFormatter;
 import com.android.sunshine.app.utils.WeatherImageProvider;
 import java.util.Date;
@@ -115,7 +118,7 @@ public class ForecastFragment extends Fragment implements AdapterView.OnItemClic
 
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-        String startDate = WeatherContract.getDbDateString(new Date());
+        String startDate = dateFormatter.getDbDateString(new Date());
         String sortOrder = WeatherEntry.COLUMN_DATETEXT + " ASC";
         location = preferenceRepository.getLocation();
         Uri weatherForLocationUri = WeatherEntry.buildWeatherLocationWithStartDate(location, startDate);

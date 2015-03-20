@@ -2,7 +2,6 @@ package com.android.sunshine.app.utils;
 
 import android.content.Context;
 import com.android.sunshine.app.R;
-import com.android.sunshine.app.repository.WeatherContract;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -10,6 +9,8 @@ import java.util.Date;
 import javax.inject.Inject;
 
 public class DateFormatter {
+
+    public static final String DATE_FORMAT = "yyyyMMdd";
 
     private Context context;
 
@@ -20,8 +21,8 @@ public class DateFormatter {
 
     public String getFriendlyDay(String dateStr) {
         Date todayDate = new Date();
-        String todayStr = WeatherContract.getDbDateString(todayDate);
-        Date inputDate = WeatherContract.getDateFromDb(dateStr);
+        String todayStr = getDbDateString(todayDate);
+        Date inputDate = getDateFromDb(dateStr);
 
         if (todayStr.equals(dateStr)) {
             return context.getString(
@@ -32,7 +33,7 @@ public class DateFormatter {
             Calendar cal = Calendar.getInstance();
             cal.setTime(todayDate);
             cal.add(Calendar.DATE, 7);
-            String weekFutureString = WeatherContract.getDbDateString(cal.getTime());
+            String weekFutureString = getDbDateString(cal.getTime());
 
             if (dateStr.compareTo(weekFutureString) < 0) {
                 return getDayName(dateStr);
@@ -44,18 +45,18 @@ public class DateFormatter {
     }
 
     public String getDayName(String dateStr) {
-        SimpleDateFormat dbDateFormat = new SimpleDateFormat(WeatherContract.DATE_FORMAT);
+        SimpleDateFormat dbDateFormat = new SimpleDateFormat(DATE_FORMAT);
         try {
             Date inputDate = dbDateFormat.parse(dateStr);
             Date todayDate = new Date();
-            if (WeatherContract.getDbDateString(todayDate).equals(dateStr)) {
+            if (getDbDateString(todayDate).equals(dateStr)) {
                 return context.getString(R.string.today);
             } else {
                 Calendar cal = Calendar.getInstance();
                 cal.setTime(todayDate);
                 cal.add(Calendar.DATE, 1);
                 Date tomorrowDate = cal.getTime();
-                if (WeatherContract.getDbDateString(tomorrowDate).equals(
+                if (getDbDateString(tomorrowDate).equals(
                     dateStr)) {
                     return context.getString(R.string.tomorrow);
                 } else {
@@ -70,7 +71,7 @@ public class DateFormatter {
     }
 
     private String getFormattedMonthDay(String dateStr) {
-        SimpleDateFormat dbDateFormat = new SimpleDateFormat(WeatherContract.DATE_FORMAT);
+        SimpleDateFormat dbDateFormat = new SimpleDateFormat(DATE_FORMAT);
         try {
             Date inputDate = dbDateFormat.parse(dateStr);
             SimpleDateFormat monthDayFormat = new SimpleDateFormat("MMMM dd");
@@ -79,5 +80,21 @@ public class DateFormatter {
             e.printStackTrace();
             return null;
         }
+    }
+
+    public String getDbDateString(final Date date){
+        final SimpleDateFormat dateFormat = new SimpleDateFormat(DATE_FORMAT);
+        return dateFormat.format(date);
+    }
+
+    public Date getDateFromDb(String date) {
+        final SimpleDateFormat simpleDateFormat = new SimpleDateFormat(DATE_FORMAT);
+        Date parsedDate = null;
+        try {
+            parsedDate = simpleDateFormat.parse(date);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        return parsedDate;
     }
 }

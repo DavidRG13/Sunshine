@@ -6,7 +6,9 @@ import java.util.List;
 
 public interface ForecastRepository {
 
-    void saveWeathers(List<Weather> weathers);
+    boolean fetchForecast(String location);
+
+    int saveWeathers(List<Weather> weathers);
 
     long addLocation(LocationProperties locationProperties);
 }

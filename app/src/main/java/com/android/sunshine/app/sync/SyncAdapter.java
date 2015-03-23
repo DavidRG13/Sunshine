@@ -13,9 +13,6 @@ import android.os.Bundle;
 import com.android.sunshine.app.R;
 import com.android.sunshine.app.repository.ForecastRepository;
 import com.android.sunshine.app.repository.PreferenceRepository;
-import com.android.sunshine.app.utils.Weather;
-import com.android.sunshine.app.utils.WeatherJsonParser;
-import java.util.ArrayList;
 
 public class SyncAdapter extends AbstractThreadedSyncAdapter {
 
@@ -23,29 +20,23 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
     public static final int SYNC_FLEXTIME = SYNC_INTERVAL / 3;
 
     private final PreferenceRepository preferenceRepository;
-    private final WeatherJsonParser weatherJsonParser;
     private final ForecastRepository forecastRepository;
-    private final WeatherDataSource weatherDataSource;
-    private final Notifier notifier;
+    private final UserNotifier userNotifier;
 
-    public SyncAdapter(final Context context, final boolean autoInitialize, final PreferenceRepository preferenceRepository, final WeatherJsonParser weatherJsonParser,
-            final ForecastRepository forecastRepository, final WeatherDataSource weatherDataSource, final Notifier notifier) {
+    public SyncAdapter(final Context context, final boolean autoInitialize, final PreferenceRepository preferenceRepository, final ForecastRepository forecastRepository, final UserNotifier userNotifier) {
         super(context, autoInitialize);
         this.preferenceRepository = preferenceRepository;
-        this.weatherJsonParser = weatherJsonParser;
         this.forecastRepository = forecastRepository;
-        this.weatherDataSource = weatherDataSource;
-        this.notifier = notifier;
+        this.userNotifier = userNotifier;
     }
 
     @Override
     public void onPerformSync(Account account, Bundle extras, String authority, ContentProviderClient provider, SyncResult syncResult) {
-        final String locationSettings = preferenceRepository.getLocation();
-        String jsonResponse = weatherDataSource.getForecastFor(locationSettings);
-        long locationId = forecastRepository.addLocation(weatherJsonParser.parseLocation(jsonResponse, locationSettings));
-        ArrayList<Weather> weathers = weatherJsonParser.parseWeatherDataFromJson(jsonResponse, locationId);
-        forecastRepository.saveWeathers(weathers);
-        notifier.notifyWeather();
+        final String location = preferenceRepository.getLocation();
+        boolean newData = forecastRepository.fetchForecast(location);
+        if (newData) {
+            userNotifier.notifyWeather();
+        }
     }
 
     public static void syncImmediately(Context context) {

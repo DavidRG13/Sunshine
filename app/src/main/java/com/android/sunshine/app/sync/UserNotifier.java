@@ -1,5 +1,5 @@
 package com.android.sunshine.app.sync;
 
-public interface Notifier {
+public interface UserNotifier {
     void notifyWeather();
 }

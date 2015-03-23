@@ -18,7 +18,7 @@ import com.android.sunshine.app.utils.WeatherImageProvider;
 import java.util.Date;
 import javax.inject.Inject;
 
-public class NotificationsNotifier implements Notifier {
+public class NotificationsUserNotifier implements UserNotifier {
 
     private static final long DAY_IN_MILLIS = 1000 * 60 * 60 * 24;
     private static final int WEATHER_NOTIFICATION_ID = 3004;
@@ -43,8 +43,8 @@ public class NotificationsNotifier implements Notifier {
     private DateFormatter dateFormatter;
 
     @Inject
-    public NotificationsNotifier(final PreferenceRepository preferenceRepository, final Context context, final TemperatureFormatter temperatureFormatter, final WeatherImageProvider weatherImageProvider, final
-        DateFormatter dateFormatter){
+    public NotificationsUserNotifier(final PreferenceRepository preferenceRepository, final Context context, final TemperatureFormatter temperatureFormatter, final WeatherImageProvider weatherImageProvider,
+        final DateFormatter dateFormatter){
         this.preferenceRepository = preferenceRepository;
         this.context = context;
         this.temperatureFormatter = temperatureFormatter;

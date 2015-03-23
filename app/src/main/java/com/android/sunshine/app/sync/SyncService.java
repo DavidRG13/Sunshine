@@ -6,7 +6,6 @@ import android.os.IBinder;
 import com.android.sunshine.app.SunshineApplication;
 import com.android.sunshine.app.repository.ForecastRepository;
 import com.android.sunshine.app.repository.PreferenceRepository;
-import com.android.sunshine.app.utils.WeatherJsonParser;
 import javax.inject.Inject;
 
 public class SyncService extends Service{
@@ -15,16 +14,10 @@ public class SyncService extends Service{
     PreferenceRepository preferenceRepository;
 
     @Inject
-    WeatherJsonParser weatherJsonParser;
-
-    @Inject
     ForecastRepository forecastRepository;
 
     @Inject
-    WeatherDataSource weatherDataSource;
-
-    @Inject
-    Notifier notifier;
+    UserNotifier userNotifier;
 
     private static final Object sSyncAdapterLock = new Object();
     private static SyncAdapter sSunshineSyncAdapter = null;
@@ -34,7 +27,7 @@ public class SyncService extends Service{
         ((SunshineApplication) getApplication()).getObjectGraph().inject(this);
         synchronized (sSyncAdapterLock) {
             if (sSunshineSyncAdapter == null) {
-                sSunshineSyncAdapter = new SyncAdapter(getApplicationContext(), true, preferenceRepository, weatherJsonParser, forecastRepository, weatherDataSource, notifier);
+                sSunshineSyncAdapter = new SyncAdapter(getApplicationContext(), true, preferenceRepository, forecastRepository, userNotifier);
             }
         }
     }

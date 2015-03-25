@@ -4,23 +4,20 @@ import android.content.Context;
 import com.android.sunshine.app.fragments.DetailFragment;
 import com.android.sunshine.app.fragments.ForecastFragment;
 import com.android.sunshine.app.repository.ForecastRepository;
-import com.android.sunshine.app.repository.PreferenceRepository;
 import com.android.sunshine.app.repository.SQLiteRepository;
-import com.android.sunshine.app.sync.Downloader;
 import com.android.sunshine.app.sync.NotificationsUserNotifier;
-import com.android.sunshine.app.sync.UserNotifier;
 import com.android.sunshine.app.sync.OWM;
 import com.android.sunshine.app.sync.SyncService;
+import com.android.sunshine.app.sync.UserNotifier;
 import com.android.sunshine.app.sync.WeatherDataSource;
 import com.android.sunshine.app.utils.AndroidStringFormatter;
-import com.android.sunshine.app.utils.DateFormatter;
 import com.android.sunshine.app.utils.ManualWeatherJsonParser;
 import com.android.sunshine.app.utils.StringFormatter;
-import com.android.sunshine.app.utils.TemperatureFormatter;
-import com.android.sunshine.app.utils.WeatherJsonParser;
 import com.android.sunshine.app.utils.WeatherImageProvider;
+import com.android.sunshine.app.utils.WeatherJsonParser;
 import dagger.Module;
 import dagger.Provides;
+import javax.inject.Singleton;
 
 @Module(
     injects = {
@@ -41,32 +38,33 @@ public class AppModule {
     }
 
     @Provides
-    public ForecastRepository providesForecastRepository(final DateFormatter dateFormatter, final WeatherDataSource weatherDataSource, final WeatherJsonParser weatherJsonParser) {
-        return new SQLiteRepository(appContext, dateFormatter, weatherDataSource, weatherJsonParser);
+    public ForecastRepository providesForecastRepository(final SQLiteRepository forecastRepository) {
+        return forecastRepository;
     }
 
     @Provides
-    public WeatherJsonParser providesWeatherJsonParser(final DateFormatter dateFormatter) {
-        return new ManualWeatherJsonParser(dateFormatter);
+    public WeatherJsonParser providesWeatherJsonParser(final ManualWeatherJsonParser jsonParser) {
+        return jsonParser;
     }
 
     @Provides
-    public WeatherDataSource providesWeatherDataSource(final Downloader downloader) {
-        return new OWM(downloader);
+    public WeatherDataSource providesWeatherDataSource(final OWM weatherDataSource) {
+        return weatherDataSource;
+    }
+
+    @Singleton
+    @Provides
+    public WeatherImageProvider providesWeatherResourceProvider(final OWM weatherImageProvider){
+        return weatherImageProvider;
     }
 
     @Provides
-    public WeatherImageProvider providesWeatherResourceProvider(final Downloader downloader){
-        return new OWM(downloader);
+    public UserNotifier providesNotifier(final NotificationsUserNotifier userNotifier){
+        return userNotifier;
     }
 
     @Provides
-    public UserNotifier providesNotifier(final PreferenceRepository preferenceRepository, final TemperatureFormatter temperatureFormatter, final WeatherImageProvider weatherImageProvider, final DateFormatter dateFormatter){
-        return new NotificationsUserNotifier(preferenceRepository, appContext, temperatureFormatter, weatherImageProvider, dateFormatter);
-    }
-
-    @Provides
-    public StringFormatter providesStringFormatter() {
-        return new AndroidStringFormatter(appContext);
+    public StringFormatter providesStringFormatter(final AndroidStringFormatter stringFormatter) {
+        return stringFormatter;
     }
 }

@@ -3,6 +3,7 @@ package com.android.sunshine.app.sync;
 import android.net.Uri;
 import com.android.sunshine.app.R;
 import com.android.sunshine.app.utils.WeatherImageProvider;
+import javax.inject.Inject;
 
 public class OWM implements WeatherDataSource, WeatherImageProvider {
 
@@ -14,6 +15,7 @@ public class OWM implements WeatherDataSource, WeatherImageProvider {
 
     private Downloader downloader;
 
+    @Inject
     public OWM(final Downloader downloader) {
         this.downloader = downloader;
     }

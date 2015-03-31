@@ -16,7 +16,7 @@ public class MainActivity : ActionBarActivity(), ItemClickCallback {
     private var twoPane: Boolean = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        ActionBarActivity<ActionBarActivity>.onCreate(savedInstanceState)
+        super<ActionBarActivity>.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         if (findViewById(R.id.fragment_detail_container) != null) {
             twoPane = true
@@ -43,19 +43,19 @@ public class MainActivity : ActionBarActivity(), ItemClickCallback {
             startActivity(Intent(this, javaClass<SettingsActivity>()))
             return true
         }
-        return ActionBarActivity<ActionBarActivity>.onOptionsItemSelected(item)
+        return super<ActionBarActivity>.onOptionsItemSelected(item)
     }
 
     override fun onItemSelected(date: String) {
         if (twoPane) {
             val args = Bundle()
-            args.putString(DetailActivity.DATE_KEY, date)
+            args.putString(DetailActivity().DATE_KEY, date)
             val detailFragment = DetailFragment()
             detailFragment.setArguments(args)
             getSupportFragmentManager().beginTransaction().replace(R.id.fragment_detail_container, detailFragment).commitAllowingStateLoss()
         } else {
             val intent = Intent(this, javaClass<DetailActivity>())
-            intent.putExtra(DetailActivity.DATE_KEY, date)
+            intent.putExtra(DetailActivity().DATE_KEY, date)
             startActivity(intent)
         }
     }

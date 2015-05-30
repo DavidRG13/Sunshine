@@ -25,9 +25,9 @@ public class WeatherProvider extends ContentProvider {
     private static final String locationSettingsSelection = LocationEntry.TABLE_NAME + "." +
             LocationEntry.COLUMN_LOCATION_SETTING + " = ?";
     private static final String locationSettingsWithStartDateSelection = LocationEntry.TABLE_NAME + "." +
-            LocationEntry.COLUMN_LOCATION_SETTING + " = ? AND " + WeatherEntry.COLUMN_DATETEXT + " >= ? ";
+            LocationEntry.COLUMN_LOCATION_SETTING + " = ? AND " + WeatherEntry.COLUMN_DATE + " >= ? ";
     private static final String locationSettingsWithDaySelection = LocationEntry.TABLE_NAME + "." +
-            LocationEntry.COLUMN_LOCATION_SETTING + " = ? AND " + WeatherEntry.COLUMN_DATETEXT + " = ? ";
+            LocationEntry.COLUMN_LOCATION_SETTING + " = ? AND " + WeatherEntry.COLUMN_DATE + " = ? ";
     private DBHelper dbHelper;
 
     private static SQLiteQueryBuilder weatherByLocationSettingsQueryBuilder;

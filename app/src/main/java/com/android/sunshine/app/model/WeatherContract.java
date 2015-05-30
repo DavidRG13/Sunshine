@@ -25,7 +25,7 @@ public class WeatherContract {
         public static final String TABLE_NAME = "weather";
 
         public static final String COLUMN_LOC_KEY = "location_id";
-        public static final String COLUMN_DATETEXT = "date";
+        public static final String COLUMN_DATE = "date";
         public static final String COLUMN_WEATHER_ID = "weather_id";
         public static final String COLUMN_SHORT_DESC = "short_desc";
         public static final String COLUMN_MIN_TEMP = "min";
@@ -44,7 +44,7 @@ public class WeatherContract {
 
         public static Uri buildWeatherLocationWithStartDate(String locationSetting, String startDate) {
             return CONTENT_URI.buildUpon().appendPath(locationSetting)
-                    .appendQueryParameter(COLUMN_DATETEXT, startDate).build();
+                    .appendQueryParameter(COLUMN_DATE, startDate).build();
         }
 
         public static Uri buildWeatherLocationWithDate(String locationSetting, String date) {
@@ -60,7 +60,7 @@ public class WeatherContract {
         }
 
         public static String getStartDateFromUri(Uri uri) {
-            return uri.getQueryParameter(COLUMN_DATETEXT);
+            return uri.getQueryParameter(COLUMN_DATE);
         }
 
     }

@@ -190,7 +190,7 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
             ContentValues weatherValues = new ContentValues();
 
             weatherValues.put(WeatherEntry.COLUMN_LOC_KEY, locationId);
-            weatherValues.put(WeatherEntry.COLUMN_DATETEXT, WeatherContract.getDbDateString(new Date(weatherForecast.getDt() * 1000L)));
+            weatherValues.put(WeatherEntry.COLUMN_DATE, weatherForecast.getDt());
             weatherValues.put(WeatherEntry.COLUMN_HUMIDITY, weatherForecast.getHumidity());
             weatherValues.put(WeatherEntry.COLUMN_PRESSURE, weatherForecast.getPressure());
             weatherValues.put(WeatherEntry.COLUMN_WIND_SPEED, weatherForecast.getSpeed());
@@ -212,7 +212,7 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
             Calendar cal = Calendar.getInstance();
             cal.add(Calendar.DATE, -1);
             String yesterdayDate = WeatherContract.getDbDateString(cal.getTime());
-            getContext().getContentResolver().delete(WeatherEntry.CONTENT_URI, WeatherEntry.COLUMN_DATETEXT + " <= ?", new String[] {yesterdayDate});
+            getContext().getContentResolver().delete(WeatherEntry.CONTENT_URI, WeatherEntry.COLUMN_DATE + " <= ?", new String[] {yesterdayDate});
         }
     }
 

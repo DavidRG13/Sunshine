@@ -21,6 +21,10 @@
     <string name="forecastIcon">forecast icon</string>
     <string name="today">hoy</string>
     <string name="tomorrow">manana</string>
+    <string name="humidity">Humidity</string>
+    <string name="pressure">Pressure</string>
+    <string name="wind">Wind</string>
+
     <string name="format_full_friendly_date">
         <xliff:g id="day_of_week">%1$s</xliff:g>, <xliff:g id="date">%2$s</xliff:g>
     </string>

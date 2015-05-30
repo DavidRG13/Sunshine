@@ -41,7 +41,7 @@ public class ForecastFragment extends Fragment implements AdapterView.OnItemClic
 
     private static final String[] FORECAST_COLUMNS = new String[]{
             WeatherEntry.TABLE_NAME + "." + WeatherEntry._ID,
-            WeatherEntry.COLUMN_DATETEXT,
+            WeatherEntry.COLUMN_DATE,
             WeatherEntry.COLUMN_SHORT_DESC,
             WeatherEntry.COLUMN_MAX_TEMP,
             WeatherEntry.COLUMN_MIN_TEMP,
@@ -127,14 +127,14 @@ public class ForecastFragment extends Fragment implements AdapterView.OnItemClic
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
         this.scrollPosition = position;
-        ((ItemClickCallback) getActivity()).onItemSelected(adapter.getCursor().getString(adapter.getCursor().getColumnIndex(WeatherEntry.COLUMN_DATETEXT)));
+        ((ItemClickCallback) getActivity()).onItemSelected(adapter.getCursor().getString(adapter.getCursor().getColumnIndex(WeatherEntry.COLUMN_DATE)));
     }
 
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
         String startDate = WeatherContract.getDbDateString(new Date());
 
-        String sortOrder = WeatherEntry.COLUMN_DATETEXT + " ASC";
+        String sortOrder = WeatherEntry.COLUMN_DATE + " ASC";
 
         location = Utilities.getLocationSettings(getActivity());
         Uri weatherForLocationUri = WeatherEntry.buildWeatherLocationWithStartDate(location, startDate);

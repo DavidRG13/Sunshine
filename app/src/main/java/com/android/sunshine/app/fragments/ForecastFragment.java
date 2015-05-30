@@ -24,6 +24,7 @@ import com.android.sunshine.app.R;
 import com.android.sunshine.app.adapter.ForecastCursorAdapter;
 import com.android.sunshine.app.callbacks.ItemClickCallback;
 import com.android.sunshine.app.model.WeatherContract;
+import com.android.sunshine.app.sync.ServerStatus;
 import com.android.sunshine.app.sync.SyncAdapter;
 import com.android.sunshine.app.utils.Utilities;
 import java.util.Date;
@@ -156,13 +157,16 @@ public class ForecastFragment extends Fragment implements AdapterView.OnItemClic
     private void updateEmptyView() {
         if (adapter.getCount() == 0) {
             int message = R.string.noWeatherInfoAvailable;
-            @SyncAdapter.ServerStatus int status = Utilities.getServerStatus(getActivity());
+            @ServerStatus int status = Utilities.getServerStatus(getActivity());
             switch (status) {
-                case SyncAdapter.SERVER_STATUS_DOWN:
+                case ServerStatus.SERVER_STATUS_DOWN:
                     message = R.string.server_down;
                     break;
-                case SyncAdapter.SERVER_STATUS_INVALID:
+                case ServerStatus.SERVER_STATUS_INVALID:
                     message = R.string.server_error;
+                    break;
+                case ServerStatus.SERVER_STATUS_LOCATION_INVALID:
+                    message = R.string.invalid_location;
                     break;
                 default:
                     if (!Utilities.isNetworkAvailable(getActivity())) {

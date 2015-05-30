@@ -10,6 +10,7 @@ import android.preference.PreferenceActivity;
 import android.preference.PreferenceManager;
 import com.android.sunshine.app.R;
 import com.android.sunshine.app.sync.SyncAdapter;
+import com.android.sunshine.app.utils.Utilities;
 
 import static com.android.sunshine.app.model.WeatherContract.WeatherEntry;
 
@@ -31,6 +32,7 @@ public class SettingsActivity extends PreferenceActivity implements Preference.O
 
         if (!bindingPreference) {
             if(preference.getKey().equals(getString(R.string.pref_location_key))){
+                Utilities.resetServerStatus(this);
                 SyncAdapter.syncImmediately(this);
             }else{
                 getContentResolver().notifyChange(WeatherEntry.CONTENT_URI, null);

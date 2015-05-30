@@ -4,7 +4,15 @@ import android.accounts.Account;
 import android.accounts.AccountManager;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
-import android.content.*;
+import android.content.AbstractThreadedSyncAdapter;
+import android.content.ContentProviderClient;
+import android.content.ContentResolver;
+import android.content.ContentUris;
+import android.content.ContentValues;
+import android.content.Context;
+import android.content.Intent;
+import android.content.SyncRequest;
+import android.content.SyncResult;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Build;
@@ -14,18 +22,15 @@ import android.support.v4.app.TaskStackBuilder;
 import android.util.Log;
 import com.android.sunshine.app.R;
 import com.android.sunshine.app.activities.MainActivity;
+import com.android.sunshine.app.model.OWMResponse;
+import com.android.sunshine.app.model.OWMWeatherForecast;
 import com.android.sunshine.app.model.WeatherContract;
 import com.android.sunshine.app.utils.Utilities;
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.io.BufferedReader;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Vector;
@@ -73,44 +78,21 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
                 .appendQueryParameter(DAYS_PARAM, "14");
 
         HttpURLConnection urlConnection = null;
-        BufferedReader reader = null;
-        String forecastJsonStr = null;
 
         try {
-            final String uri = builder.build().toString();
-            URL url = new URL(uri);
-
+            URL url = new URL(builder.build().toString());
             urlConnection = (HttpURLConnection) url.openConnection();
             urlConnection.setRequestMethod("GET");
             urlConnection.connect();
 
-            InputStream inputStream = urlConnection.getInputStream();
-            StringBuilder buffer = new StringBuilder();
-            if (inputStream != null) {
-                reader = new BufferedReader(new InputStreamReader(inputStream));
-
-                String line;
-                while ((line = reader.readLine()) != null) {
-                    buffer.append(line).append("\n");
-                }
-
-                if (buffer.length() > 0) {
-                    forecastJsonStr = buffer.toString();
-                }
-                parseWeatherDataFromJson(forecastJsonStr, locationSettings);
-            }
-        } catch (IOException | JSONException e) {
+            ObjectMapper mapper = new ObjectMapper();
+            OWMResponse owmResponse = mapper.readValue(urlConnection.getInputStream(), OWMResponse.class);
+            parseWeatherDataFromJson(owmResponse, locationSettings);
+        } catch (IOException e) {
             Log.e("WeatherRequester", "Error ", e);
         } finally {
             if (urlConnection != null) {
                 urlConnection.disconnect();
-            }
-            if (reader != null) {
-                try {
-                    reader.close();
-                } catch (final IOException e) {
-                    Log.e("PlaceholderFragment", "Error closing stream", e);
-                }
             }
         }
     }
@@ -152,68 +134,32 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
         return newAccount;
     }
 
-    private void parseWeatherDataFromJson(String forecastJsonStr, String locationSettings) throws JSONException {
-        final String OWM_LIST = "list";
-        final String OWM_WEATHER = "weather";
-        final String OWM_TEMPERATURE = "temp";
-        final String OWM_MAX = "max";
-        final String OWM_MIN = "min";
-        final String OWM_DATETIME = "dt";
-        final String OWM_DESCRIPTION = "main";
-        final String OWM_LAT = "lon";
-        final String OWM_LNG = "lat";
-        final String OWM_CITY = "city";
-        final String OWM_NAME = "name";
-        final String OWM_COORDS = "coord";
-        final String OWM_PRESSURE = "pressure";
-        final String OWM_HUMIDITY = "humidity";
-        final String OWM_WINDSPEED = "speed";
-        final String OWM_WIND_DIRECTION = "deg";
-        final String OWM_WEATHER_ID = "id";
+    private void parseWeatherDataFromJson(OWMResponse owmResponse, String locationSettings) {
+        String cityName = owmResponse.getCity().getName();
+        double cityLatitude = owmResponse.getCity().getCoord().getLat();
+        double cityLongitude = owmResponse.getCity().getCoord().getLon();
 
-        JSONObject forecastJson = new JSONObject(forecastJsonStr);
-        JSONArray weatherArray = forecastJson.getJSONArray(OWM_LIST);
-        final JSONObject cityJson = forecastJson.getJSONObject(OWM_CITY);
-        final String cityName = cityJson.getString(OWM_NAME);
-        final JSONObject coordsJson = cityJson.getJSONObject(OWM_COORDS);
-        final double cityLatitude = coordsJson.getDouble(OWM_LAT);
-        final double cityLongitude = coordsJson.getDouble(OWM_LNG);
+        long locationId = addLocation(locationSettings, cityName, cityLatitude, cityLongitude);
 
-        final long locationId = addLocation(locationSettings, cityName, cityLatitude, cityLongitude);
-
-        Vector<ContentValues> cVVector = new Vector<>(weatherArray.length());
-        for (int i = 0; i < weatherArray.length(); i++) {
-            JSONObject dayForecast = weatherArray.getJSONObject(i);
-
-            long dateTime = dayForecast.getLong(OWM_DATETIME);
-            final double pressure = dayForecast.getDouble(OWM_PRESSURE);
-            final int humidity = dayForecast.getInt(OWM_HUMIDITY);
-            final double windSpeed = dayForecast.getDouble(OWM_WINDSPEED);
-            final double windDirection = dayForecast.getDouble(OWM_WIND_DIRECTION);
-
-            JSONObject weatherObject = dayForecast.getJSONArray(OWM_WEATHER).getJSONObject(0);
-            final String description = weatherObject.getString(OWM_DESCRIPTION);
-            final int weatherId = weatherObject.getInt(OWM_WEATHER_ID);
-
-            JSONObject temperatureObject = dayForecast.getJSONObject(OWM_TEMPERATURE);
-            double high = temperatureObject.getDouble(OWM_MAX);
-            double low = temperatureObject.getDouble(OWM_MIN);
-
+        ArrayList<OWMWeatherForecast> weatherForecasts = owmResponse.getList();
+        Vector<ContentValues> cVVector = new Vector<>(weatherForecasts.size());
+        for (OWMWeatherForecast weatherForecast : weatherForecasts) {
             ContentValues weatherValues = new ContentValues();
 
             weatherValues.put(WeatherEntry.COLUMN_LOC_KEY, locationId);
-            weatherValues.put(WeatherEntry.COLUMN_DATETEXT, WeatherContract.getDbDateString(new Date(dateTime * 1000L)));
-            weatherValues.put(WeatherEntry.COLUMN_HUMIDITY, humidity);
-            weatherValues.put(WeatherEntry.COLUMN_PRESSURE, pressure);
-            weatherValues.put(WeatherEntry.COLUMN_WIND_SPEED, windSpeed);
-            weatherValues.put(WeatherEntry.COLUMN_DEGREES, windDirection);
-            weatherValues.put(WeatherEntry.COLUMN_MAX_TEMP, high);
-            weatherValues.put(WeatherEntry.COLUMN_MIN_TEMP, low);
-            weatherValues.put(WeatherEntry.COLUMN_SHORT_DESC, description);
-            weatherValues.put(WeatherEntry.COLUMN_WEATHER_ID, weatherId);
+            weatherValues.put(WeatherEntry.COLUMN_DATETEXT, WeatherContract.getDbDateString(new Date(weatherForecast.getDt() * 1000L)));
+            weatherValues.put(WeatherEntry.COLUMN_HUMIDITY, weatherForecast.getHumidity());
+            weatherValues.put(WeatherEntry.COLUMN_PRESSURE, weatherForecast.getPressure());
+            weatherValues.put(WeatherEntry.COLUMN_WIND_SPEED, weatherForecast.getSpeed());
+            weatherValues.put(WeatherEntry.COLUMN_DEGREES, weatherForecast.getDeg());
+            weatherValues.put(WeatherEntry.COLUMN_MAX_TEMP, weatherForecast.getTemp().getMax());
+            weatherValues.put(WeatherEntry.COLUMN_MIN_TEMP, weatherForecast.getTemp().getMin());
+            weatherValues.put(WeatherEntry.COLUMN_SHORT_DESC, weatherForecast.getWeather().get(0).getDescription());
+            weatherValues.put(WeatherEntry.COLUMN_WEATHER_ID, weatherForecast.getWeather().get(0).getId());
 
             cVVector.add(weatherValues);
         }
+
         if (cVVector.size() > 0) {
             ContentValues[] contentValues = new ContentValues[cVVector.size()];
             cVVector.toArray(contentValues);
@@ -223,8 +169,7 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
             Calendar cal = Calendar.getInstance();
             cal.add(Calendar.DATE, -1);
             String yesterdayDate = WeatherContract.getDbDateString(cal.getTime());
-            getContext().getContentResolver().delete(WeatherEntry.CONTENT_URI,
-                    WeatherEntry.COLUMN_DATETEXT + " <= ?", new String[] {yesterdayDate});
+            getContext().getContentResolver().delete(WeatherEntry.CONTENT_URI, WeatherEntry.COLUMN_DATETEXT + " <= ?", new String[] {yesterdayDate});
         }
     }
 

@@ -61,6 +61,8 @@ public class ForecastFragment extends Fragment implements AdapterView.OnItemClic
         rootView = inflater.inflate(R.layout.fragment_main, container, false);
         forecastList = (ListView) rootView.findViewById(R.id.forecast_listview);
         forecastList.setOnItemClickListener(this);
+        forecastList.setEmptyView(rootView.findViewById(R.id.empty_list));
+
         adapter = new ForecastCursorAdapter(getActivity(), null, 0);
         forecastList.setAdapter(adapter);
         if (savedInstanceState != null && savedInstanceState.containsKey(SCROLL_POSITION)) {

@@ -10,4 +10,13 @@
             android:layout_height="match_parent"
             android:choiceMode="singleChoice"/>
 
+    <TextView
+        android:id="@+id/empty_list"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:text="@string/noWeatherInfoAvailable"
+        android:gravity="center_horizontal"
+        android:padding="@dimen/dimen16dp"
+        android:visibility="gone"/>
+
 </FrameLayout>

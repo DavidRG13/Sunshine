@@ -1,13 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:custom="http://schemas.android.com/apk/res/com.android.sunshine.app">
 
-   <EditTextPreference
+   <com.android.sunshine.app.preferences.EditTextPreferencesWithAttributes
        android:key="@string/pref_location_key"
        android:title="@string/pref_location_label"
        android:defaultValue="@string/location_default"
        android:inputType="text"
-       android:singleLine="true"/>
+       android:singleLine="true"
+       custom:minLength="3"/>
 
     <ListPreference
         android:key="@string/pref_unit_key"

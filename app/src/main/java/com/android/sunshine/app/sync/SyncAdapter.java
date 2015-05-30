@@ -30,7 +30,10 @@ import com.android.sunshine.app.model.WeatherContract;
 import com.android.sunshine.app.utils.Utilities;
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
@@ -89,27 +92,51 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
             urlConnection.connect();
 
             ObjectMapper mapper = new ObjectMapper();
+
+            //printResponse(urlConnection);
+
             OWMResponse owmResponse = mapper.readValue(urlConnection.getInputStream(), OWMResponse.class);
+            Log.d("AQUII", owmResponse.getCod());
 
             int responseCode = Integer.parseInt(owmResponse.getCod());
             if (responseCode == HttpURLConnection.HTTP_OK) {
                 parseWeatherDataFromJson(owmResponse, locationSettings);
                 setServerStatus(getContext(), ServerStatus.SERVER_STATUS_OK);
             } else if (responseCode == HttpURLConnection.HTTP_NOT_FOUND) {
-                setServerStatus(getContext(), ServerStatus.SERVER_STATUS_INVALID);
+                setServerStatus(getContext(), ServerStatus.SERVER_STATUS_LOCATION_INVALID);
             } else {
                 setServerStatus(getContext(), ServerStatus.SERVER_STATUS_DOWN);
             }
         } catch (JsonParseException e) {
-            Log.e("WeatherRequester", "Error ", e);
+            Log.e("WeatherRequester", "Server Down. Error ", e);
             setServerStatus(getContext(), ServerStatus.SERVER_STATUS_DOWN);
         } catch (IOException e) {
-            Log.e("WeatherRequester", "Error ", e);
-            setServerStatus(getContext(), ServerStatus.SERVER_STATUS_DOWN);
+            Log.e("WeatherRequester", "Invalid URL. Error ", e);
+            setServerStatus(getContext(), ServerStatus.SERVER_STATUS_INVALID);
         }finally {
             if (urlConnection != null) {
                 urlConnection.disconnect();
             }
+        }
+    }
+
+    private void printResponse(final HttpURLConnection urlConnection) throws IOException {
+        BufferedReader reader;
+        String forecastJsonStr = null;
+        InputStream inputStream = urlConnection.getInputStream();
+        StringBuilder buffer = new StringBuilder();
+        if (inputStream != null) {
+            reader = new BufferedReader(new InputStreamReader(inputStream));
+
+            String line;
+            while ((line = reader.readLine()) != null) {
+                buffer.append(line).append("\n");
+            }
+
+            if (buffer.length() > 0) {
+                forecastJsonStr = buffer.toString();
+            }
+            Log.d("AQUIII", forecastJsonStr);
         }
     }
 

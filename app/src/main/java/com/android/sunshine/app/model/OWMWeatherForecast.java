@@ -13,11 +13,13 @@ public class OWMWeatherForecast {
     private double speed;
     private int deg;
     private int clouds;
+    private double rain;
 
     public OWMWeatherForecast() {
     }
 
-    public OWMWeatherForecast(final int dt, final OWMTemperatures temp, final double pressure, final int humidity, final ArrayList<OWMWeather> weather, final double speed, final int deg, final int clouds) {
+    public OWMWeatherForecast(final int dt, final OWMTemperatures temp, final double pressure, final int humidity, final ArrayList<OWMWeather> weather, final double speed, final int deg, final int clouds,
+        final double rain) {
         this.dt = dt;
         this.temp = temp;
         this.pressure = pressure;
@@ -26,6 +28,7 @@ public class OWMWeatherForecast {
         this.speed = speed;
         this.deg = deg;
         this.clouds = clouds;
+        this.rain = rain;
     }
 
     @JsonProperty
@@ -66,5 +69,10 @@ public class OWMWeatherForecast {
     @JsonProperty
     public int getClouds() {
         return clouds;
+    }
+
+    @JsonProperty
+    public double getRain() {
+        return rain;
     }
 }

@@ -14,6 +14,8 @@
     <string name="pref_unit_key">temperatureUnit</string>
     <string name="prefs_units_imperial">imperial</string>
     <string name="prefs_server_status">serverStatus</string>
+    <string name="prefs_location_invalid_error_description">Invalid Location (<xliff:g id="location_settings">%1$s</xliff:g>)</string>
+    <string name="prefs_location_unknown_description">Validating Location… (<xliff:g id="location_settings">%1$s</xliff:g>) </string>
     <string name="viewLocation">View current location</string>
     <string name="share">Share</string>
     <string name="forecastIcon">forecast icon</string>

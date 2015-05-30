@@ -8,15 +8,19 @@ public class City {
     private String name;
     private String country;
     private Coordinates coord;
+    private String population;
+    private Sys sys;
 
     public City() {
     }
 
-    public City(final int id, final String name, final String country, final Coordinates coord) {
+    public City(final int id, final String name, final String country, final Coordinates coord, final String population, final Sys sys) {
         this.id = id;
         this.name = name;
         this.country = country;
         this.coord = coord;
+        this.population = population;
+        this.sys = sys;
     }
 
     @JsonProperty
@@ -37,5 +41,15 @@ public class City {
     @JsonProperty
     public Coordinates getCoord() {
         return coord;
+    }
+
+    @JsonProperty
+    public String getPopulation() {
+        return population;
+    }
+
+    @JsonProperty
+    public Sys getSys() {
+        return sys;
     }
 }

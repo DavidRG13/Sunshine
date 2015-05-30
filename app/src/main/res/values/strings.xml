@@ -47,5 +47,6 @@
     <string name="sync_account_type">com.android.sunshine.app</string>
     <string name="content_authority">com.android.sunshine.app</string>
     <string name="noWeatherInfoAvailable">No weather information available</string>
+    <string name="noWeatherInfoAvailableNoNetwork">No weather information available. The network is not available to fetch weather data.</string>
 
 </resources>

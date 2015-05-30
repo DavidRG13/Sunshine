@@ -2,6 +2,8 @@ package com.android.sunshine.app.utils;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.preference.PreferenceManager;
 import com.android.sunshine.app.R;
 import com.android.sunshine.app.model.WeatherContract;
@@ -171,5 +173,11 @@ public class Utilities {
             return R.drawable.art_clouds;
         }
         return -1;
+    }
+
+    public static boolean isNetworkAvailable(final Context context) {
+        ConnectivityManager connectivityManager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
+        return activeNetworkInfo != null && activeNetworkInfo.isConnectedOrConnecting();
     }
 }

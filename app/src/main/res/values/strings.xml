@@ -49,5 +49,7 @@
     <string name="content_authority">com.android.sunshine.app</string>
     <string name="noWeatherInfoAvailable">No weather information available</string>
     <string name="noWeatherInfoAvailableNoNetwork">No weather information available. The network is not available to fetch weather data.</string>
+    <string name="server_down">No weather info available. The server is down.</string>
+    <string name="server_error">No weather data available. The server is not returning valid data.</string>
 
 </resources>

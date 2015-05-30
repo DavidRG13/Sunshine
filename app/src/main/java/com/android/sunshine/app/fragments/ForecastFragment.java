@@ -1,9 +1,12 @@
 package com.android.sunshine.app.fragments;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
@@ -28,7 +31,7 @@ import java.util.Date;
 import static com.android.sunshine.app.model.WeatherContract.LocationEntry;
 import static com.android.sunshine.app.model.WeatherContract.WeatherEntry;
 
-public class ForecastFragment extends Fragment implements AdapterView.OnItemClickListener, LoaderManager.LoaderCallbacks<Cursor> {
+public class ForecastFragment extends Fragment implements AdapterView.OnItemClickListener, LoaderManager.LoaderCallbacks<Cursor>, OnSharedPreferenceChangeListener {
 
     public static final int FORECAST_LOADER = 0;
     public static final String SCROLL_POSITION = "scrollPosition";
@@ -50,6 +53,7 @@ public class ForecastFragment extends Fragment implements AdapterView.OnItemClic
     private int scrollPosition;
     private ListView forecastList;
     private View rootView;
+    private TextView emptyView;
 
     public ForecastFragment() {
     }
@@ -66,7 +70,8 @@ public class ForecastFragment extends Fragment implements AdapterView.OnItemClic
         rootView = inflater.inflate(R.layout.fragment_main, container, false);
         forecastList = (ListView) rootView.findViewById(R.id.forecast_listview);
         forecastList.setOnItemClickListener(this);
-        forecastList.setEmptyView(rootView.findViewById(R.id.empty_list));
+        emptyView = (TextView) rootView.findViewById(R.id.empty_list);
+        forecastList.setEmptyView(emptyView);
 
         adapter = new ForecastCursorAdapter(getActivity(), null, 0);
         forecastList.setAdapter(adapter);
@@ -79,9 +84,18 @@ public class ForecastFragment extends Fragment implements AdapterView.OnItemClic
     @Override
     public void onResume() {
         super.onResume();
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
+        preferences.registerOnSharedPreferenceChangeListener(this);
         if (location != null && !Utilities.getLocationSettings(getActivity()).equals(location)) {
             getLoaderManager().restartLoader(FORECAST_LOADER, null, this);
         }
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
+        preferences.unregisterOnSharedPreferenceChangeListener(this);
     }
 
     @Override
@@ -140,10 +154,22 @@ public class ForecastFragment extends Fragment implements AdapterView.OnItemClic
     }
 
     private void updateEmptyView() {
-        if (!Utilities.isNetworkAvailable(getActivity())) {
-            ((TextView) getView().findViewById(R.id.empty_list)).setText(R.string.noWeatherInfoAvailableNoNetwork);
-        } else {
-            ((TextView) getView().findViewById(R.id.empty_list)).setText(R.string.noWeatherInfoAvailable);
+        if (adapter.getCount() == 0) {
+            int message = R.string.noWeatherInfoAvailable;
+            @SyncAdapter.ServerStatus int status = Utilities.getServerStatus(getActivity());
+            switch (status) {
+                case SyncAdapter.SERVER_STATUS_DOWN:
+                    message = R.string.server_down;
+                    break;
+                case SyncAdapter.SERVER_STATUS_INVALID:
+                    message = R.string.server_error;
+                    break;
+                default:
+                    if (!Utilities.isNetworkAvailable(getActivity())) {
+                        ((TextView) getView().findViewById(R.id.empty_list)).setText(R.string.noWeatherInfoAvailableNoNetwork);
+                    }
+            }
+            emptyView.setText(message);
         }
     }
 
@@ -177,6 +203,13 @@ public class ForecastFragment extends Fragment implements AdapterView.OnItemClic
 
                 startActivity(intent);
             }
+        }
+    }
+
+    @Override
+    public void onSharedPreferenceChanged(final SharedPreferences sharedPreferences, final String key) {
+        if (key.equals(getString(R.string.prefs_server_status))) {
+            updateEmptyView();
         }
     }
 }

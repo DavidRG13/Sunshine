@@ -8,6 +8,7 @@ import android.preference.PreferenceManager;
 import com.android.sunshine.app.R;
 import com.android.sunshine.app.model.WeatherContract;
 
+import com.android.sunshine.app.sync.SyncAdapter;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -179,5 +180,11 @@ public class Utilities {
         ConnectivityManager connectivityManager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
         return activeNetworkInfo != null && activeNetworkInfo.isConnectedOrConnecting();
+    }
+
+    @SuppressWarnings("ResourceType")
+    public static @SyncAdapter.ServerStatus int getServerStatus(final Context context){
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
+        return preferences.getInt(context.getString(R.string.prefs_server_status), SyncAdapter.SERVER_STATUS_UNKNOWN);
     }
 }

@@ -11,12 +11,14 @@ import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.SyncRequest;
 import android.content.SyncResult;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.annotation.IntDef;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.TaskStackBuilder;
@@ -27,6 +29,7 @@ import com.android.sunshine.app.model.OWMResponse;
 import com.android.sunshine.app.model.OWMWeatherForecast;
 import com.android.sunshine.app.model.WeatherContract;
 import com.android.sunshine.app.utils.Utilities;
+import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
 import java.lang.annotation.Retention;
@@ -99,9 +102,14 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
             ObjectMapper mapper = new ObjectMapper();
             OWMResponse owmResponse = mapper.readValue(urlConnection.getInputStream(), OWMResponse.class);
             parseWeatherDataFromJson(owmResponse, locationSettings);
+            setServerStatus(getContext(), SERVER_STATUS_OK);
+        } catch (JsonParseException e) {
+            Log.e("WeatherRequester", "Error ", e);
+            setServerStatus(getContext(), SERVER_STATUS_DOWN);
         } catch (IOException e) {
             Log.e("WeatherRequester", "Error ", e);
-        } finally {
+            setServerStatus(getContext(), SERVER_STATUS_DOWN);
+        }finally {
             if (urlConnection != null) {
                 urlConnection.disconnect();
             }
@@ -204,6 +212,13 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
         SyncAdapter.configurePeriodicSync(context, SYNC_INTERVAL, SYNC_FLEXTIME);
         ContentResolver.setSyncAutomatically(newAccount, context.getString(R.string.content_authority), true);
         syncImmediately(context);
+    }
+
+    private void setServerStatus(final Context context, final @ServerStatus int serverStatus){
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
+        SharedPreferences.Editor editor = preferences.edit();
+        editor.putInt(context.getString(R.string.prefs_server_status), serverStatus);
+        editor.apply();
     }
 
     private void notifyWeather() {

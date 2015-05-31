@@ -25,11 +25,11 @@ public class MainActivity extends AppCompatActivity implements ItemClickCallback
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayShowTitleEnabled(false);
 
-        if (findViewById(R.id.fragment_detail_container) != null) {
+        if (findViewById(R.id.weather_detail_container) != null) {
             twoPane = true;
             if (savedInstanceState == null) {
                 getSupportFragmentManager().beginTransaction()
-                        .replace(R.id.fragment_detail_container, new DetailFragment())
+                        .replace(R.id.weather_detail_container, new DetailFragment())
                         .commit();
             }
         } else {
@@ -63,7 +63,7 @@ public class MainActivity extends AppCompatActivity implements ItemClickCallback
             final DetailFragment detailFragment = new DetailFragment();
             detailFragment.setArguments(args);
             getSupportFragmentManager().beginTransaction()
-                    .replace(R.id.fragment_detail_container, detailFragment)
+                    .replace(R.id.weather_detail_container, detailFragment)
                     .commitAllowingStateLoss();
         } else {
             final Intent intent = new Intent(this, DetailActivity.class);

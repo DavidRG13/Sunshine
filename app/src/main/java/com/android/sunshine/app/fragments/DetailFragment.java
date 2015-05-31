@@ -9,6 +9,7 @@ import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.CardView;
 import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -16,6 +17,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewParent;
 import android.widget.ImageView;
 import android.widget.TextView;
 import com.android.sunshine.app.R;
@@ -68,7 +70,7 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        final View view = inflater.inflate(R.layout.fragment_detail, container, false);
+        final View view = inflater.inflate(R.layout.fragment_detail_start, container, false);
         iconView = (ImageView) view.findViewById(R.id.detail_icon);
         dateView = (TextView) view.findViewById(R.id.detail_date_textview);
         mDescriptionView = (TextView) view.findViewById(R.id.detail_forecast_textview);
@@ -114,14 +116,20 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
         final String date = getArguments().getString(DetailActivity.DATE_KEY);
         location = Utilities.getLocationSettings(getActivity());
         final Uri weatherUri = WeatherContract.WeatherEntry.buildWeatherLocationWithDate(location, date);
-        getView().setVisibility(View.INVISIBLE);
+        ViewParent vp = getView().getParent();
+        if ( vp instanceof CardView ) {
+            ((View)vp).setVisibility(View.INVISIBLE);
+        }
         return new CursorLoader(getActivity(), weatherUri, COLUMNS, null, null, WeatherContract.WeatherEntry.COLUMN_DATE + " ASC");
     }
 
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
         if (data.moveToFirst()) {
-            getView().setVisibility(View.VISIBLE);
+            ViewParent vp = getView().getParent();
+            if ( vp instanceof CardView) {
+                ((View)vp).setVisibility(View.VISIBLE);
+            }
 
             final boolean isMetric = Utilities.isMetric(getActivity());
             final int weatherId = data.getInt(data.getColumnIndex(WeatherContract.WeatherEntry.COLUMN_WEATHER_ID));

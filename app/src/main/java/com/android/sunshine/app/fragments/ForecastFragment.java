@@ -69,9 +69,9 @@ public class ForecastFragment extends Fragment implements AdapterView.OnItemClic
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         setHasOptionsMenu(true);
         rootView = inflater.inflate(R.layout.fragment_main, container, false);
-        forecastList = (ListView) rootView.findViewById(R.id.forecast_listview);
+        forecastList = (ListView) rootView.findViewById(R.id.listview_forecast);
         forecastList.setOnItemClickListener(this);
-        emptyView = (TextView) rootView.findViewById(R.id.empty_list);
+        emptyView = (TextView) rootView.findViewById(R.id.listview_forecast_empty);
         forecastList.setEmptyView(emptyView);
 
         adapter = new ForecastCursorAdapter(getActivity(), null, 0);
@@ -170,7 +170,7 @@ public class ForecastFragment extends Fragment implements AdapterView.OnItemClic
                     break;
                 default:
                     if (!Utilities.isNetworkAvailable(getActivity())) {
-                        ((TextView) getView().findViewById(R.id.empty_list)).setText(R.string.noWeatherInfoAvailableNoNetwork);
+                        ((TextView) getView().findViewById(R.id.listview_forecast_empty)).setText(R.string.noWeatherInfoAvailableNoNetwork);
                     }
             }
             emptyView.setText(message);

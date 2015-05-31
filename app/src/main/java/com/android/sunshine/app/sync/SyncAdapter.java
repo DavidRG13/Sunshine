@@ -157,8 +157,7 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
         Account account = getSyncAccount(context);
         String authority = context.getString(R.string.content_authority);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-            SyncRequest request = new SyncRequest.Builder()
-                    .syncPeriodic(syncInterval, flexTime).setSyncAdapter(account, authority).build();
+            SyncRequest request = new SyncRequest.Builder().syncPeriodic(syncInterval, flexTime).setSyncAdapter(account, authority).build();
             ContentResolver.requestSync(request);
         } else {
             ContentResolver.addPeriodicSync(account, authority, new Bundle(), syncInterval);

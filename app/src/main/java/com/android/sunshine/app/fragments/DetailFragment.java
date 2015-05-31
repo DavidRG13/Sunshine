@@ -114,12 +114,15 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
         final String date = getArguments().getString(DetailActivity.DATE_KEY);
         location = Utilities.getLocationSettings(getActivity());
         final Uri weatherUri = WeatherContract.WeatherEntry.buildWeatherLocationWithDate(location, date);
+        getView().setVisibility(View.INVISIBLE);
         return new CursorLoader(getActivity(), weatherUri, COLUMNS, null, null, WeatherContract.WeatherEntry.COLUMN_DATE + " ASC");
     }
 
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
         if (data.moveToFirst()) {
+            getView().setVisibility(View.VISIBLE);
+
             final boolean isMetric = Utilities.isMetric(getActivity());
             final int weatherId = data.getInt(data.getColumnIndex(WeatherContract.WeatherEntry.COLUMN_WEATHER_ID));
             final String description = data.getString(data.getColumnIndex(WeatherContract.WeatherEntry.COLUMN_SHORT_DESC));

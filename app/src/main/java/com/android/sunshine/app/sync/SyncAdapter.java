@@ -21,6 +21,7 @@ import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.TaskStackBuilder;
+import android.text.format.Time;
 import android.util.Log;
 import com.android.sunshine.app.R;
 import com.android.sunshine.app.activities.MainActivity;
@@ -184,13 +185,19 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
 
         long locationId = addLocation(locationSettings, cityName, cityLatitude, cityLongitude);
 
+        Time dayTime = new Time();
+        dayTime.setToNow();
+        int julianStartDay = Time.getJulianDay(System.currentTimeMillis(), dayTime.gmtoff);
+        dayTime = new Time();
+
         ArrayList<OWMWeatherForecast> weatherForecasts = owmResponse.getList();
         Vector<ContentValues> cVVector = new Vector<>(weatherForecasts.size());
-        for (OWMWeatherForecast weatherForecast : weatherForecasts) {
+        for (int i = 0; i < weatherForecasts.size(); i++) {
+            OWMWeatherForecast weatherForecast = weatherForecasts.get(i);
             ContentValues weatherValues = new ContentValues();
 
             weatherValues.put(WeatherEntry.COLUMN_LOC_KEY, locationId);
-            weatherValues.put(WeatherEntry.COLUMN_DATE, weatherForecast.getDt());
+            weatherValues.put(WeatherEntry.COLUMN_DATE, dayTime.setJulianDay(julianStartDay+i));
             weatherValues.put(WeatherEntry.COLUMN_HUMIDITY, weatherForecast.getHumidity());
             weatherValues.put(WeatherEntry.COLUMN_PRESSURE, weatherForecast.getPressure());
             weatherValues.put(WeatherEntry.COLUMN_WIND_SPEED, weatherForecast.getSpeed());

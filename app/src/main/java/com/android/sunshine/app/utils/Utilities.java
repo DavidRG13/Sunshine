@@ -60,9 +60,8 @@ public class Utilities {
     public static String getFriendlyDay(Context context, long dateInMillis) {
         Time time = new Time();
         time.setToNow();
-        long currentTime = System.currentTimeMillis();
         int julianDay = Time.getJulianDay(dateInMillis, time.gmtoff);
-        int currentJulianDay = Time.getJulianDay(currentTime, time.gmtoff);
+        int currentJulianDay = Time.getJulianDay(System.currentTimeMillis(), time.gmtoff);
 
         if (julianDay == currentJulianDay) {
             String today = context.getString(R.string.today);

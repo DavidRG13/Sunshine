@@ -18,6 +18,10 @@
         for two-pane layout -->
     </style>
 
+    <style name="AppTheme.Main" parent="@style/AppTheme"/>
+
+    <style name="AppTheme.Details" parent="@style/AppTheme"/>
+
     <style name="Toolbar" parent="Widget.AppCompat.Toolbar">
         <item name="android:background">?attr/colorPrimary</item>
         <item name="popupTheme">@style/Theme.AppCompat.Light</item>

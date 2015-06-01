@@ -2,6 +2,8 @@ package com.android.sunshine.app.activities;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
@@ -68,7 +70,8 @@ public class MainActivity extends AppCompatActivity implements ItemClickCallback
         } else {
             final Intent intent = new Intent(this, DetailActivity.class);
             intent.putExtra(DetailActivity.DATE_KEY, date);
-            startActivity(intent);
+            ActivityOptionsCompat activityOptions = ActivityOptionsCompat.makeSceneTransitionAnimation(this);
+            ActivityCompat.startActivity(this, intent, activityOptions.toBundle());
         }
     }
 }

@@ -2,10 +2,10 @@ package com.android.sunshine.app.adapter;
 
 import android.content.Context;
 import android.database.Cursor;
+import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.CursorAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 import com.android.sunshine.app.R;
@@ -13,44 +13,47 @@ import com.android.sunshine.app.utils.Utilities;
 
 import static com.android.sunshine.app.model.WeatherContract.WeatherEntry;
 
-public class ForecastCursorAdapter extends CursorAdapter{
+public class ForecastCursorAdapter extends RecyclerView.Adapter<ForecastCursorAdapter.ViewHolder>{
 
     private static final int TODAY_VIEW_TYPE = 0;
     private static final int FUTURE_DAY_VIEW_TYPE = 1;
     private boolean useTodayLayout;
+    private Cursor cursor;
+    private Context context;
 
-    public ForecastCursorAdapter(Context context, Cursor c, int flags) {
-        super(context, c, flags);
+    public ForecastCursorAdapter(Context context) {
+        this.context = context;
     }
 
     @Override
-    public View newView(Context context, Cursor cursor, ViewGroup parent) {
-        final int itemViewType = getItemViewType(cursor.getPosition());
-        int layoutId = -1;
-        switch (itemViewType){
-            case TODAY_VIEW_TYPE:
-                layoutId = R.layout.today_list_item;
-                break;
-            case FUTURE_DAY_VIEW_TYPE:
-                layoutId = R.layout.forecast_list_item;
-                break;
+    public ViewHolder onCreateViewHolder(final ViewGroup viewGroup, final int viewType) {
+        if (viewGroup instanceof RecyclerView) {
+            int layoutId = -1;
+            switch (viewType){
+                case TODAY_VIEW_TYPE:
+                    layoutId = R.layout.today_list_item;
+                    break;
+                case FUTURE_DAY_VIEW_TYPE:
+                    layoutId = R.layout.forecast_list_item;
+                    break;
+            }
+            final View view = LayoutInflater.from(context).inflate(layoutId, viewGroup, false);
+            return new ViewHolder(view);
+        } else {
+            throw new RuntimeException("Not bound to RecyclerViewSelection");
         }
-        final View view = LayoutInflater.from(context).inflate(layoutId, parent, false);
-        final ViewHolder viewHolder = new ViewHolder(view);
-        view.setTag(viewHolder);
-        return view;
     }
 
     @Override
-    public void bindView(View view, Context context, Cursor cursor) {
+    public void onBindViewHolder(final ViewHolder viewHolder, final int position) {
+        cursor.moveToPosition(position);
+
         final boolean isMetric = Utilities.isMetric(context);
         final int weatherId = cursor.getInt(cursor.getColumnIndex(WeatherEntry.COLUMN_WEATHER_ID));
         final long weatherDate = cursor.getInt(cursor.getColumnIndex(WeatherEntry.COLUMN_DATE));
         final String descriptionWeather = cursor.getString(cursor.getColumnIndex(WeatherEntry.COLUMN_SHORT_DESC));
         final float maxTemp = cursor.getFloat(cursor.getColumnIndex(WeatherEntry.COLUMN_MAX_TEMP));
         final float minTemp = cursor.getFloat(cursor.getColumnIndex(WeatherEntry.COLUMN_MIN_TEMP));
-
-        final ViewHolder viewHolder = (ViewHolder) view.getTag();
 
         viewHolder.dateWeather.setText(Utilities.getFriendlyDay(context, weatherDate));
         viewHolder.forecastDescription.setText(descriptionWeather);
@@ -69,20 +72,29 @@ public class ForecastCursorAdapter extends CursorAdapter{
         return (position == 0 && useTodayLayout) ? TODAY_VIEW_TYPE : FUTURE_DAY_VIEW_TYPE;
     }
 
-    @Override
-    public int getViewTypeCount() {
-        return 2;
-    }
-
     public void setUseTodayLayout(boolean useTodayLayout) {
         this.useTodayLayout = useTodayLayout;
     }
 
-    public boolean getUseTodayLayout() {
-        return useTodayLayout;
+    @Override
+    public int getItemCount() {
+        if (null == cursor) {
+            return 0;
+        } else {
+            return cursor.getCount();
+        }
     }
 
-    private static class ViewHolder{
+    public void swapCursor(final Cursor cursor) {
+        this.cursor = cursor;
+        notifyDataSetChanged();
+    }
+
+    public Cursor getCursor() {
+        return cursor;
+    }
+
+    public static class ViewHolder extends RecyclerView.ViewHolder{
         public final ImageView forecastIcon;
         public final TextView dateWeather;
         public final TextView forecastDescription;
@@ -90,6 +102,7 @@ public class ForecastCursorAdapter extends CursorAdapter{
         public final TextView min;
 
         private ViewHolder(View view) {
+            super(view);
             forecastIcon = (ImageView) view.findViewById(R.id.list_item_icon);
             dateWeather = (TextView) view.findViewById(R.id.list_item_date);
             forecastDescription = (TextView) view.findViewById(R.id.list_item_forecast);

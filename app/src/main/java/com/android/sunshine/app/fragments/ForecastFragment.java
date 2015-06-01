@@ -11,6 +11,8 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -18,7 +20,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.ListView;
 import android.widget.TextView;
 import com.android.sunshine.app.R;
 import com.android.sunshine.app.adapter.ForecastCursorAdapter;
@@ -51,9 +52,8 @@ public class ForecastFragment extends Fragment implements AdapterView.OnItemClic
             LocationEntry.COLUMN_COORD_LAT,
             LocationEntry.COLUMN_COORD_LONG
     };
-    private int scrollPosition;
-    private ListView forecastList;
-    private View rootView;
+    private int scrollPosition = RecyclerView.NO_POSITION;
+    private RecyclerView forecastList;
     private TextView emptyView;
 
     public ForecastFragment() {
@@ -68,13 +68,14 @@ public class ForecastFragment extends Fragment implements AdapterView.OnItemClic
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         setHasOptionsMenu(true);
-        rootView = inflater.inflate(R.layout.fragment_main, container, false);
-        forecastList = (ListView) rootView.findViewById(R.id.listview_forecast);
-        forecastList.setOnItemClickListener(this);
+        final View rootView = inflater.inflate(R.layout.fragment_main, container, false);
+        forecastList = (RecyclerView) rootView.findViewById(R.id.recycler_view_forecast);
+        forecastList.setLayoutManager(new LinearLayoutManager(getActivity()));
+        //forecastList.setOnItemClickListener(this);
         emptyView = (TextView) rootView.findViewById(R.id.listview_forecast_empty);
-        forecastList.setEmptyView(emptyView);
+        //forecastList.setEmptyView(emptyView);
 
-        adapter = new ForecastCursorAdapter(getActivity(), null, 0);
+        adapter = new ForecastCursorAdapter(getActivity());
         forecastList.setAdapter(adapter);
         if (savedInstanceState != null && savedInstanceState.containsKey(SCROLL_POSITION)) {
             scrollPosition = savedInstanceState.getInt(SCROLL_POSITION);
@@ -118,7 +119,7 @@ public class ForecastFragment extends Fragment implements AdapterView.OnItemClic
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
-        if (scrollPosition != ListView.INVALID_POSITION) {
+        if (scrollPosition != RecyclerView.NO_POSITION) {
             outState.putInt(SCROLL_POSITION, scrollPosition);
         }
         super.onSaveInstanceState(outState);
@@ -145,17 +146,17 @@ public class ForecastFragment extends Fragment implements AdapterView.OnItemClic
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
         adapter.swapCursor(data);
-        if (scrollPosition != ListView.INVALID_POSITION) {
+        if (scrollPosition != RecyclerView.NO_POSITION) {
             forecastList.smoothScrollToPosition(scrollPosition);
-            if (!adapter.getUseTodayLayout()) {
-                forecastList.performItemClick(rootView, scrollPosition, forecastList.getAdapter().getItemId(scrollPosition));
-            }
+            //if (!adapter.getUseTodayLayout()) {
+            //    forecastList.cliperformItemClick(rootView, scrollPosition, forecastList.getAdapter().getItemId(scrollPosition));
+            //}
         }
         updateEmptyView();
     }
 
     private void updateEmptyView() {
-        if (adapter.getCount() == 0) {
+        if (adapter.getItemCount() == 0) {
             int message = R.string.noWeatherInfoAvailable;
             @ServerStatus int status = Utilities.getServerStatus(getActivity());
             switch (status) {

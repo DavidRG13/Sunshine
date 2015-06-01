@@ -18,11 +18,13 @@ public class DetailActivity extends AppCompatActivity {
             final long date = getIntent().getLongExtra(DATE_KEY, 0);
             final Bundle bundle = new Bundle();
             bundle.putLong(DATE_KEY, date);
+            bundle.putBoolean(DetailFragment.DETAIL_TRANSITION_ANIMATION, true);
             final DetailFragment detailFragment = new DetailFragment();
             detailFragment.setArguments(bundle);
             getSupportFragmentManager().beginTransaction()
                     .add(R.id.fragment_detail_container, detailFragment)
                     .commit();
+            supportPostponeEnterTransition();
         }
     }
 }

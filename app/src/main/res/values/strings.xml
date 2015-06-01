@@ -59,4 +59,6 @@
     <string name="server_error">No weather data available. The server is not returning valid data.</string>
     <string name="invalid_location">No weather information available. The location in settings is not recognized by the weather server.</string>
 
+    <string name="detail_icon_transition_name" translatable="false">TN_DetailIcon</string>
+
 </resources>

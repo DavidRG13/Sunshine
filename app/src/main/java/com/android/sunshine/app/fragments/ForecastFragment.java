@@ -47,23 +47,16 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
     private String location;
     private ForecastCursorAdapter adapter;
 
-    private static final String[] FORECAST_COLUMNS = new String[]{
-            WeatherEntry.TABLE_NAME + "." + WeatherEntry._ID,
-            WeatherEntry.COLUMN_DATE,
-            WeatherEntry.COLUMN_SHORT_DESC,
-            WeatherEntry.COLUMN_MAX_TEMP,
-            WeatherEntry.COLUMN_MIN_TEMP,
-            WeatherEntry.COLUMN_WEATHER_ID,
-            WeatherEntry.COLUMN_WEATHER_ID,
-            LocationEntry.COLUMN_LOCATION_SETTING,
-            LocationEntry.COLUMN_COORD_LAT,
-            LocationEntry.COLUMN_COORD_LONG
+    private static final String[] FORECAST_COLUMNS = new String[] {
+        WeatherEntry.TABLE_NAME + "." + WeatherEntry._ID, WeatherEntry.COLUMN_DATE, WeatherEntry.COLUMN_SHORT_DESC, WeatherEntry.COLUMN_MAX_TEMP, WeatherEntry.COLUMN_MIN_TEMP, WeatherEntry.COLUMN_WEATHER_ID,
+        WeatherEntry.COLUMN_WEATHER_ID, LocationEntry.COLUMN_LOCATION_SETTING, LocationEntry.COLUMN_COORD_LAT, LocationEntry.COLUMN_COORD_LONG
     };
     private int scrollPosition = RecyclerView.NO_POSITION;
     private RecyclerView forecastList;
     private TextView emptyView;
     private boolean autoSelectView;
     private int choiceMode;
+    private boolean holdForTransition;
 
     public ForecastFragment() {
     }
@@ -71,6 +64,9 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
+        if (holdForTransition) {
+            getActivity().supportPostponeEnterTransition();
+        }
         getLoaderManager().initLoader(FORECAST_LOADER, null, this);
     }
 
@@ -118,6 +114,7 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
         TypedArray a = activity.obtainStyledAttributes(attrs, R.styleable.ForecastFragment, 0, 0);
         choiceMode = a.getInt(R.styleable.ForecastFragment_android_choiceMode, AbsListView.CHOICE_MODE_NONE);
         autoSelectView = a.getBoolean(R.styleable.ForecastFragment_autoSelectView, false);
+        holdForTransition = a.getBoolean(R.styleable.ForecastFragment_sharedElementTransitions, false);
         a.recycle();
     }
 
@@ -165,9 +162,9 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
     }
 
     @Override
-    public void onClick(final long date, final int position) {
-        this.scrollPosition = position;
-        ((ItemClickCallback) getActivity()).onItemSelected(date);
+    public void onClick(final long date, final ForecastCursorAdapter.ViewHolder viewHolder) {
+        this.scrollPosition = viewHolder.getAdapterPosition();
+        ((ItemClickCallback) getActivity()).onItemSelected(date, viewHolder);
     }
 
     @Override
@@ -189,17 +186,22 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
             forecastList.smoothScrollToPosition(scrollPosition);
         }
         updateEmptyView();
-        if ( data.getCount() > 0 ) {
+        if (data.getCount() == 0) {
+            getActivity().supportStartPostponedEnterTransition();
+        } else {
             forecastList.getViewTreeObserver().addOnPreDrawListener(new ViewTreeObserver.OnPreDrawListener() {
                 @Override
                 public boolean onPreDraw() {
                     if (forecastList.getChildCount() > 0) {
                         forecastList.getViewTreeObserver().removeOnPreDrawListener(this);
                         int itemPosition = adapter.getSelectedItemPosition();
-                        if ( RecyclerView.NO_POSITION == itemPosition ) itemPosition = 0;
+                        if (RecyclerView.NO_POSITION == itemPosition) itemPosition = 0;
                         RecyclerView.ViewHolder vh = forecastList.findViewHolderForAdapterPosition(itemPosition);
-                        if ( null != vh && autoSelectView) {
-                            adapter.selectView( vh );
+                        if (null != vh && autoSelectView) {
+                            adapter.selectView(vh);
+                        }
+                        if (holdForTransition) {
+                            getActivity().supportStartPostponedEnterTransition();
                         }
                         return true;
                     }

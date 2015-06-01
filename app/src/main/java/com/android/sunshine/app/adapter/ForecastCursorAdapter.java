@@ -3,6 +3,7 @@ package com.android.sunshine.app.adapter;
 import android.content.Context;
 import android.database.Cursor;
 import android.os.Bundle;
+import android.support.v4.view.ViewCompat;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -18,6 +19,7 @@ public class ForecastCursorAdapter extends RecyclerView.Adapter<ForecastCursorAd
 
     private static final int TODAY_VIEW_TYPE = 0;
     private static final int FUTURE_DAY_VIEW_TYPE = 1;
+
     private boolean useTodayLayout;
     private Cursor cursor;
     private Context context;
@@ -73,6 +75,8 @@ public class ForecastCursorAdapter extends RecyclerView.Adapter<ForecastCursorAd
         }else{
             viewHolder.forecastIcon.setImageResource(Utilities.getIconResourceForWeatherCondition(weatherId));
         }
+        ViewCompat.setTransitionName(viewHolder.forecastIcon, "iconView" + position);
+
         itemChoiceManager.onBindViewHolder(viewHolder, position);
     }
 
@@ -109,7 +113,7 @@ public class ForecastCursorAdapter extends RecyclerView.Adapter<ForecastCursorAd
         int position = viewHolder.getAdapterPosition();
         cursor.moveToPosition(position);
         long date = cursor.getLong(cursor.getColumnIndex(WeatherEntry.COLUMN_DATE));
-        onAdapterItemClickListener.onClick(date, position);
+        onAdapterItemClickListener.onClick(date, (ViewHolder) viewHolder);
         itemChoiceManager.onClick(viewHolder);
     }
 

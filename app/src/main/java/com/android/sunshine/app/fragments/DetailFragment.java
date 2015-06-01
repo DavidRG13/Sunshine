@@ -30,6 +30,7 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
 
     public static final int DETAIL_LOADER = 0;
     public static final String LOCATION_KEY = "location";
+    public static final String DETAIL_TRANSITION_ANIMATION = "DTA";
     private String location;
     private String weatherData;
     private static final String[] COLUMNS = new String[]{
@@ -51,6 +52,7 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
     private TextView mHumidityView;
     private TextView mWindView;
     private TextView mPressureView;
+    private boolean transitionAnimation;
 
     public DetailFragment() {
         setHasOptionsMenu(true);
@@ -70,6 +72,11 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        Bundle arguments = getArguments();
+        if (arguments != null) {
+            transitionAnimation = arguments.getBoolean(DetailFragment.DETAIL_TRANSITION_ANIMATION, false);
+        }
+
         final View view = inflater.inflate(R.layout.fragment_detail_start, container, false);
         iconView = (ImageView) view.findViewById(R.id.detail_icon);
         dateView = (TextView) view.findViewById(R.id.detail_date_textview);
@@ -158,7 +165,7 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
             Toolbar toolbarView = (Toolbar) getView().findViewById(R.id.toolbar);
 
             // We need to start the enter transition after the data has loaded
-            if (activity instanceof DetailActivity) {
+            if (transitionAnimation) {
                 activity.supportStartPostponedEnterTransition();
 
                 if ( null != toolbarView ) {

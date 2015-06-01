@@ -15,9 +15,9 @@ public class DetailActivity extends AppCompatActivity {
         setContentView(R.layout.activity_detail);
 
         if (savedInstanceState == null) {
-            final String date = getIntent().getStringExtra(DATE_KEY);
+            final long date = getIntent().getLongExtra(DATE_KEY, 0);
             final Bundle bundle = new Bundle();
-            bundle.putString(DATE_KEY, date);
+            bundle.putLong(DATE_KEY, date);
             final DetailFragment detailFragment = new DetailFragment();
             detailFragment.setArguments(bundle);
             getSupportFragmentManager().beginTransaction()

@@ -258,7 +258,7 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
             if (System.currentTimeMillis() - lastSync >= DAY_IN_MILLIS) {
                 String locationQuery = Utilities.getLocationSettings(getContext());
 
-                Uri weatherUri = WeatherEntry.buildWeatherLocationWithDate(locationQuery, WeatherContract.getDbDateString(new Date()));
+                Uri weatherUri = WeatherEntry.buildWeatherLocationWithDate(locationQuery, new Date().getTime());
 
                 Cursor cursor = getContext().getContentResolver().query(weatherUri, NOTIFY_WEATHER_PROJECTION, null, null, null);
 

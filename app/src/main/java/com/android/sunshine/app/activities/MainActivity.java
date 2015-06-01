@@ -56,10 +56,10 @@ public class MainActivity extends AppCompatActivity implements ItemClickCallback
     }
 
     @Override
-    public void onItemSelected(String date) {
+    public void onItemSelected(long date) {
         if (twoPane) {
             final Bundle args = new Bundle();
-            args.putString(DetailActivity.DATE_KEY, date);
+            args.putLong(DetailActivity.DATE_KEY, date);
             final DetailFragment detailFragment = new DetailFragment();
             detailFragment.setArguments(args);
             getSupportFragmentManager().beginTransaction()

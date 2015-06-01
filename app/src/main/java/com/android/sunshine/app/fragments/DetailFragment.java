@@ -113,7 +113,7 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
 
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-        final String date = getArguments().getString(DetailActivity.DATE_KEY);
+        final long date = getArguments().getLong(DetailActivity.DATE_KEY);
         location = Utilities.getLocationSettings(getActivity());
         final Uri weatherUri = WeatherContract.WeatherEntry.buildWeatherLocationWithDate(location, date);
         ViewParent vp = getView().getParent();

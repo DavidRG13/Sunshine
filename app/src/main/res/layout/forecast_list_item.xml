@@ -31,13 +31,13 @@
             android:orientation="vertical">
 
             <TextView
-                android:id="@+id/list_item_date"
+                android:id="@+id/list_item_date_textview"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textAppearance="@style/TextAppearance.AppCompat.Subhead"/>
 
             <TextView
-                android:id="@+id/list_item_forecast"
+                android:id="@+id/list_item_forecast_textview"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textAppearance="@style/TextAppearance.AppCompat.Body1"
@@ -45,7 +45,7 @@
         </LinearLayout>
 
         <TextView
-            android:id="@+id/list_item_max"
+            android:id="@+id/list_item_high_textview"
             android:layout_width="@dimen/forecast_text_width"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
@@ -57,7 +57,7 @@
             android:textSize="@dimen/forecast_text_size"/>
 
         <TextView
-            android:id="@+id/list_item_min"
+            android:id="@+id/list_item_low_textview"
             android:layout_width="@dimen/forecast_text_width"
             android:layout_height="wrap_content"
             android:layout_gravity="center"

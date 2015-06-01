@@ -1,8 +1,10 @@
 package com.android.sunshine.app.fragments;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
+import android.content.res.TypedArray;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
@@ -13,12 +15,15 @@ import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewTreeObserver;
+import android.widget.AbsListView;
 import android.widget.TextView;
 import com.android.sunshine.app.R;
 import com.android.sunshine.app.adapter.ForecastCursorAdapter;
@@ -55,6 +60,8 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
     private int scrollPosition = RecyclerView.NO_POSITION;
     private RecyclerView forecastList;
     private TextView emptyView;
+    private boolean autoSelectView;
+    private int choiceMode;
 
     public ForecastFragment() {
     }
@@ -74,12 +81,22 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
         forecastList.setHasFixedSize(true);
         emptyView = (TextView) rootView.findViewById(R.id.listview_forecast_empty);
 
-        adapter = new ForecastCursorAdapter(getActivity(), emptyView, this);
+        adapter = new ForecastCursorAdapter(getActivity(), emptyView, this, choiceMode);
         forecastList.setAdapter(adapter);
         if (savedInstanceState != null && savedInstanceState.containsKey(SCROLL_POSITION)) {
             scrollPosition = savedInstanceState.getInt(SCROLL_POSITION);
         }
+        adapter.onRestoreInstanceState(savedInstanceState);
         return rootView;
+    }
+
+    @Override
+    public void onInflate(Activity activity, AttributeSet attrs, Bundle savedInstanceState) {
+        super.onInflate(activity, attrs, savedInstanceState);
+        TypedArray a = activity.obtainStyledAttributes(attrs, R.styleable.ForecastFragment, 0, 0);
+        choiceMode = a.getInt(R.styleable.ForecastFragment_android_choiceMode, AbsListView.CHOICE_MODE_NONE);
+        autoSelectView = a.getBoolean(R.styleable.ForecastFragment_autoSelectView, false);
+        a.recycle();
     }
 
     @Override
@@ -121,6 +138,7 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
         if (scrollPosition != RecyclerView.NO_POSITION) {
             outState.putInt(SCROLL_POSITION, scrollPosition);
         }
+        adapter.onSaveInstanceState(outState);
         super.onSaveInstanceState(outState);
     }
 
@@ -147,11 +165,26 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
         adapter.swapCursor(data);
         if (scrollPosition != RecyclerView.NO_POSITION) {
             forecastList.smoothScrollToPosition(scrollPosition);
-            //if (!adapter.getUseTodayLayout()) {
-            //    forecastList.cliperformItemClick(rootView, scrollPosition, forecastList.getAdapter().getItemId(scrollPosition));
-            //}
         }
         updateEmptyView();
+        if ( data.getCount() > 0 ) {
+            forecastList.getViewTreeObserver().addOnPreDrawListener(new ViewTreeObserver.OnPreDrawListener() {
+                @Override
+                public boolean onPreDraw() {
+                    if (forecastList.getChildCount() > 0) {
+                        forecastList.getViewTreeObserver().removeOnPreDrawListener(this);
+                        int itemPosition = adapter.getSelectedItemPosition();
+                        if ( RecyclerView.NO_POSITION == itemPosition ) itemPosition = 0;
+                        RecyclerView.ViewHolder vh = forecastList.findViewHolderForAdapterPosition(itemPosition);
+                        if ( null != vh && autoSelectView) {
+                            adapter.selectView( vh );
+                        }
+                        return true;
+                    }
+                    return false;
+                }
+            });
+        }
     }
 
     private void updateEmptyView() {

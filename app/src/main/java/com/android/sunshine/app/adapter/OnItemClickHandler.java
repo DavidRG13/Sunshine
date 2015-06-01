@@ -1,7 +1,7 @@
 package com.android.sunshine.app.adapter;
 
-import android.view.View;
+import android.support.v7.widget.RecyclerView;
 
 public interface OnItemClickHandler {
-    void itemClick(int position, View view);
+    void itemClick(RecyclerView.ViewHolder viewHolder);
 }

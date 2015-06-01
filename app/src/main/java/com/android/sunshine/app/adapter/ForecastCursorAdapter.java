@@ -2,6 +2,7 @@ package com.android.sunshine.app.adapter;
 
 import android.content.Context;
 import android.database.Cursor;
+import android.os.Bundle;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -22,11 +23,14 @@ public class ForecastCursorAdapter extends RecyclerView.Adapter<ForecastCursorAd
     private Context context;
     private View emptyView;
     private OnAdapterItemClickListener onAdapterItemClickListener;
+    final private ItemChoiceManager itemChoiceManager;
 
-    public ForecastCursorAdapter(final Context context, final View emptyView, final OnAdapterItemClickListener onAdapterItemClickListener) {
+    public ForecastCursorAdapter(final Context context, final View emptyView, final OnAdapterItemClickListener onAdapterItemClickListener, final int choiceMode) {
         this.context = context;
         this.emptyView = emptyView;
         this.onAdapterItemClickListener = onAdapterItemClickListener;
+        itemChoiceManager = new ItemChoiceManager(this);
+        itemChoiceManager.setChoiceMode(choiceMode);
     }
 
     @Override
@@ -69,6 +73,7 @@ public class ForecastCursorAdapter extends RecyclerView.Adapter<ForecastCursorAd
         }else{
             viewHolder.forecastIcon.setImageResource(Utilities.getIconResourceForWeatherCondition(weatherId));
         }
+        itemChoiceManager.onBindViewHolder(viewHolder, position);
     }
 
     @Override
@@ -100,10 +105,31 @@ public class ForecastCursorAdapter extends RecyclerView.Adapter<ForecastCursorAd
     }
 
     @Override
-    public void itemClick(final int position, final View view) {
+    public void itemClick(final RecyclerView.ViewHolder viewHolder) {
+        int position = viewHolder.getAdapterPosition();
         cursor.moveToPosition(position);
         long date = cursor.getLong(cursor.getColumnIndex(WeatherEntry.COLUMN_DATE));
         onAdapterItemClickListener.onClick(date, position);
+        itemChoiceManager.onClick(viewHolder);
+    }
+
+    public void selectView(RecyclerView.ViewHolder viewHolder) {
+        if ( viewHolder instanceof ViewHolder ) {
+            ViewHolder holder = (ViewHolder)viewHolder;
+            holder.onClick(holder.itemView);
+        }
+    }
+
+    public void onRestoreInstanceState(Bundle savedInstanceState) {
+        itemChoiceManager.onRestoreInstanceState(savedInstanceState);
+    }
+
+    public void onSaveInstanceState(Bundle outState) {
+        itemChoiceManager.onSaveInstanceState(outState);
+    }
+
+    public int getSelectedItemPosition() {
+        return itemChoiceManager.getSelectedItemPosition();
     }
 
     public static class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
@@ -119,16 +145,15 @@ public class ForecastCursorAdapter extends RecyclerView.Adapter<ForecastCursorAd
             this.onItemClickHandler = onItemClickHandler;
             view.setOnClickListener(this);
             forecastIcon = (ImageView) view.findViewById(R.id.list_item_icon);
-            dateWeather = (TextView) view.findViewById(R.id.list_item_date);
-            forecastDescription = (TextView) view.findViewById(R.id.list_item_forecast);
-            max = (TextView) view.findViewById(R.id.list_item_max);
-            min = (TextView) view.findViewById(R.id.list_item_min);
+            dateWeather = (TextView) view.findViewById(R.id.list_item_date_textview);
+            forecastDescription = (TextView) view.findViewById(R.id.list_item_forecast_textview);
+            max = (TextView) view.findViewById(R.id.list_item_high_textview);
+            min = (TextView) view.findViewById(R.id.list_item_low_textview);
         }
 
         @Override
         public void onClick(final View view) {
-            int position = getAdapterPosition();
-            onItemClickHandler.itemClick(position, view);
+            onItemClickHandler.itemClick(this);
         }
     }
 }

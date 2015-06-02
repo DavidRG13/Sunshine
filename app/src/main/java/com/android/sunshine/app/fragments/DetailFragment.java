@@ -31,6 +31,8 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
     public static final int DETAIL_LOADER = 0;
     public static final String LOCATION_KEY = "location";
     public static final String DETAIL_TRANSITION_ANIMATION = "DTA";
+    public static final String DETAIL_URI = "URI";
+
     private String location;
     private String weatherData;
     private static final String[] COLUMNS = new String[]{

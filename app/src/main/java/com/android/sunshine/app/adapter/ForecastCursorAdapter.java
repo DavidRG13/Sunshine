@@ -65,16 +65,19 @@ public class ForecastCursorAdapter extends RecyclerView.Adapter<ForecastCursorAd
         final float maxTemp = cursor.getFloat(cursor.getColumnIndex(WeatherEntry.COLUMN_MAX_TEMP));
         final float minTemp = cursor.getFloat(cursor.getColumnIndex(WeatherEntry.COLUMN_MIN_TEMP));
 
-        viewHolder.dateWeather.setText(Utilities.getFriendlyDay(context, weatherDate));
+        boolean useLongToday;
+        if(getItemViewType(cursor.getPosition()) == TODAY_VIEW_TYPE){
+            useLongToday = true;
+            viewHolder.forecastIcon.setImageResource(Utilities.getArtResourceForWeatherCondition(weatherId));
+        }else{
+            useLongToday = false;
+            viewHolder.forecastIcon.setImageResource(Utilities.getIconResourceForWeatherCondition(weatherId));
+        }
+
+        viewHolder.dateWeather.setText(Utilities.getFriendlyDay(context, weatherDate, useLongToday));
         viewHolder.forecastDescription.setText(descriptionWeather);
         viewHolder.max.setText(Utilities.formatTemperature(context, maxTemp, isMetric));
         viewHolder.min.setText(Utilities.formatTemperature(context, minTemp, isMetric));
-
-        if(getItemViewType(cursor.getPosition()) == TODAY_VIEW_TYPE){
-            viewHolder.forecastIcon.setImageResource(Utilities.getArtResourceForWeatherCondition(weatherId));
-        }else{
-            viewHolder.forecastIcon.setImageResource(Utilities.getIconResourceForWeatherCondition(weatherId));
-        }
         ViewCompat.setTransitionName(viewHolder.forecastIcon, "iconView" + position);
 
         itemChoiceManager.onBindViewHolder(viewHolder, position);

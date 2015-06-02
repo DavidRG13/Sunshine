@@ -224,10 +224,8 @@ public class WeatherProvider extends ContentProvider {
 
     private Cursor getWeatherByLocationSettingsWithDate(Uri uri, String[] projection, String sortOrder) {
         final String locationSetting = WeatherEntry.getLocationSettingFromUri(uri);
-        final String startDate = WeatherEntry.getDateFromUri(uri);
-        return weatherByLocationSettingsQueryBuilder.query(dbHelper.getReadableDatabase(),
-                projection, locationSettingsWithDaySelection, new String[]{locationSetting, startDate},
-                null, null, sortOrder);
+        final long startDate = WeatherEntry.getDateFromUri(uri);
+        return weatherByLocationSettingsQueryBuilder.query(dbHelper.getReadableDatabase(), projection, locationSettingsWithDaySelection, new String[]{locationSetting, String.valueOf(startDate) }, null, null, sortOrder);
     }
 
     private static UriMatcher buildUriMatcher() {

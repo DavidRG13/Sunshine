@@ -33,6 +33,7 @@ import com.android.sunshine.app.R;
 import com.android.sunshine.app.adapter.ForecastCursorAdapter;
 import com.android.sunshine.app.adapter.OnAdapterItemClickListener;
 import com.android.sunshine.app.callbacks.ItemClickCallback;
+import com.android.sunshine.app.model.WeatherContract;
 import com.android.sunshine.app.sync.ServerStatus;
 import com.android.sunshine.app.sync.SyncAdapter;
 import com.android.sunshine.app.utils.Utilities;
@@ -52,12 +53,12 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
         WeatherEntry.TABLE_NAME + "." + WeatherEntry._ID, WeatherEntry.COLUMN_DATE, WeatherEntry.COLUMN_SHORT_DESC, WeatherEntry.COLUMN_MAX_TEMP, WeatherEntry.COLUMN_MIN_TEMP, WeatherEntry.COLUMN_WEATHER_ID,
         WeatherEntry.COLUMN_WEATHER_ID, LocationEntry.COLUMN_LOCATION_SETTING, LocationEntry.COLUMN_COORD_LAT, LocationEntry.COLUMN_COORD_LONG
     };
-    private int scrollPosition = RecyclerView.NO_POSITION;
     private RecyclerView forecastList;
     private TextView emptyView;
     private boolean autoSelectView;
     private int choiceMode;
     private boolean holdForTransition;
+    private long mInitialSelectedDate = -1;
 
     public ForecastFragment() {
     }
@@ -82,10 +83,9 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
 
         adapter = new ForecastCursorAdapter(getActivity(), emptyView, this, choiceMode);
         forecastList.setAdapter(adapter);
-        if (savedInstanceState != null && savedInstanceState.containsKey(SCROLL_POSITION)) {
-            scrollPosition = savedInstanceState.getInt(SCROLL_POSITION);
+        if (savedInstanceState != null) {
+            adapter.onRestoreInstanceState(savedInstanceState);
         }
-        adapter.onRestoreInstanceState(savedInstanceState);
 
         final View parallaxView = rootView.findViewById(R.id.parallax_bar);
         if (null != parallaxView) {
@@ -173,16 +173,12 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
-        if (scrollPosition != RecyclerView.NO_POSITION) {
-            outState.putInt(SCROLL_POSITION, scrollPosition);
-        }
         adapter.onSaveInstanceState(outState);
         super.onSaveInstanceState(outState);
     }
 
     @Override
     public void onClick(final long date, final ForecastCursorAdapter.ViewHolder viewHolder) {
-        this.scrollPosition = viewHolder.getAdapterPosition();
         ((ItemClickCallback) getActivity()).onItemSelected(date, viewHolder);
     }
 
@@ -199,9 +195,6 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
         adapter.swapCursor(data);
-        if (scrollPosition != RecyclerView.NO_POSITION) {
-            forecastList.smoothScrollToPosition(scrollPosition);
-        }
         updateEmptyView();
         if (data.getCount() == 0) {
             getActivity().supportStartPostponedEnterTransition();
@@ -211,13 +204,28 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
                 public boolean onPreDraw() {
                     if (forecastList.getChildCount() > 0) {
                         forecastList.getViewTreeObserver().removeOnPreDrawListener(this);
-                        int itemPosition = adapter.getSelectedItemPosition();
-                        if (RecyclerView.NO_POSITION == itemPosition) itemPosition = 0;
-                        RecyclerView.ViewHolder vh = forecastList.findViewHolderForAdapterPosition(itemPosition);
+                        int position = adapter.getSelectedItemPosition();
+                        if (position == RecyclerView.NO_POSITION && -1 != mInitialSelectedDate) {
+                            Cursor data = adapter.getCursor();
+                            int count = data.getCount();
+                            int dateColumn = data.getColumnIndex(WeatherContract.WeatherEntry.COLUMN_DATE);
+                            for ( int i = 0; i < count; i++ ) {
+                                data.moveToPosition(i);
+                                if ( data.getLong(dateColumn) == mInitialSelectedDate ) {
+                                    position = i;
+                                    break;
+                                }
+                            }
+                        }
+                        if (position == RecyclerView.NO_POSITION) position = 0;
+                        // If we don't need to restart the loader, and there's a desired position to restore
+                        // to, do so now.
+                        forecastList.smoothScrollToPosition(position);
+                        RecyclerView.ViewHolder vh = forecastList.findViewHolderForAdapterPosition(position);
                         if (null != vh && autoSelectView) {
                             adapter.selectView(vh);
                         }
-                        if (holdForTransition) {
+                        if ( holdForTransition ) {
                             getActivity().supportStartPostponedEnterTransition();
                         }
                         return true;
@@ -264,6 +272,10 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
 
     private void refreshWeatherData() {
         SyncAdapter.syncImmediately(getActivity());
+    }
+
+    public void setInitialSelectedDate(long initialSelectedDate) {
+        mInitialSelectedDate = initialSelectedDate;
     }
 
     private void showCurrentLocation() {

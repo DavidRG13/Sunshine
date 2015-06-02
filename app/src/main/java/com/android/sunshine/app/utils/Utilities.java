@@ -57,13 +57,13 @@ public class Utilities {
         return prefs.getBoolean(displayNotificationsKey, Boolean.parseBoolean(context.getString(R.string.pref_enable_notifications_default)));
     }
 
-    public static String getFriendlyDay(Context context, long dateInMillis) {
+    public static String getFriendlyDay(Context context, long dateInMillis, boolean displayLongToday) {
         Time time = new Time();
         time.setToNow();
         int julianDay = Time.getJulianDay(dateInMillis, time.gmtoff);
         int currentJulianDay = Time.getJulianDay(System.currentTimeMillis(), time.gmtoff);
 
-        if (julianDay == currentJulianDay) {
+        if (displayLongToday && julianDay == currentJulianDay) {
             String today = context.getString(R.string.today);
             int formatId = R.string.format_full_friendly_date;
             return context.getString(formatId, today, getFormattedMonthDay(context, dateInMillis));

@@ -1,6 +1,7 @@
 package com.android.sunshine.app.activities;
 
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.ActivityOptionsCompat;
@@ -15,6 +16,7 @@ import com.android.sunshine.app.adapter.ForecastCursorAdapter;
 import com.android.sunshine.app.callbacks.ItemClickCallback;
 import com.android.sunshine.app.fragments.DetailFragment;
 import com.android.sunshine.app.fragments.ForecastFragment;
+import com.android.sunshine.app.model.WeatherContract;
 import com.android.sunshine.app.sync.SyncAdapter;
 
 public class MainActivity extends AppCompatActivity implements ItemClickCallback {
@@ -26,6 +28,8 @@ public class MainActivity extends AppCompatActivity implements ItemClickCallback
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        Uri contentUri = getIntent() != null ? getIntent().getData() : null;
+
         Toolbar toolbar = (Toolbar)findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayShowTitleEnabled(false);
@@ -33,6 +37,12 @@ public class MainActivity extends AppCompatActivity implements ItemClickCallback
         if (findViewById(R.id.weather_detail_container) != null) {
             twoPane = true;
             if (savedInstanceState == null) {
+                DetailFragment fragment = new DetailFragment();
+                if (contentUri != null) {
+                    Bundle args = new Bundle();
+                    args.putParcelable(DetailFragment.DETAIL_URI, contentUri);
+                    fragment.setArguments(args);
+                }
                 getSupportFragmentManager().beginTransaction()
                         .replace(R.id.weather_detail_container, new DetailFragment())
                         .commit();
@@ -43,6 +53,9 @@ public class MainActivity extends AppCompatActivity implements ItemClickCallback
         SyncAdapter.initializeSyncAdapter(this);
         final ForecastFragment forecastFragment = (ForecastFragment) getSupportFragmentManager().findFragmentById(R.id.fragment_forecast);
         forecastFragment.setUseTodayLayout(!twoPane);
+        if (contentUri != null) {
+            forecastFragment.setInitialSelectedDate(WeatherContract.WeatherEntry.getDateFromUri(contentUri));
+        }
     }
 
     @Override

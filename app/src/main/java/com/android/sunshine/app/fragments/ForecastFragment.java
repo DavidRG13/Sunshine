@@ -33,7 +33,6 @@ import com.android.sunshine.app.R;
 import com.android.sunshine.app.adapter.ForecastCursorAdapter;
 import com.android.sunshine.app.adapter.OnAdapterItemClickListener;
 import com.android.sunshine.app.callbacks.ItemClickCallback;
-import com.android.sunshine.app.model.WeatherContract;
 import com.android.sunshine.app.sync.ServerStatus;
 import com.android.sunshine.app.sync.SyncAdapter;
 import com.android.sunshine.app.utils.Utilities;
@@ -189,12 +188,10 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
 
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-        String startDate = WeatherContract.getDbDateString(new Date());
-
         String sortOrder = WeatherEntry.COLUMN_DATE + " ASC";
 
         location = Utilities.getLocationSettings(getActivity());
-        Uri weatherForLocationUri = WeatherEntry.buildWeatherLocationWithStartDate(location, startDate);
+        Uri weatherForLocationUri = WeatherEntry.buildWeatherLocationWithStartDate(location, new Date().getTime());
 
         return new CursorLoader(getActivity(), weatherForLocationUri, FORECAST_COLUMNS, null, null, sortOrder);
     }

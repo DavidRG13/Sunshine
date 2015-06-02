@@ -53,6 +53,7 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
     public static final String UNITS_PARAM = "units";
     public static final String DAYS_PARAM = "cnt";
     public static final String BASE_URI = "http://api.openweathermap.org/data/2.5/forecast/daily";
+    public static final String ACTION_DATA_UPDATED = "com.example.android.sunshine.app.ACTION_DATA_UPDATED";
 
     private static final long DAY_IN_MILLIS = 1000 * 60 * 60 * 24;
     private static final int WEATHER_NOTIFICATION_ID = 3004;
@@ -214,12 +215,19 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
             cVVector.toArray(contentValues);
             getContext().getContentResolver().bulkInsert(WeatherEntry.CONTENT_URI, contentValues);
             notifyWeather();
+            updateWidgets();
 
             Calendar cal = Calendar.getInstance();
             cal.add(Calendar.DATE, -1);
             String yesterdayDate = WeatherContract.getDbDateString(cal.getTime());
             getContext().getContentResolver().delete(WeatherEntry.CONTENT_URI, WeatherEntry.COLUMN_DATE + " <= ?", new String[] {yesterdayDate});
         }
+    }
+
+    private void updateWidgets() {
+        Context context = getContext();
+        Intent dataUpdatedIntent = new Intent(ACTION_DATA_UPDATED).setPackage(context.getPackageName());
+        context.sendBroadcast(dataUpdatedIntent);
     }
 
     private long addLocation(final String locationSettings, final String cityName, final double cityLatitude, final double cityLongitude) {

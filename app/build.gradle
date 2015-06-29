@@ -7,6 +7,7 @@ buildscript {
     }
 }
 apply plugin: 'com.android.application'
+apply from: '../config/quality.gradle'
 
 repositories {
     jcenter()

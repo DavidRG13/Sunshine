@@ -29,6 +29,8 @@ import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
 import android.widget.AbsListView;
 import android.widget.TextView;
+import butterknife.Bind;
+import butterknife.ButterKnife;
 import com.android.sunshine.app.R;
 import com.android.sunshine.app.adapter.ForecastCursorAdapter;
 import com.android.sunshine.app.adapter.OnAdapterItemClickListener;
@@ -45,7 +47,6 @@ import static com.android.sunshine.app.model.WeatherContract.WeatherEntry;
 public class ForecastFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor>, OnSharedPreferenceChangeListener, OnAdapterItemClickListener {
 
     public static final int FORECAST_LOADER = 0;
-    public static final String SCROLL_POSITION = "scrollPosition";
     private String location;
     private ForecastCursorAdapter adapter;
 
@@ -53,8 +54,9 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
         WeatherEntry.TABLE_NAME + "." + WeatherEntry._ID, WeatherEntry.COLUMN_DATE, WeatherEntry.COLUMN_SHORT_DESC, WeatherEntry.COLUMN_MAX_TEMP, WeatherEntry.COLUMN_MIN_TEMP, WeatherEntry.COLUMN_WEATHER_ID,
         WeatherEntry.COLUMN_WEATHER_ID, LocationEntry.COLUMN_LOCATION_SETTING, LocationEntry.COLUMN_COORD_LAT, LocationEntry.COLUMN_COORD_LONG
     };
-    private RecyclerView forecastList;
-    private TextView emptyView;
+
+    @Bind(R.id.recycler_view_forecast) RecyclerView forecastList;
+    @Bind(R.id.listview_forecast_empty) TextView emptyView;
     private boolean autoSelectView;
     private int choiceMode;
     private boolean holdForTransition;
@@ -76,10 +78,9 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         setHasOptionsMenu(true);
         final View rootView = inflater.inflate(R.layout.fragment_main, container, false);
-        forecastList = (RecyclerView) rootView.findViewById(R.id.recycler_view_forecast);
+        ButterKnife.bind(this, rootView);
         forecastList.setLayoutManager(new LinearLayoutManager(getActivity()));
         forecastList.setHasFixedSize(true);
-        emptyView = (TextView) rootView.findViewById(R.id.listview_forecast_empty);
 
         adapter = new ForecastCursorAdapter(getActivity(), emptyView, this, choiceMode);
         forecastList.setAdapter(adapter);
@@ -252,7 +253,7 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
                     break;
                 default:
                     if (!Utilities.isNetworkAvailable(getActivity())) {
-                        ((TextView) getView().findViewById(R.id.listview_forecast_empty)).setText(R.string.noWeatherInfoAvailableNoNetwork);
+                        emptyView.setText(R.string.noWeatherInfoAvailableNoNetwork);
                     }
             }
             emptyView.setText(message);

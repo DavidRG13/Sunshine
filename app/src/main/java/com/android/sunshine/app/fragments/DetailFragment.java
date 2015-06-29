@@ -20,6 +20,8 @@ import android.view.ViewGroup;
 import android.view.ViewParent;
 import android.widget.ImageView;
 import android.widget.TextView;
+import butterknife.Bind;
+import butterknife.ButterKnife;
 import com.android.sunshine.app.R;
 import com.android.sunshine.app.activities.DetailActivity;
 import com.android.sunshine.app.model.WeatherContract;
@@ -46,14 +48,14 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
             WeatherContract.WeatherEntry.COLUMN_WIND_SPEED,
             WeatherContract.WeatherEntry.COLUMN_WEATHER_ID
     };
-    private ImageView iconView;
-    private TextView dateView;
-    private TextView mDescriptionView;
-    private TextView mHighTempView;
-    private TextView mLowTempView;
-    private TextView mHumidityView;
-    private TextView mWindView;
-    private TextView mPressureView;
+    @Bind(R.id.detail_icon) ImageView iconView;
+    @Bind(R.id.detail_date_textview) TextView dateView;
+    @Bind(R.id.detail_forecast_textview) TextView mDescriptionView;
+    @Bind(R.id.detail_high_textview) TextView mHighTempView;
+    @Bind(R.id.detail_low_textview) TextView mLowTempView;
+    @Bind(R.id.detail_humidity_textview) TextView mHumidityView;
+    @Bind(R.id.detail_wind_textview) TextView mWindView;
+    @Bind(R.id.detail_pressure_textview) TextView mPressureView;
     private boolean transitionAnimation;
 
     public DetailFragment() {
@@ -80,17 +82,7 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
         }
 
         final View view = inflater.inflate(R.layout.fragment_detail_start, container, false);
-        iconView = (ImageView) view.findViewById(R.id.detail_icon);
-        dateView = (TextView) view.findViewById(R.id.detail_date_textview);
-        mDescriptionView = (TextView) view.findViewById(R.id.detail_forecast_textview);
-        mHighTempView = (TextView) view.findViewById(R.id.detail_high_textview);
-        mLowTempView = (TextView) view.findViewById(R.id.detail_low_textview);
-        mHumidityView = (TextView) view.findViewById(R.id.detail_humidity_textview);
-        final TextView mHumidityLabelView = (TextView) view.findViewById(R.id.detail_humidity_label_textview);
-        mWindView = (TextView) view.findViewById(R.id.detail_wind_textview);
-        final TextView mWindLabelView = (TextView) view.findViewById(R.id.detail_wind_label_textview);
-        mPressureView = (TextView) view.findViewById(R.id.detail_pressure_textview);
-        final TextView mPressureLabelView = (TextView) view.findViewById(R.id.detail_pressure_label_textview);
+        ButterKnife.bind(this, view);
         return view;
     }
 

@@ -10,6 +10,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+import butterknife.Bind;
+import butterknife.ButterKnife;
 import com.android.sunshine.app.R;
 import com.android.sunshine.app.utils.Utilities;
 
@@ -140,22 +142,18 @@ public class ForecastCursorAdapter extends RecyclerView.Adapter<ForecastCursorAd
     }
 
     public static class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
-        public final ImageView forecastIcon;
-        public final TextView dateWeather;
-        public final TextView forecastDescription;
-        public final TextView max;
-        public final TextView min;
+        @Bind(R.id.list_item_icon) public ImageView forecastIcon;
+        @Bind(R.id.list_item_date_textview) public TextView dateWeather;
+        @Bind(R.id.list_item_forecast_textview) public TextView forecastDescription;
+        @Bind(R.id.list_item_high_textview) public TextView max;
+        @Bind(R.id.list_item_low_textview) public TextView min;
         private final OnItemClickHandler onItemClickHandler;
 
         private ViewHolder(View view, final OnItemClickHandler onItemClickHandler) {
             super(view);
+            ButterKnife.bind(this, view);
             this.onItemClickHandler = onItemClickHandler;
             view.setOnClickListener(this);
-            forecastIcon = (ImageView) view.findViewById(R.id.list_item_icon);
-            dateWeather = (TextView) view.findViewById(R.id.list_item_date_textview);
-            forecastDescription = (TextView) view.findViewById(R.id.list_item_forecast_textview);
-            max = (TextView) view.findViewById(R.id.list_item_high_textview);
-            min = (TextView) view.findViewById(R.id.list_item_low_textview);
         }
 
         @Override

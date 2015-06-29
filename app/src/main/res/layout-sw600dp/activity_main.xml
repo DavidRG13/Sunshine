@@ -20,6 +20,7 @@
             android:layout_height="?attr/actionBarSize"
             android:layout_alignParentTop="true"
             android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
             app:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar" />
 
         <android.support.v4.widget.Space
@@ -29,6 +30,7 @@
             android:layout_marginLeft="@dimen/abc_list_item_padding_horizontal_material"
             android:layout_marginStart="@dimen/abc_list_item_padding_horizontal_material"
             android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
             android:layout_below="@id/toolbar"/>
 
         <ImageView
@@ -39,6 +41,7 @@
             android:layout_marginLeft="@dimen/abc_list_item_padding_horizontal_material"
             android:layout_marginStart="@dimen/abc_list_item_padding_horizontal_material"
             android:layout_toRightOf="@id/sunshineLogoAlign"
+            android:layout_toEndOf="@id/sunshineLogoAlign"
             android:src="@drawable/ic_logo"
             android:contentDescription="@string/app_name"/>
     </RelativeLayout>
@@ -81,7 +84,9 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_alignLeft="@id/cardviewAligner"
+        android:layout_alignStart="@id/cardviewAligner"
         android:layout_alignRight="@id/cardviewAligner"
+        android:layout_alignEnd="@id/cardviewAligner"
         android:layout_alignTop="@id/cardviewAligner"
         android:layout_alignBottom="@id/cardviewAligner"
         android:layout_marginRight="@dimen/abc_list_item_padding_horizontal_material"

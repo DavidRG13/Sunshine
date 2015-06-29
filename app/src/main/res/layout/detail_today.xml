@@ -8,7 +8,7 @@
     app:columnCount="2">
 
     <android.support.v7.widget.Space
-        android:layout_height="@dimen/detail_view_padding_vertical"
+        android:layout_height="@dimen/abc_list_item_padding_horizontal_material"
         app:layout_columnSpan="2"
         app:layout_columnWeight="1"
         app:layout_rowWeight="1" />
@@ -33,6 +33,7 @@
         android:maxHeight="@dimen/today_icon"
         android:maxWidth="@dimen/today_icon"
         android:transitionName="@string/detail_icon_transition_name"
+        android:contentDescription="@string/forecastIcon"
         app:layout_columnWeight="1"
         app:layout_gravity="fill_horizontal"
         tools:src="@drawable/art_clouds" />
@@ -70,7 +71,7 @@
         tools:text="10" />
 
     <android.support.v7.widget.Space
-        android:layout_height="@dimen/detail_view_padding_vertical"
+        android:layout_height="@dimen/abc_list_item_padding_horizontal_material"
         app:layout_columnSpan="2"
         app:layout_columnWeight="1"
         app:layout_rowWeight="1" />

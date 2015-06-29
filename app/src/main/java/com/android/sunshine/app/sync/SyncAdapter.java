@@ -95,8 +95,6 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
 
             ObjectMapper mapper = new ObjectMapper();
 
-            //printResponse(urlConnection);
-
             OWMResponse owmResponse = mapper.readValue(urlConnection.getInputStream(), OWMResponse.class);
             Log.d("AQUII", owmResponse.getCod());
 
@@ -119,26 +117,6 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
             if (urlConnection != null) {
                 urlConnection.disconnect();
             }
-        }
-    }
-
-    private void printResponse(final HttpURLConnection urlConnection) throws IOException {
-        BufferedReader reader;
-        String forecastJsonStr = null;
-        InputStream inputStream = urlConnection.getInputStream();
-        StringBuilder buffer = new StringBuilder();
-        if (inputStream != null) {
-            reader = new BufferedReader(new InputStreamReader(inputStream));
-
-            String line;
-            while ((line = reader.readLine()) != null) {
-                buffer.append(line).append("\n");
-            }
-
-            if (buffer.length() > 0) {
-                forecastJsonStr = buffer.toString();
-            }
-            Log.d("AQUIII", forecastJsonStr);
         }
     }
 
@@ -237,13 +215,16 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
         locationValues.put(WeatherContract.LocationEntry.COLUMN_COORD_LAT, cityLatitude);
         locationValues.put(WeatherContract.LocationEntry.COLUMN_COORD_LONG, cityLongitude);
 
+        long result;
         final Cursor cursor = getContext().getContentResolver().query(WeatherContract.LocationEntry.CONTENT_URI, new String[]{WeatherContract.LocationEntry._ID},
                 WeatherContract.LocationEntry.COLUMN_LOCATION_SETTING + " = ?", new String[]{locationSettings}, null);
         if (cursor.moveToFirst()) {
-            return cursor.getColumnIndex(WeatherContract.LocationEntry._ID);
+            result = cursor.getColumnIndex(WeatherContract.LocationEntry._ID);
         } else {
-            return ContentUris.parseId(getContext().getContentResolver().insert(WeatherContract.LocationEntry.CONTENT_URI, locationValues));
+            result = ContentUris.parseId(getContext().getContentResolver().insert(WeatherContract.LocationEntry.CONTENT_URI, locationValues));
         }
+        cursor.close();
+        return result;
     }
 
     private static void onAccountCreated(Account newAccount, Context context) {
@@ -301,6 +282,7 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
                     mNotificationManager.notify(WEATHER_NOTIFICATION_ID, mBuilder.build());
 
                     Utilities.setLastNotification(getContext());
+                    cursor.close();
                 }
             }
         }

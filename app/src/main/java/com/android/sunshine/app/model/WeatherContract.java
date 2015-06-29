@@ -3,10 +3,9 @@ package com.android.sunshine.app.model;
 import android.content.ContentUris;
 import android.net.Uri;
 import android.provider.BaseColumns;
-
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Locale;
 
 public class WeatherContract {
 
@@ -80,19 +79,7 @@ public class WeatherContract {
 
     }
     public static String getDbDateString(final Date date){
-        final SimpleDateFormat dateFormat = new SimpleDateFormat(DATE_FORMAT);
+        final SimpleDateFormat dateFormat = new SimpleDateFormat(DATE_FORMAT, Locale.getDefault());
         return dateFormat.format(date);
-    }
-
-    public static Date getDateFromDb(String date) {
-        final SimpleDateFormat simpleDateFormat = new SimpleDateFormat(DATE_FORMAT);
-        Date parsedDate = null;
-        try {
-            parsedDate = simpleDateFormat.parse(date);
-            return parsedDate;
-        } catch (ParseException e) {
-            e.printStackTrace();
-        }
-        return parsedDate;
     }
 }

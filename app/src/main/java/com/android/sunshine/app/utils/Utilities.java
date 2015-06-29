@@ -66,7 +66,7 @@ public class Utilities {
         if (displayLongToday && julianDay == currentJulianDay) {
             String today = context.getString(R.string.today);
             int formatId = R.string.format_full_friendly_date;
-            return context.getString(formatId, today, getFormattedMonthDay(context, dateInMillis));
+            return context.getString(formatId, today, getFormattedMonthDay(dateInMillis));
         } else if ( julianDay < currentJulianDay + 7 ) {
             return getDayName(context, dateInMillis);
         } else {
@@ -92,10 +92,9 @@ public class Utilities {
         }
     }
 
-    public static String getFormattedMonthDay(Context context, long dateInMillis) {
+    public static String getFormattedMonthDay(long dateInMillis) {
         Time time = new Time();
         time.setToNow();
-        SimpleDateFormat dbDateFormat = new SimpleDateFormat(DATE_FORMAT, Locale.getDefault());
         SimpleDateFormat monthDayFormat = new SimpleDateFormat("MMMM dd", Locale.getDefault());
         return monthDayFormat.format(dateInMillis);
     }
@@ -178,6 +177,6 @@ public class Utilities {
     public static String getFullFriendlyDayString(Context context, long dateInMillis) {
         String day = getDayName(context, dateInMillis);
         int formatId = R.string.format_full_friendly_date;
-        return context.getString(formatId, day, getFormattedMonthDay(context, dateInMillis));
+        return context.getString(formatId, day, getFormattedMonthDay(dateInMillis));
     }
 }

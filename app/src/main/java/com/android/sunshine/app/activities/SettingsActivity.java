@@ -15,8 +15,6 @@ import com.android.sunshine.app.sync.ServerStatus;
 import com.android.sunshine.app.sync.SyncAdapter;
 import com.android.sunshine.app.utils.Utilities;
 
-import static com.android.sunshine.app.model.WeatherContract.WeatherEntry;
-
 public class SettingsActivity extends PreferenceActivity implements Preference.OnPreferenceChangeListener, SharedPreferences.OnSharedPreferenceChangeListener {
 
     @Override

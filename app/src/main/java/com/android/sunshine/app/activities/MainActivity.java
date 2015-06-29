@@ -86,8 +86,7 @@ public class MainActivity extends AppCompatActivity implements ItemClickCallback
         } else {
             final Intent intent = new Intent(this, DetailActivity.class);
             intent.putExtra(DetailActivity.DATE_KEY, date);
-            ActivityOptionsCompat activityOptions =
-                ActivityOptionsCompat.makeSceneTransitionAnimation(this, new Pair<View, String>(viewHolder.forecastIcon, getString(R.string.detail_icon_transition_name)));
+            ActivityOptionsCompat activityOptions = ActivityOptionsCompat.makeSceneTransitionAnimation(this, new Pair<View, String>(viewHolder.forecastIcon, getString(R.string.detail_icon_transition_name)));
             ActivityCompat.startActivity(this, intent, activityOptions.toBundle());
         }
     }

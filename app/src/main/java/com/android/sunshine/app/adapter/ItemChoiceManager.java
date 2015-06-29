@@ -25,9 +25,6 @@ public class ItemChoiceManager {
         }
     };
 
-    private ItemChoiceManager() {
-    }
-
     public ItemChoiceManager(RecyclerView.Adapter adapter) {
         mAdapter = adapter;
     }
@@ -36,7 +33,7 @@ public class ItemChoiceManager {
 
     SparseBooleanArray mCheckStates = new SparseBooleanArray();
 
-    LongSparseArray<Integer> mCheckedIdStates = new LongSparseArray<Integer>();
+    LongSparseArray<Integer> mCheckedIdStates = new LongSparseArray<>();
 
     public void onClick(RecyclerView.ViewHolder vh) {
         if (mChoiceMode == AbsListView.CHOICE_MODE_NONE) return;
@@ -149,6 +146,7 @@ public class ItemChoiceManager {
                     final int value = inParcel.readInt();
                     mCheckedIdStates.put(key, value);
                 }
+                inParcel.recycle();
             }
         }
     }

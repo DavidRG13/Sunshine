@@ -22,7 +22,8 @@
             android:layout_width="@dimen/list_icon"
             android:layout_height="@dimen/list_icon"
             android:layout_marginRight="@dimen/abc_list_item_padding_horizontal_material"
-            android:layout_marginEnd="@dimen/abc_list_item_padding_horizontal_material"/>
+            android:layout_marginEnd="@dimen/abc_list_item_padding_horizontal_material"
+            android:contentDescription="@string/forecastIcon"/>
 
         <LinearLayout
             android:layout_height="wrap_content"
@@ -49,7 +50,7 @@
             android:layout_width="@dimen/forecast_text_width"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:gravity="right"
+            android:gravity="end"
             android:layout_marginRight="@dimen/forecast_temperature_space"
             android:layout_marginEnd="@dimen/forecast_temperature_space"
             android:fontFamily="sans-serif-light"
@@ -61,7 +62,7 @@
             android:layout_width="@dimen/forecast_text_width"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:gravity="right"
+            android:gravity="end"
             android:fontFamily="sans-serif-light"
             android:textColor="@color/forecast_low_text"
             android:textSize="@dimen/forecast_text_size"/>

@@ -1,20 +1,12 @@
 package com.android.sunshine.app.widget;
 
-import android.annotation.TargetApi;
-import android.app.PendingIntent;
 import android.appwidget.AppWidgetManager;
 import android.appwidget.AppWidgetProvider;
 import android.content.Context;
 import android.content.Intent;
-import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.widget.RemoteViews;
-
-import com.android.sunshine.app.activities.MainActivity;
-import com.android.sunshine.app.R;
 import com.android.sunshine.app.sync.SyncAdapter;
-import com.android.sunshine.app.utils.Utilities;
 
 public class TodayWidgetProvider extends AppWidgetProvider {
 

@@ -3,6 +3,7 @@ package com.android.sunshine.app.utils;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.util.Log;
+import java.util.Locale;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -121,7 +122,7 @@ public class WeatherRequester extends AsyncTask<String[], Void, ArrayList<String
 
     private String getReadableDateString(long time) {
         Date date = new Date(time * 1000);
-        SimpleDateFormat format = new SimpleDateFormat("E, MMM d");
+        SimpleDateFormat format = new SimpleDateFormat("E, MMM d", Locale.getDefault());
         return format.format(date);
     }
 

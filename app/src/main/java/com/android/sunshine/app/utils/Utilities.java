@@ -13,8 +13,6 @@ import java.util.Locale;
 
 public class Utilities {
 
-    private static final String DATE_FORMAT = "yyyyMMdd";
-
     public static String formatTemperature(final Context context, final double temperature) {
         return formatTemperature(context, temperature, isMetric(context));
     }
@@ -51,10 +49,9 @@ public class Utilities {
         editor.apply();
     }
 
-    public static boolean displayNotifications(final Context context) {
+    public static boolean notificationsEnabled(final Context context) {
         final SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
-        String displayNotificationsKey = context.getString(R.string.pref_enable_notifications_key);
-        return prefs.getBoolean(displayNotificationsKey, Boolean.parseBoolean(context.getString(R.string.pref_enable_notifications_default)));
+        return prefs.getBoolean(context.getString(R.string.pref_enable_notifications_key), Boolean.parseBoolean(context.getString(R.string.pref_enable_notifications_default)));
     }
 
     public static String getFriendlyDay(Context context, long dateInMillis, boolean displayLongToday) {

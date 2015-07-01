@@ -6,7 +6,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import com.android.sunshine.app.sync.SyncAdapter;
+import com.android.sunshine.app.weather.WeatherRepository;
 
 public class TodayWidgetProvider extends AppWidgetProvider {
 
@@ -24,7 +24,7 @@ public class TodayWidgetProvider extends AppWidgetProvider {
     @Override
     public void onReceive(@NonNull Context context, @NonNull Intent intent) {
         super.onReceive(context, intent);
-        if (SyncAdapter.ACTION_DATA_UPDATED.equals(intent.getAction())) {
+        if (WeatherRepository.ACTION_DATA_UPDATED.equals(intent.getAction())) {
             context.startService(new Intent(context, TodayWidgetIntentService.class));
         }
     }}

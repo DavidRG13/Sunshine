@@ -1,0 +1,101 @@
+package com.android.sunshine.app.weather;
+
+import android.content.ContentUris;
+import android.content.ContentValues;
+import android.content.Context;
+import android.content.Intent;
+import android.database.Cursor;
+import com.android.sunshine.app.location.LocationProvider;
+import com.android.sunshine.app.model.OWMResponse;
+import com.android.sunshine.app.model.OWMWeatherForecast;
+import com.android.sunshine.app.model.WeatherContract;
+import com.android.sunshine.app.utils.UserNotificator;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.GregorianCalendar;
+import java.util.Vector;
+
+public class WeatherRepository {
+
+    public static final String ACTION_DATA_UPDATED = "com.example.android.sunshine.app.ACTION_DATA_UPDATED";
+
+    private final Context context;
+    private final UserNotificator userNotificator;
+
+    public WeatherRepository(final Context context, final UserNotificator userNotificator) {
+        this.context = context;
+        this.userNotificator = userNotificator;
+    }
+
+    public void saveWeatherForLocation(OWMResponse owmResponse, String locationSettings) {
+        String cityName = owmResponse.getCity().getName();
+        double cityLatitude = owmResponse.getCity().getCoord().getLat();
+        double cityLongitude = owmResponse.getCity().getCoord().getLon();
+
+        long locationId = addLocation(locationSettings, cityName, cityLatitude, cityLongitude);
+
+        GregorianCalendar calendar = new GregorianCalendar();
+
+        ArrayList<OWMWeatherForecast> weatherForecasts = owmResponse.getList();
+        Vector<ContentValues> cVVector = new Vector<>(weatherForecasts.size());
+        for (int i = 0; i < weatherForecasts.size(); i++) {
+            OWMWeatherForecast weatherForecast = weatherForecasts.get(i);
+            ContentValues weatherValues = new ContentValues();
+            calendar.add(Calendar.DAY_OF_YEAR, i);
+
+            weatherValues.put(WeatherContract.WeatherEntry.COLUMN_LOC_KEY, locationId);
+            weatherValues.put(WeatherContract.WeatherEntry.COLUMN_DATE, calendar.getTimeInMillis());
+            weatherValues.put(WeatherContract.WeatherEntry.COLUMN_HUMIDITY, weatherForecast.getHumidity());
+            weatherValues.put(WeatherContract.WeatherEntry.COLUMN_PRESSURE, weatherForecast.getPressure());
+            weatherValues.put(WeatherContract.WeatherEntry.COLUMN_WIND_SPEED, weatherForecast.getSpeed());
+            weatherValues.put(WeatherContract.WeatherEntry.COLUMN_DEGREES, weatherForecast.getDeg());
+            weatherValues.put(WeatherContract.WeatherEntry.COLUMN_MAX_TEMP, weatherForecast.getTemp().getMax());
+            weatherValues.put(WeatherContract.WeatherEntry.COLUMN_MIN_TEMP, weatherForecast.getTemp().getMin());
+            weatherValues.put(WeatherContract.WeatherEntry.COLUMN_SHORT_DESC, weatherForecast.getWeather().get(0).getDescription());
+            weatherValues.put(WeatherContract.WeatherEntry.COLUMN_WEATHER_ID, weatherForecast.getWeather().get(0).getId());
+
+            cVVector.add(weatherValues);
+        }
+
+        if (cVVector.size() > 0) {
+            ContentValues[] contentValues = new ContentValues[cVVector.size()];
+            cVVector.toArray(contentValues);
+            context.getContentResolver().bulkInsert(WeatherContract.WeatherEntry.CONTENT_URI, contentValues);
+            userNotificator.notifyWeather(weatherForecasts.get(0));
+            updateWidgets();
+
+            removePastForecast();
+        }
+    }
+
+    private void removePastForecast() {
+        Calendar cal = Calendar.getInstance();
+        cal.add(Calendar.DATE, -1);
+        String yesterdayDate = WeatherContract.getDbDateString(cal.getTime());
+        context.getContentResolver().delete(WeatherContract.WeatherEntry.CONTENT_URI, WeatherContract.WeatherEntry.COLUMN_DATE + " <= ?", new String[] { yesterdayDate });
+    }
+
+    private void updateWidgets() {
+        Intent dataUpdatedIntent = new Intent(ACTION_DATA_UPDATED).setPackage(context.getPackageName());
+        context.sendBroadcast(dataUpdatedIntent);
+    }
+
+    private long addLocation(final String locationSettings, final String cityName, final double cityLatitude, final double cityLongitude) {
+        ContentValues locationValues = new ContentValues();
+        locationValues.put(WeatherContract.LocationEntry.COLUMN_LOCATION_SETTING, locationSettings);
+        locationValues.put(WeatherContract.LocationEntry.COLUMN_CITY_NAME, cityName);
+        locationValues.put(WeatherContract.LocationEntry.COLUMN_COORD_LAT, cityLatitude);
+        locationValues.put(WeatherContract.LocationEntry.COLUMN_COORD_LONG, cityLongitude);
+
+        long result;
+        final Cursor cursor = context.getContentResolver()
+            .query(WeatherContract.LocationEntry.CONTENT_URI, new String[] { WeatherContract.LocationEntry._ID }, WeatherContract.LocationEntry.COLUMN_LOCATION_SETTING + " = ?", new String[] { locationSettings }, null);
+        if (cursor.moveToFirst()) {
+            result = cursor.getColumnIndex(WeatherContract.LocationEntry._ID);
+        } else {
+            result = ContentUris.parseId(context.getContentResolver().insert(WeatherContract.LocationEntry.CONTENT_URI, locationValues));
+        }
+        cursor.close();
+        return result;
+    }
+}

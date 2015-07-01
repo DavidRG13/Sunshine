@@ -14,7 +14,7 @@ import android.widget.RemoteViews;
 import com.android.sunshine.app.R;
 import com.android.sunshine.app.activities.DetailActivity;
 import com.android.sunshine.app.activities.MainActivity;
-import com.android.sunshine.app.sync.SyncAdapter;
+import com.android.sunshine.app.weather.WeatherRepository;
 
 @TargetApi(Build.VERSION_CODES.HONEYCOMB)
 public class DetailWidgetProvider extends AppWidgetProvider {
@@ -45,7 +45,7 @@ public class DetailWidgetProvider extends AppWidgetProvider {
     @Override
     public void onReceive(@NonNull Context context, @NonNull Intent intent) {
         super.onReceive(context, intent);
-        if (SyncAdapter.ACTION_DATA_UPDATED.equals(intent.getAction())) {
+        if (WeatherRepository.ACTION_DATA_UPDATED.equals(intent.getAction())) {
             AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(context);
             int[] appWidgetIds = appWidgetManager.getAppWidgetIds(new ComponentName(context, getClass()));
             appWidgetManager.notifyAppWidgetViewDataChanged(appWidgetIds, R.id.widget_list);

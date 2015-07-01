@@ -21,26 +21,21 @@ import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.TaskStackBuilder;
-import android.text.format.Time;
-import android.util.Log;
 import com.android.sunshine.app.R;
 import com.android.sunshine.app.activities.MainActivity;
 import com.android.sunshine.app.model.OWMResponse;
 import com.android.sunshine.app.model.OWMWeatherForecast;
 import com.android.sunshine.app.model.WeatherContract;
 import com.android.sunshine.app.utils.Utilities;
-import com.fasterxml.jackson.core.JsonParseException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+import com.android.sunshine.app.weather.OWM;
 import java.net.HttpURLConnection;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.Vector;
+import retrofit.RestAdapter;
+import retrofit.converter.JacksonConverter;
 
 import static com.android.sunshine.app.model.WeatherContract.WeatherEntry;
 
@@ -48,21 +43,13 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
 
     public static final int SYNC_INTERVAL = 60 * 180;
     public static final int SYNC_FLEXTIME = SYNC_INTERVAL / 3;
-    public static final String QUERY_PARAM = "q";
-    public static final String MODE_PARAM = "mode";
-    public static final String UNITS_PARAM = "units";
-    public static final String DAYS_PARAM = "cnt";
-    public static final String BASE_URI = "http://api.openweathermap.org/data/2.5/forecast/daily";
     public static final String ACTION_DATA_UPDATED = "com.example.android.sunshine.app.ACTION_DATA_UPDATED";
 
     private static final long DAY_IN_MILLIS = 1000 * 60 * 60 * 24;
     private static final int WEATHER_NOTIFICATION_ID = 3004;
 
-    private static final String[] NOTIFY_WEATHER_PROJECTION = new String[]{
-            WeatherEntry.COLUMN_WEATHER_ID,
-            WeatherEntry.COLUMN_MAX_TEMP,
-            WeatherEntry.COLUMN_MIN_TEMP,
-            WeatherEntry.COLUMN_SHORT_DESC
+    private static final String[] NOTIFY_WEATHER_PROJECTION = new String[] {
+        WeatherEntry.COLUMN_WEATHER_ID, WeatherEntry.COLUMN_MAX_TEMP, WeatherEntry.COLUMN_MIN_TEMP, WeatherEntry.COLUMN_SHORT_DESC
     };
 
     // these indices must match the projection
@@ -79,44 +66,22 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
     public void onPerformSync(Account account, Bundle extras, String authority, ContentProviderClient provider, SyncResult syncResult) {
         final String locationSettings = Utilities.getLocationSettings(getContext());
 
-        Uri.Builder builder = Uri.parse(BASE_URI).buildUpon()
-                .appendQueryParameter(QUERY_PARAM, locationSettings)
-                .appendQueryParameter(MODE_PARAM, "json")
-                .appendQueryParameter(UNITS_PARAM, "metric")
-                .appendQueryParameter(DAYS_PARAM, "14");
+        RestAdapter restAdapter = new RestAdapter.Builder()
+            .setEndpoint(OWM.API_URL)
+            .setConverter(new JacksonConverter())
+            .build();
 
-        HttpURLConnection urlConnection = null;
+        OWM weather = restAdapter.create(OWM.class);
+        OWMResponse response = weather.fetch(locationSettings, "json", "metric", "14");
 
-        try {
-            URL url = new URL(builder.build().toString());
-            urlConnection = (HttpURLConnection) url.openConnection();
-            urlConnection.setRequestMethod("GET");
-            urlConnection.connect();
-
-            ObjectMapper mapper = new ObjectMapper();
-
-            OWMResponse owmResponse = mapper.readValue(urlConnection.getInputStream(), OWMResponse.class);
-            Log.d("AQUII", owmResponse.getCod());
-
-            int responseCode = Integer.parseInt(owmResponse.getCod());
-            if (responseCode == HttpURLConnection.HTTP_OK) {
-                parseWeatherDataFromJson(owmResponse, locationSettings);
-                setServerStatus(getContext(), ServerStatus.SERVER_STATUS_OK);
-            } else if (responseCode == HttpURLConnection.HTTP_NOT_FOUND) {
-                setServerStatus(getContext(), ServerStatus.SERVER_STATUS_LOCATION_INVALID);
-            } else {
-                setServerStatus(getContext(), ServerStatus.SERVER_STATUS_DOWN);
-            }
-        } catch (JsonParseException e) {
-            Log.e("WeatherRequester", "Server Down. Error ", e);
+        int responseCode = Integer.parseInt(response.getCod());
+        if (responseCode == HttpURLConnection.HTTP_OK) {
+            parseWeatherDataFromJson(response, locationSettings);
+            setServerStatus(getContext(), ServerStatus.SERVER_STATUS_OK);
+        } else if (responseCode == HttpURLConnection.HTTP_NOT_FOUND) {
+            setServerStatus(getContext(), ServerStatus.SERVER_STATUS_LOCATION_INVALID);
+        } else {
             setServerStatus(getContext(), ServerStatus.SERVER_STATUS_DOWN);
-        } catch (IOException e) {
-            Log.e("WeatherRequester", "Invalid URL. Error ", e);
-            setServerStatus(getContext(), ServerStatus.SERVER_STATUS_INVALID);
-        }finally {
-            if (urlConnection != null) {
-                urlConnection.disconnect();
-            }
         }
     }
 
@@ -124,8 +89,7 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
         Bundle bundle = new Bundle();
         bundle.putBoolean(ContentResolver.SYNC_EXTRAS_EXPEDITED, true);
         bundle.putBoolean(ContentResolver.SYNC_EXTRAS_MANUAL, true);
-        ContentResolver.requestSync(getSyncAccount(context),
-                context.getString(R.string.content_authority), bundle);
+        ContentResolver.requestSync(getSyncAccount(context), context.getString(R.string.content_authority), bundle);
     }
 
     public static void initializeSyncAdapter(Context context) {
@@ -163,19 +127,17 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
 
         long locationId = addLocation(locationSettings, cityName, cityLatitude, cityLongitude);
 
-        Time dayTime = new Time();
-        dayTime.setToNow();
-        int julianStartDay = Time.getJulianDay(System.currentTimeMillis(), dayTime.gmtoff);
-        dayTime = new Time();
+        GregorianCalendar calendar = new GregorianCalendar();
 
         ArrayList<OWMWeatherForecast> weatherForecasts = owmResponse.getList();
         Vector<ContentValues> cVVector = new Vector<>(weatherForecasts.size());
         for (int i = 0; i < weatherForecasts.size(); i++) {
             OWMWeatherForecast weatherForecast = weatherForecasts.get(i);
             ContentValues weatherValues = new ContentValues();
+            calendar.add(Calendar.DAY_OF_YEAR, i);
 
             weatherValues.put(WeatherEntry.COLUMN_LOC_KEY, locationId);
-            weatherValues.put(WeatherEntry.COLUMN_DATE, dayTime.setJulianDay(julianStartDay+i));
+            weatherValues.put(WeatherEntry.COLUMN_DATE, calendar.getTimeInMillis());
             weatherValues.put(WeatherEntry.COLUMN_HUMIDITY, weatherForecast.getHumidity());
             weatherValues.put(WeatherEntry.COLUMN_PRESSURE, weatherForecast.getPressure());
             weatherValues.put(WeatherEntry.COLUMN_WIND_SPEED, weatherForecast.getSpeed());
@@ -198,7 +160,7 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
             Calendar cal = Calendar.getInstance();
             cal.add(Calendar.DATE, -1);
             String yesterdayDate = WeatherContract.getDbDateString(cal.getTime());
-            getContext().getContentResolver().delete(WeatherEntry.CONTENT_URI, WeatherEntry.COLUMN_DATE + " <= ?", new String[] {yesterdayDate});
+            getContext().getContentResolver().delete(WeatherEntry.CONTENT_URI, WeatherEntry.COLUMN_DATE + " <= ?", new String[] { yesterdayDate });
         }
     }
 
@@ -216,8 +178,8 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
         locationValues.put(WeatherContract.LocationEntry.COLUMN_COORD_LONG, cityLongitude);
 
         long result;
-        final Cursor cursor = getContext().getContentResolver().query(WeatherContract.LocationEntry.CONTENT_URI, new String[]{WeatherContract.LocationEntry._ID},
-                WeatherContract.LocationEntry.COLUMN_LOCATION_SETTING + " = ?", new String[]{locationSettings}, null);
+        final Cursor cursor = getContext().getContentResolver()
+            .query(WeatherContract.LocationEntry.CONTENT_URI, new String[] { WeatherContract.LocationEntry._ID }, WeatherContract.LocationEntry.COLUMN_LOCATION_SETTING + " = ?", new String[] { locationSettings }, null);
         if (cursor.moveToFirst()) {
             result = cursor.getColumnIndex(WeatherContract.LocationEntry._ID);
         } else {
@@ -233,7 +195,7 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
         syncImmediately(context);
     }
 
-    private void setServerStatus(final Context context, final @ServerStatus int serverStatus){
+    private void setServerStatus(final Context context, final @ServerStatus int serverStatus) {
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
         SharedPreferences.Editor editor = preferences.edit();
         editor.putInt(context.getString(R.string.prefs_server_status), serverStatus);
@@ -260,22 +222,15 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
                     int iconId = Utilities.getIconResourceForWeatherCondition(weatherId);
                     String title = getContext().getString(R.string.app_name);
 
-                    String contentText = String.format(getContext().getString(R.string.format_notification),
-                            desc,
-                            Utilities.formatTemperature(getContext(), high),
-                            Utilities.formatTemperature(getContext(), low));
+                    String contentText = String.format(getContext().getString(R.string.format_notification), desc, Utilities.formatTemperature(getContext(), high), Utilities.formatTemperature(getContext(), low));
 
-                    NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(getContext())
-                            .setSmallIcon(iconId)
-                            .setContentTitle(title)
-                            .setContentText(contentText);
+                    NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(getContext()).setSmallIcon(iconId).setContentTitle(title).setContentText(contentText);
 
                     Intent resultIntent = new Intent(getContext(), MainActivity.class);
 
                     TaskStackBuilder stackBuilder = TaskStackBuilder.create(getContext());
                     stackBuilder.addNextIntent(resultIntent);
-                    PendingIntent resultPendingIntent = stackBuilder.getPendingIntent(0,
-                            PendingIntent.FLAG_UPDATE_CURRENT);
+                    PendingIntent resultPendingIntent = stackBuilder.getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT);
                     mBuilder.setContentIntent(resultPendingIntent);
 
                     NotificationManager mNotificationManager = (NotificationManager) getContext().getSystemService(Context.NOTIFICATION_SERVICE);

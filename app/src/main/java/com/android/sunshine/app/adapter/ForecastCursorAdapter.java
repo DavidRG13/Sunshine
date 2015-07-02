@@ -13,6 +13,7 @@ import android.widget.TextView;
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import com.android.sunshine.app.R;
+import com.android.sunshine.app.utils.TemperatureFormatter;
 import com.android.sunshine.app.utils.Utilities;
 
 import static com.android.sunshine.app.model.WeatherContract.WeatherEntry;
@@ -27,12 +28,15 @@ public class ForecastCursorAdapter extends RecyclerView.Adapter<ForecastCursorAd
     private Context context;
     private View emptyView;
     private OnAdapterItemClickListener onAdapterItemClickListener;
+    private final TemperatureFormatter temperatureFormatter;
     private final ItemChoiceManager itemChoiceManager;
 
-    public ForecastCursorAdapter(final Context context, final View emptyView, final OnAdapterItemClickListener onAdapterItemClickListener, final int choiceMode) {
+    public ForecastCursorAdapter(final Context context, final View emptyView, final OnAdapterItemClickListener onAdapterItemClickListener,
+        final int choiceMode, final TemperatureFormatter temperatureFormatter) {
         this.context = context;
         this.emptyView = emptyView;
         this.onAdapterItemClickListener = onAdapterItemClickListener;
+        this.temperatureFormatter = temperatureFormatter;
         itemChoiceManager = new ItemChoiceManager(this);
         itemChoiceManager.setChoiceMode(choiceMode);
     }
@@ -62,7 +66,6 @@ public class ForecastCursorAdapter extends RecyclerView.Adapter<ForecastCursorAd
     public void onBindViewHolder(final ViewHolder viewHolder, final int position) {
         cursor.moveToPosition(position);
 
-        final boolean isMetric = Utilities.isMetric(context);
         final int weatherId = cursor.getInt(cursor.getColumnIndex(WeatherEntry.COLUMN_WEATHER_ID));
         final long weatherDate = cursor.getInt(cursor.getColumnIndex(WeatherEntry.COLUMN_DATE));
         final String descriptionWeather = cursor.getString(cursor.getColumnIndex(WeatherEntry.COLUMN_SHORT_DESC));
@@ -80,8 +83,8 @@ public class ForecastCursorAdapter extends RecyclerView.Adapter<ForecastCursorAd
 
         viewHolder.dateWeather.setText(Utilities.getFriendlyDay(context, weatherDate, useLongToday));
         viewHolder.forecastDescription.setText(descriptionWeather);
-        viewHolder.max.setText(Utilities.formatTemperature(context, maxTemp, isMetric));
-        viewHolder.min.setText(Utilities.formatTemperature(context, minTemp, isMetric));
+        viewHolder.max.setText(temperatureFormatter.format(maxTemp));
+        viewHolder.min.setText(temperatureFormatter.format(minTemp));
         ViewCompat.setTransitionName(viewHolder.forecastIcon, "iconView" + position);
 
         itemChoiceManager.onBindViewHolder(viewHolder, position);

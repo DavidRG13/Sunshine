@@ -15,26 +15,6 @@ public final class Utilities {
 
     private Utilities() { }
 
-    public static String formatTemperature(final Context context, final double temperature) {
-        return formatTemperature(context, temperature, isMetric(context));
-    }
-
-    public static String formatTemperature(final Context context, final double temperature, final boolean isMetric) {
-        double temp;
-        if (isMetric) {
-            temp = temperature;
-        } else {
-            temp = 9 * temperature / 5 + 32;
-        }
-        return context.getString(R.string.format_temperature, temp);
-    }
-
-    public static boolean isMetric(final Context context) {
-        final SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
-        return prefs.getString(context.getString(R.string.pref_unit_key),
-            context.getString(R.string.prefs_units_imperial)).equals(context.getString(R.string.prefs_units_imperial));
-    }
-
     public static long getLastNotification(final Context context) {
         final SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
         return prefs.getLong(context.getString(R.string.pref_last_notification), 0);

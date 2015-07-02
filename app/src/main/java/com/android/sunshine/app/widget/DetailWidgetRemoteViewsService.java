@@ -13,6 +13,7 @@ import com.android.sunshine.app.R;
 import com.android.sunshine.app.location.LocationProvider;
 import com.android.sunshine.app.location.PreferenceLocationProvider;
 import com.android.sunshine.app.model.WeatherContract;
+import com.android.sunshine.app.utils.TemperatureFormatter;
 import com.android.sunshine.app.utils.Utilities;
 
 @TargetApi(Build.VERSION_CODES.HONEYCOMB)
@@ -33,6 +34,7 @@ public class DetailWidgetRemoteViewsService extends RemoteViewsService {
     public RemoteViewsFactory onGetViewFactory(final Intent intent) {
 
         final LocationProvider locationProvider = new PreferenceLocationProvider(this);
+        final TemperatureFormatter temperatureFormatter = new TemperatureFormatter(this);
 
         return new RemoteViewsFactory() {
             private Cursor data = null;
@@ -79,16 +81,14 @@ public class DetailWidgetRemoteViewsService extends RemoteViewsService {
                 String formattedDate = Utilities.getFriendlyDay(DetailWidgetRemoteViewsService.this, dateInMillis, false);
                 double maxTemp = data.getDouble(INDEX_WEATHER_MAX_TEMP);
                 double minTemp = data.getDouble(INDEX_WEATHER_MIN_TEMP);
-                String formattedMaxTemperature = Utilities.formatTemperature(DetailWidgetRemoteViewsService.this, maxTemp);
-                String formattedMinTemperature = Utilities.formatTemperature(DetailWidgetRemoteViewsService.this, minTemp);
                 views.setImageViewResource(R.id.widget_icon, weatherArtResourceId);
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH_MR1) {
                     setRemoteContentDescription(views, description);
                 }
                 views.setTextViewText(R.id.widget_date, formattedDate);
                 views.setTextViewText(R.id.widget_description, description);
-                views.setTextViewText(R.id.widget_high_temperature, formattedMaxTemperature);
-                views.setTextViewText(R.id.widget_low_temperature, formattedMinTemperature);
+                views.setTextViewText(R.id.widget_high_temperature, temperatureFormatter.format(maxTemp));
+                views.setTextViewText(R.id.widget_low_temperature, temperatureFormatter.format(minTemp));
 
                 final Intent fillInIntent = new Intent();
                 Uri weatherUri = WeatherContract.WeatherEntry.buildWeatherLocationWithDate(locationProvider.getLocation(), dateInMillis);

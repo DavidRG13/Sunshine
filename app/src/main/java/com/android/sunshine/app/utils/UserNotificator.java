@@ -16,9 +16,11 @@ public class UserNotificator {
     private static final int WEATHER_NOTIFICATION_ID = 3004;
 
     private Context context;
+    private TemperatureFormatter temperatureFormatter;
 
-    public UserNotificator(final Context context) {
+    public UserNotificator(final Context context, final TemperatureFormatter temperatureFormatter) {
         this.context = context;
+        this.temperatureFormatter = temperatureFormatter;
     }
 
     public void notifyWeather(final OWMWeatherForecast owmWeatherForecast) {
@@ -36,7 +38,10 @@ public class UserNotificator {
                 String title = context.getString(R.string.app_name);
 
                 String contentText = String.format(context.getString(R.string.format_notification),
-                    desc, Utilities.formatTemperature(context, high), Utilities.formatTemperature(context, low));
+                    desc,
+                    temperatureFormatter.format(high),
+                    temperatureFormatter.format(low)
+                );
 
                 NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(context).setSmallIcon(iconId).setContentTitle(title).setContentText(contentText);
 

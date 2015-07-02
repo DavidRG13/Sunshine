@@ -18,6 +18,7 @@ import com.android.sunshine.app.activities.MainActivity;
 import com.android.sunshine.app.location.LocationProvider;
 import com.android.sunshine.app.location.PreferenceLocationProvider;
 import com.android.sunshine.app.model.WeatherContract;
+import com.android.sunshine.app.utils.TemperatureFormatter;
 import com.android.sunshine.app.utils.Utilities;
 
 public class TodayWidgetIntentService extends IntentService {
@@ -34,10 +35,12 @@ public class TodayWidgetIntentService extends IntentService {
     private static final int INDEX_MAX_TEMP = 2;
     private static final int INDEX_MIN_TEMP = 3;
     private final LocationProvider locationProvider;
+    private final TemperatureFormatter temperatureFormatter;
 
     public TodayWidgetIntentService() {
         super("TodayWidgetIntentService");
         locationProvider = new PreferenceLocationProvider(this);
+        temperatureFormatter = new TemperatureFormatter(this);
     }
 
     @Override
@@ -62,8 +65,8 @@ public class TodayWidgetIntentService extends IntentService {
         String description = data.getString(INDEX_SHORT_DESC);
         double maxTemp = data.getDouble(INDEX_MAX_TEMP);
         double minTemp = data.getDouble(INDEX_MIN_TEMP);
-        String formattedMaxTemperature = Utilities.formatTemperature(this, maxTemp);
-        String formattedMinTemperature = Utilities.formatTemperature(this, minTemp);
+        String formattedMaxTemperature = temperatureFormatter.format(maxTemp);
+        String formattedMinTemperature = temperatureFormatter.format(minTemp);
         data.close();
 
         for (int appWidgetId : appWidgetIds) {

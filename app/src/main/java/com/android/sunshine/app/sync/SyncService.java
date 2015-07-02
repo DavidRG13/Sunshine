@@ -6,6 +6,7 @@ import android.os.IBinder;
 import com.android.sunshine.app.location.PreferenceLocationProvider;
 import com.android.sunshine.app.utils.ServerStatusChanger;
 import com.android.sunshine.app.utils.UserNotificator;
+import com.android.sunshine.app.weather.RetrofitWeatherFetcher;
 import com.android.sunshine.app.weather.WeatherRepository;
 
 public class SyncService extends Service {
@@ -18,7 +19,7 @@ public class SyncService extends Service {
         synchronized (S_SYNC_ADAPTER_LOCK) {
             if (sSunshineSyncAdapter == null) {
                 sSunshineSyncAdapter = new SyncAdapter(new PreferenceLocationProvider(this),
-                    new WeatherRepository(this, new UserNotificator(this)), new ServerStatusChanger(this), getApplicationContext(), true);
+                    new WeatherRepository(this, new UserNotificator(this)), new ServerStatusChanger(this), new RetrofitWeatherFetcher(), getApplicationContext(), true);
             }
         }
     }

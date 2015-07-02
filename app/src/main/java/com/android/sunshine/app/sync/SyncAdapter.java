@@ -14,11 +14,9 @@ import com.android.sunshine.app.R;
 import com.android.sunshine.app.location.LocationProvider;
 import com.android.sunshine.app.model.OWMResponse;
 import com.android.sunshine.app.utils.ServerStatusChanger;
-import com.android.sunshine.app.weather.OWM;
+import com.android.sunshine.app.weather.WeatherFetcher;
 import com.android.sunshine.app.weather.WeatherRepository;
 import java.net.HttpURLConnection;
-import retrofit.RestAdapter;
-import retrofit.converter.JacksonConverter;
 
 public class SyncAdapter extends AbstractThreadedSyncAdapter {
 
@@ -28,26 +26,22 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
     private final LocationProvider locationProvider;
     private final WeatherRepository weatherRepository;
     private final ServerStatusChanger serverStatusChanger;
+    private final WeatherFetcher weatherFetcher;
 
     public SyncAdapter(final LocationProvider locationProvider, final WeatherRepository weatherRepository, final ServerStatusChanger serverStatusChanger,
-        final Context context, boolean autoInitialize) {
+        final WeatherFetcher weatherFetcher, final Context context, boolean autoInitialize) {
         super(context, autoInitialize);
         this.locationProvider = locationProvider;
         this.weatherRepository = weatherRepository;
         this.serverStatusChanger = serverStatusChanger;
+        this.weatherFetcher = weatherFetcher;
     }
 
     @Override
     public void onPerformSync(final Account account, final Bundle extras, final String authority, final ContentProviderClient provider, final SyncResult syncResult) {
         final String location = locationProvider.getLocation();
 
-        RestAdapter restAdapter = new RestAdapter.Builder()
-            .setEndpoint(OWM.API_URL)
-            .setConverter(new JacksonConverter())
-            .build();
-
-        OWM weather = restAdapter.create(OWM.class);
-        OWMResponse response = weather.fetch(location, "json", "metric", "14");
+        OWMResponse response = weatherFetcher.forecastForLocation(location);
 
         int responseCode = Integer.parseInt(response.getCod());
         serverStatusChanger.fromResponseCode(responseCode);

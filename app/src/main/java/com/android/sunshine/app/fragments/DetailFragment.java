@@ -24,6 +24,8 @@ import butterknife.Bind;
 import butterknife.ButterKnife;
 import com.android.sunshine.app.R;
 import com.android.sunshine.app.activities.DetailActivity;
+import com.android.sunshine.app.location.LocationProvider;
+import com.android.sunshine.app.location.PreferenceLocationProvider;
 import com.android.sunshine.app.model.WeatherContract;
 import com.android.sunshine.app.utils.Utilities;
 import java.util.Locale;
@@ -58,6 +60,7 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
     private boolean transitionAnimation;
     private String location;
     private String weatherData;
+    private LocationProvider locationProvider;
 
     public DetailFragment() {
         setHasOptionsMenu(true);
@@ -84,6 +87,7 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
 
         final View view = inflater.inflate(R.layout.fragment_detail_start, container, false);
         ButterKnife.bind(this, view);
+        locationProvider = new PreferenceLocationProvider(getActivity());
         return view;
     }
 
@@ -99,7 +103,7 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
     public void onResume() {
         super.onResume();
         final Bundle arguments = getArguments();
-        if (arguments != null && !location.equals(Utilities.getLocationSettings(getActivity()))
+        if (arguments != null && !location.equals(locationProvider.getLocation())
                 && arguments.containsKey(DetailActivity.DATE_KEY)) {
             getLoaderManager().restartLoader(DETAIL_LOADER, null, this);
         }
@@ -116,7 +120,7 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
     @Override
     public Loader<Cursor> onCreateLoader(final int id, final Bundle args) {
         final long date = getArguments().getLong(DetailActivity.DATE_KEY);
-        location = Utilities.getLocationSettings(getActivity());
+        location = locationProvider.getLocation();
         final Uri weatherUri = WeatherContract.WeatherEntry.buildWeatherLocationWithDate(location, date);
         ViewParent vp = getView().getParent();
         if (vp instanceof CardView) {

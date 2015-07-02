@@ -15,6 +15,8 @@ import android.util.TypedValue;
 import android.widget.RemoteViews;
 import com.android.sunshine.app.R;
 import com.android.sunshine.app.activities.MainActivity;
+import com.android.sunshine.app.location.LocationProvider;
+import com.android.sunshine.app.location.PreferenceLocationProvider;
 import com.android.sunshine.app.model.WeatherContract;
 import com.android.sunshine.app.utils.Utilities;
 
@@ -31,9 +33,11 @@ public class TodayWidgetIntentService extends IntentService {
     private static final int INDEX_SHORT_DESC = 1;
     private static final int INDEX_MAX_TEMP = 2;
     private static final int INDEX_MIN_TEMP = 3;
+    private final LocationProvider locationProvider;
 
     public TodayWidgetIntentService() {
         super("TodayWidgetIntentService");
+        locationProvider = new PreferenceLocationProvider(this);
     }
 
     @Override
@@ -41,9 +45,8 @@ public class TodayWidgetIntentService extends IntentService {
         AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(this);
         int[] appWidgetIds = appWidgetManager.getAppWidgetIds(new ComponentName(this, TodayWidgetProvider.class));
 
-        String location = Utilities.getLocationSettings(this);
         Uri weatherForLocationUri = WeatherContract.WeatherEntry.buildWeatherLocationWithStartDate(
-            location, System.currentTimeMillis());
+            locationProvider.getLocation(), System.currentTimeMillis());
         Cursor data = getContentResolver().query(weatherForLocationUri, FORECAST_COLUMNS, null,
             null, WeatherContract.WeatherEntry.COLUMN_DATE + " ASC");
         if (data == null) {

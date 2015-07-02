@@ -10,6 +10,8 @@ import android.widget.AdapterView;
 import android.widget.RemoteViews;
 import android.widget.RemoteViewsService;
 import com.android.sunshine.app.R;
+import com.android.sunshine.app.location.LocationProvider;
+import com.android.sunshine.app.location.PreferenceLocationProvider;
 import com.android.sunshine.app.model.WeatherContract;
 import com.android.sunshine.app.utils.Utilities;
 
@@ -29,6 +31,9 @@ public class DetailWidgetRemoteViewsService extends RemoteViewsService {
 
     @Override
     public RemoteViewsFactory onGetViewFactory(final Intent intent) {
+
+        final LocationProvider locationProvider = new PreferenceLocationProvider(this);
+
         return new RemoteViewsFactory() {
             private Cursor data = null;
 
@@ -42,8 +47,7 @@ public class DetailWidgetRemoteViewsService extends RemoteViewsService {
                     data.close();
                 }
                 final long identityToken = Binder.clearCallingIdentity();
-                String location = Utilities.getLocationSettings(DetailWidgetRemoteViewsService.this);
-                Uri weatherForLocationUri = WeatherContract.WeatherEntry.buildWeatherLocationWithStartDate(location, System.currentTimeMillis());
+                Uri weatherForLocationUri = WeatherContract.WeatherEntry.buildWeatherLocationWithStartDate(locationProvider.getLocation(), System.currentTimeMillis());
                 data = getContentResolver().query(weatherForLocationUri, FORECAST_COLUMNS, null, null, WeatherContract.WeatherEntry.COLUMN_DATE + " ASC");
                 Binder.restoreCallingIdentity(identityToken);
             }
@@ -87,8 +91,7 @@ public class DetailWidgetRemoteViewsService extends RemoteViewsService {
                 views.setTextViewText(R.id.widget_low_temperature, formattedMinTemperature);
 
                 final Intent fillInIntent = new Intent();
-                String locationSetting = Utilities.getLocationSettings(DetailWidgetRemoteViewsService.this);
-                Uri weatherUri = WeatherContract.WeatherEntry.buildWeatherLocationWithDate(locationSetting, dateInMillis);
+                Uri weatherUri = WeatherContract.WeatherEntry.buildWeatherLocationWithDate(locationProvider.getLocation(), dateInMillis);
                 fillInIntent.setData(weatherUri);
                 views.setOnClickFillInIntent(R.id.widget_list_item, fillInIntent);
                 return views;

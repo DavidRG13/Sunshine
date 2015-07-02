@@ -1,7 +1,9 @@
 package com.android.sunshine.app.location;
 
 import android.content.Context;
-import com.android.sunshine.app.utils.Utilities;
+import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
+import com.android.sunshine.app.R;
 
 public class PreferenceLocationProvider implements LocationProvider {
 
@@ -13,6 +15,7 @@ public class PreferenceLocationProvider implements LocationProvider {
 
     @Override
     public String getLocation() {
-        return Utilities.getLocationSettings(context);
+        final SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
+        return sharedPreferences.getString(context.getString(R.string.pref_location_key), context.getString(R.string.location_default));
     }
 }

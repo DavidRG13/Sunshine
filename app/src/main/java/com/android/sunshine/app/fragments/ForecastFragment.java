@@ -35,6 +35,8 @@ import com.android.sunshine.app.R;
 import com.android.sunshine.app.adapter.ForecastCursorAdapter;
 import com.android.sunshine.app.adapter.OnAdapterItemClickListener;
 import com.android.sunshine.app.callbacks.ItemClickCallback;
+import com.android.sunshine.app.location.LocationProvider;
+import com.android.sunshine.app.location.PreferenceLocationProvider;
 import com.android.sunshine.app.model.WeatherContract;
 import com.android.sunshine.app.sync.ServerStatus;
 import com.android.sunshine.app.sync.SyncAdapter;
@@ -62,6 +64,7 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
     private int choiceMode;
     private boolean holdForTransition;
     private long mInitialSelectedDate = -1;
+    private LocationProvider locationProvider;
 
     public ForecastFragment() {
     }
@@ -80,6 +83,7 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
         setHasOptionsMenu(true);
         final View rootView = inflater.inflate(R.layout.fragment_main, container, false);
         ButterKnife.bind(this, rootView);
+        locationProvider = new PreferenceLocationProvider(getActivity());
         forecastList.setLayoutManager(new LinearLayoutManager(getActivity()));
         forecastList.setHasFixedSize(true);
 
@@ -144,7 +148,7 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
         super.onResume();
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
         preferences.registerOnSharedPreferenceChangeListener(this);
-        if (location != null && !Utilities.getLocationSettings(getActivity()).equals(location)) {
+        if (location != null && !location.equals(locationProvider.getLocation())) {
             getLoaderManager().restartLoader(FORECAST_LOADER, null, this);
         }
     }
@@ -188,7 +192,7 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
     public Loader<Cursor> onCreateLoader(final int id, final Bundle args) {
         String sortOrder = WeatherEntry.COLUMN_DATE + " ASC";
 
-        location = Utilities.getLocationSettings(getActivity());
+        location = locationProvider.getLocation();
         Uri weatherForLocationUri = WeatherEntry.buildWeatherLocationWithStartDate(location, new Date().getTime());
 
         return new CursorLoader(getActivity(), weatherForLocationUri, FORECAST_COLUMNS, null, null, sortOrder);

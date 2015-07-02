@@ -24,13 +24,13 @@ public class MainActivity extends AppCompatActivity implements ItemClickCallback
     private boolean twoPane;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
         Uri contentUri = getIntent() != null ? getIntent().getData() : null;
 
-        Toolbar toolbar = (Toolbar)findViewById(R.id.toolbar);
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayShowTitleEnabled(false);
 
@@ -59,13 +59,13 @@ public class MainActivity extends AppCompatActivity implements ItemClickCallback
     }
 
     @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
+    public boolean onCreateOptionsMenu(final Menu menu) {
         getMenuInflater().inflate(R.menu.main, menu);
         return true;
     }
 
     @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
+    public boolean onOptionsItemSelected(final MenuItem item) {
         if (item.getItemId() == R.id.action_settings) {
             startActivity(new Intent(this, SettingsActivity.class));
             return true;
@@ -74,7 +74,7 @@ public class MainActivity extends AppCompatActivity implements ItemClickCallback
     }
 
     @Override
-    public void onItemSelected(long date, final ForecastCursorAdapter.ViewHolder viewHolder) {
+    public void onItemSelected(final long date, final ForecastCursorAdapter.ViewHolder viewHolder) {
         if (twoPane) {
             final Bundle args = new Bundle();
             args.putLong(DetailActivity.DATE_KEY, date);
@@ -86,7 +86,8 @@ public class MainActivity extends AppCompatActivity implements ItemClickCallback
         } else {
             final Intent intent = new Intent(this, DetailActivity.class);
             intent.putExtra(DetailActivity.DATE_KEY, date);
-            ActivityOptionsCompat activityOptions = ActivityOptionsCompat.makeSceneTransitionAnimation(this, new Pair<View, String>(viewHolder.forecastIcon, getString(R.string.detail_icon_transition_name)));
+            ActivityOptionsCompat activityOptions = ActivityOptionsCompat.makeSceneTransitionAnimation(this,
+                new Pair<View, String>(viewHolder.forecastIcon, getString(R.string.detail_icon_transition_name)));
             ActivityCompat.startActivity(this, intent, activityOptions.toBundle());
         }
     }

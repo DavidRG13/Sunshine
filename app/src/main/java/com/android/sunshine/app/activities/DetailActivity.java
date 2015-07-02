@@ -10,7 +10,7 @@ public class DetailActivity extends AppCompatActivity {
     public static final String DATE_KEY = "forecast_date";
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_detail);
 

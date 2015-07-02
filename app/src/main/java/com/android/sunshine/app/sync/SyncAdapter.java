@@ -29,7 +29,8 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
     private final WeatherRepository weatherRepository;
     private final ServerStatusChanger serverStatusChanger;
 
-    public SyncAdapter(final LocationProvider locationProvider, final WeatherRepository weatherRepository, final ServerStatusChanger serverStatusChanger, Context context, boolean autoInitialize) {
+    public SyncAdapter(final LocationProvider locationProvider, final WeatherRepository weatherRepository, final ServerStatusChanger serverStatusChanger,
+        final Context context, boolean autoInitialize) {
         super(context, autoInitialize);
         this.locationProvider = locationProvider;
         this.weatherRepository = weatherRepository;
@@ -37,7 +38,7 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
     }
 
     @Override
-    public void onPerformSync(Account account, Bundle extras, String authority, ContentProviderClient provider, SyncResult syncResult) {
+    public void onPerformSync(final Account account, final Bundle extras, final String authority, final ContentProviderClient provider, final SyncResult syncResult) {
         final String location = locationProvider.getLocation();
 
         RestAdapter restAdapter = new RestAdapter.Builder()
@@ -55,18 +56,18 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
         }
     }
 
-    public static void syncImmediately(Context context) {
+    public static void syncImmediately(final Context context) {
         Bundle bundle = new Bundle();
         bundle.putBoolean(ContentResolver.SYNC_EXTRAS_EXPEDITED, true);
         bundle.putBoolean(ContentResolver.SYNC_EXTRAS_MANUAL, true);
         ContentResolver.requestSync(getSyncAccount(context), context.getString(R.string.content_authority), bundle);
     }
 
-    public static void initializeSyncAdapter(Context context) {
+    public static void initializeSyncAdapter(final Context context) {
         getSyncAccount(context);
     }
 
-    public static void configurePeriodicSync(Context context, int syncInterval, int flexTime) {
+    public static void configurePeriodicSync(final Context context, final int syncInterval, final int flexTime) {
         Account account = getSyncAccount(context);
         String authority = context.getString(R.string.content_authority);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
@@ -77,7 +78,7 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
         }
     }
 
-    public static Account getSyncAccount(Context context) {
+    public static Account getSyncAccount(final Context context) {
         AccountManager accountManager = (AccountManager) context.getSystemService(Context.ACCOUNT_SERVICE);
         Account newAccount = new Account(context.getString(R.string.app_name), context.getString(R.string.sync_account_type));
 
@@ -90,7 +91,7 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
         return newAccount;
     }
 
-    private static void onAccountCreated(Account newAccount, Context context) {
+    private static void onAccountCreated(final Account newAccount, final Context context) {
         SyncAdapter.configurePeriodicSync(context, SYNC_INTERVAL, SYNC_FLEXTIME);
         ContentResolver.setSyncAutomatically(newAccount, context.getString(R.string.content_authority), true);
         syncImmediately(context);

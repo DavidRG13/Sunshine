@@ -34,9 +34,6 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
     public static final String LOCATION_KEY = "location";
     public static final String DETAIL_TRANSITION_ANIMATION = "DTA";
     public static final String DETAIL_URI = "URI";
-
-    private String location;
-    private String weatherData;
     private static final String[] COLUMNS = new String[]{
             WeatherContract.WeatherEntry.TABLE_NAME + "." + WeatherContract.WeatherEntry._ID,
             WeatherContract.WeatherEntry.COLUMN_DATE,
@@ -48,6 +45,7 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
             WeatherContract.WeatherEntry.COLUMN_WIND_SPEED,
             WeatherContract.WeatherEntry.COLUMN_WEATHER_ID
     };
+
     @Bind(R.id.detail_icon) ImageView iconView;
     @Bind(R.id.detail_date_textview) TextView dateView;
     @Bind(R.id.detail_forecast_textview) TextView mDescriptionView;
@@ -56,26 +54,29 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
     @Bind(R.id.detail_humidity_textview) TextView mHumidityView;
     @Bind(R.id.detail_wind_textview) TextView mWindView;
     @Bind(R.id.detail_pressure_textview) TextView mPressureView;
+
     private boolean transitionAnimation;
+    private String location;
+    private String weatherData;
 
     public DetailFragment() {
         setHasOptionsMenu(true);
     }
 
     @Override
-    public void onActivityCreated(Bundle savedInstanceState) {
+    public void onActivityCreated(final Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        if(savedInstanceState != null) {
+        if (savedInstanceState != null) {
             location = savedInstanceState.getString(LOCATION_KEY);
         }
         final Bundle arguments = getArguments();
-        if(arguments != null && arguments.containsKey(DetailActivity.DATE_KEY)) {
+        if (arguments != null && arguments.containsKey(DetailActivity.DATE_KEY)) {
             getLoaderManager().initLoader(DETAIL_LOADER, null, this);
         }
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+    public View onCreateView(final LayoutInflater inflater, final ViewGroup container, final Bundle savedInstanceState) {
         Bundle arguments = getArguments();
         if (arguments != null) {
             transitionAnimation = arguments.getBoolean(DetailFragment.DETAIL_TRANSITION_ANIMATION, false);
@@ -87,7 +88,7 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
     }
 
     @Override
-    public void onSaveInstanceState(Bundle outState) {
+    public void onSaveInstanceState(final Bundle outState) {
         super.onSaveInstanceState(outState);
         if (location != null) {
             outState.putString(LOCATION_KEY, location);
@@ -105,7 +106,7 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
     }
 
     @Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+    public void onCreateOptionsMenu(final Menu menu, final MenuInflater inflater) {
         if (getActivity() instanceof DetailActivity) {
             inflater.inflate(R.menu.detail_fragment, menu);
             finishCreatingMenu(menu);
@@ -113,23 +114,23 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
     }
 
     @Override
-    public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+    public Loader<Cursor> onCreateLoader(final int id, final Bundle args) {
         final long date = getArguments().getLong(DetailActivity.DATE_KEY);
         location = Utilities.getLocationSettings(getActivity());
         final Uri weatherUri = WeatherContract.WeatherEntry.buildWeatherLocationWithDate(location, date);
         ViewParent vp = getView().getParent();
-        if ( vp instanceof CardView ) {
-            ((View)vp).setVisibility(View.INVISIBLE);
+        if (vp instanceof CardView) {
+            ((View) vp).setVisibility(View.INVISIBLE);
         }
         return new CursorLoader(getActivity(), weatherUri, COLUMNS, null, null, WeatherContract.WeatherEntry.COLUMN_DATE + " ASC");
     }
 
     @Override
-    public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+    public void onLoadFinished(final Loader<Cursor> loader, final Cursor data) {
         if (data.moveToFirst()) {
             ViewParent vp = getView().getParent();
-            if ( vp instanceof CardView) {
-                ((View)vp).setVisibility(View.VISIBLE);
+            if (vp instanceof CardView) {
+                ((View) vp).setVisibility(View.VISIBLE);
             }
 
             final boolean isMetric = Utilities.isMetric(getActivity());
@@ -155,23 +156,25 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
 
             weatherData = String.format(Locale.getDefault(), "%s - %s - %s/%s", date, description, max, min);
 
-            AppCompatActivity activity = (AppCompatActivity)getActivity();
+            AppCompatActivity activity = (AppCompatActivity) getActivity();
             Toolbar toolbarView = (Toolbar) getView().findViewById(R.id.toolbar);
 
             // We need to start the enter transition after the data has loaded
             if (transitionAnimation) {
                 activity.supportStartPostponedEnterTransition();
 
-                if ( null != toolbarView ) {
+                if (null != toolbarView) {
                     activity.setSupportActionBar(toolbarView);
 
                     activity.getSupportActionBar().setDisplayShowTitleEnabled(false);
                     activity.getSupportActionBar().setDisplayHomeAsUpEnabled(true);
                 }
             } else {
-                if ( null != toolbarView ) {
+                if (null != toolbarView) {
                     Menu menu = toolbarView.getMenu();
-                    if ( null != menu ) menu.clear();
+                    if (null != menu) {
+                        menu.clear();
+                    }
                     toolbarView.inflateMenu(R.menu.detail_fragment);
                     finishCreatingMenu(toolbarView.getMenu());
                 }
@@ -180,11 +183,11 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
     }
 
     @Override
-    public void onLoaderReset(Loader<Cursor> loader) {
+    public void onLoaderReset(final Loader<Cursor> loader) {
 
     }
 
-    private void finishCreatingMenu(Menu menu) {
+    private void finishCreatingMenu(final Menu menu) {
         MenuItem menuItem = menu.findItem(R.id.action_share);
         menuItem.setIntent(createShareIntent());
     }

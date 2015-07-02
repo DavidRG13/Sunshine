@@ -11,20 +11,20 @@ import com.android.sunshine.app.weather.WeatherRepository;
 public class TodayWidgetProvider extends AppWidgetProvider {
 
     @Override
-    public void onUpdate(Context context, AppWidgetManager appWidgetManager, int[] appWidgetIds) {
+    public void onUpdate(final Context context, final AppWidgetManager appWidgetManager, final int[] appWidgetIds) {
         context.startService(new Intent(context, TodayWidgetIntentService.class));
     }
 
     @Override
-    public void onAppWidgetOptionsChanged(Context context, AppWidgetManager appWidgetManager,
-        int appWidgetId, Bundle newOptions) {
+    public void onAppWidgetOptionsChanged(final Context context, final AppWidgetManager appWidgetManager, final int appWidgetId, final Bundle newOptions) {
         context.startService(new Intent(context, TodayWidgetIntentService.class));
     }
 
     @Override
-    public void onReceive(@NonNull Context context, @NonNull Intent intent) {
+    public void onReceive(@NonNull final Context context, @NonNull final Intent intent) {
         super.onReceive(context, intent);
         if (WeatherRepository.ACTION_DATA_UPDATED.equals(intent.getAction())) {
             context.startService(new Intent(context, TodayWidgetIntentService.class));
         }
-    }}
+    }
+}

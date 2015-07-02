@@ -12,31 +12,24 @@ import android.widget.Checkable;
 import com.android.sunshine.app.activities.MainActivity;
 
 public class ItemChoiceManager {
-    private final String LOG_TAG = MainActivity.class.getSimpleName();
-    private final String SELECTED_ITEMS_KEY = "SIK";
+
+    private static final String LOG_TAG = MainActivity.class.getSimpleName();
+    private static final String SELECTED_ITEMS_KEY = "SIK";
+    private static final int CHECK_POSITION_SEARCH_DISTANCE = 20;
     private int mChoiceMode;
 
     private RecyclerView.Adapter mAdapter;
-    private RecyclerView.AdapterDataObserver mAdapterDataObserver = new RecyclerView.AdapterDataObserver() {
-        @Override
-        public void onChanged() {
-            super.onChanged();
-            if (mAdapter != null && mAdapter.hasStableIds()) confirmCheckedPositionsById(mAdapter.getItemCount());
-        }
-    };
+    private SparseBooleanArray mCheckStates = new SparseBooleanArray();
+    private LongSparseArray<Integer> mCheckedIdStates = new LongSparseArray<>();
 
-    public ItemChoiceManager(RecyclerView.Adapter adapter) {
+    public ItemChoiceManager(final RecyclerView.Adapter adapter) {
         mAdapter = adapter;
     }
 
-    private static final int CHECK_POSITION_SEARCH_DISTANCE = 20;
-
-    SparseBooleanArray mCheckStates = new SparseBooleanArray();
-
-    LongSparseArray<Integer> mCheckedIdStates = new LongSparseArray<>();
-
-    public void onClick(RecyclerView.ViewHolder vh) {
-        if (mChoiceMode == AbsListView.CHOICE_MODE_NONE) return;
+    public void onClick(final RecyclerView.ViewHolder vh) {
+        if (mChoiceMode == AbsListView.CHOICE_MODE_NONE) {
+            return;
+        }
 
         int checkedItemCount = mCheckStates.size();
         int position = vh.getAdapterPosition();
@@ -49,7 +42,7 @@ public class ItemChoiceManager {
         switch (mChoiceMode) {
             case AbsListView.CHOICE_MODE_NONE:
                 break;
-            case AbsListView.CHOICE_MODE_SINGLE: {
+            case AbsListView.CHOICE_MODE_SINGLE:
                 boolean checked = mCheckStates.get(position, false);
                 if (!checked) {
                     for (int i = 0; i < checkedItemCount; i++) {
@@ -62,27 +55,26 @@ public class ItemChoiceManager {
                 }
                 mAdapter.onBindViewHolder(vh, position);
                 break;
-            }
-            case AbsListView.CHOICE_MODE_MULTIPLE: {
-                boolean checked = mCheckStates.get(position, false);
-                mCheckStates.put(position, !checked);
+            case AbsListView.CHOICE_MODE_MULTIPLE:
+                boolean checkedMulti = mCheckStates.get(position, false);
+                mCheckStates.put(position, !checkedMulti);
                 mAdapter.onBindViewHolder(vh, position);
                 break;
-            }
-            case AbsListView.CHOICE_MODE_MULTIPLE_MODAL: {
+            case AbsListView.CHOICE_MODE_MULTIPLE_MODAL:
                 throw new RuntimeException("Multiple Modal not implemented in ItemChoiceManager.");
-            }
+            default:
+                break;
         }
     }
 
-    public void setChoiceMode(int choiceMode) {
+    public void setChoiceMode(final int choiceMode) {
         if (mChoiceMode != choiceMode) {
             mChoiceMode = choiceMode;
             clearSelections();
         }
     }
 
-    public boolean isItemChecked(int position) {
+    public boolean isItemChecked(final int position) {
         return mCheckStates.get(position);
     }
 
@@ -91,7 +83,7 @@ public class ItemChoiceManager {
         mCheckedIdStates.clear();
     }
 
-    void confirmCheckedPositionsById(int oldItemCount) {
+    void confirmCheckedPositionsById(final int oldItemCount) {
         mCheckStates.clear();
 
         for (int checkedIndex = 0; checkedIndex < mCheckedIdStates.size(); checkedIndex++) {
@@ -123,7 +115,7 @@ public class ItemChoiceManager {
         }
     }
 
-    public void onBindViewHolder(RecyclerView.ViewHolder vh, int position) {
+    public void onBindViewHolder(final RecyclerView.ViewHolder vh, final int position) {
         boolean checked = isItemChecked(position);
         if (vh.itemView instanceof Checkable) {
             ((Checkable) vh.itemView).setChecked(checked);
@@ -131,7 +123,7 @@ public class ItemChoiceManager {
         ViewCompat.setActivated(vh.itemView, checked);
     }
 
-    public void onRestoreInstanceState(Bundle savedInstanceState) {
+    public void onRestoreInstanceState(final Bundle savedInstanceState) {
         if (savedInstanceState != null) {
             byte[] states = savedInstanceState.getByteArray(SELECTED_ITEMS_KEY);
             if (null != states) {
@@ -151,7 +143,7 @@ public class ItemChoiceManager {
         }
     }
 
-    public void onSaveInstanceState(Bundle outState) {
+    public void onSaveInstanceState(final Bundle outState) {
         Parcel outParcel = Parcel.obtain();
         outParcel.writeSparseBooleanArray(mCheckStates);
         final int numStates = mCheckedIdStates.size();
@@ -173,4 +165,3 @@ public class ItemChoiceManager {
         }
     }
 }
-

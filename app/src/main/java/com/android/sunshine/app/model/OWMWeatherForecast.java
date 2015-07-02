@@ -18,7 +18,8 @@ public class OWMWeatherForecast {
     public OWMWeatherForecast() {
     }
 
-    public OWMWeatherForecast(final int dt, final OWMTemperatures temp, final double pressure, final int humidity, final ArrayList<OWMWeather> weather, final double speed, final int deg, final int clouds,
+    public OWMWeatherForecast(final int dt, final OWMTemperatures temp, final double pressure, final int humidity,
+        final ArrayList<OWMWeather> weather, final double speed, final int deg, final int clouds,
         final double rain) {
         this.dt = dt;
         this.temp = temp;

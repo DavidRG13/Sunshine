@@ -11,7 +11,9 @@ import com.android.sunshine.app.sync.ServerStatus;
 import java.text.SimpleDateFormat;
 import java.util.Locale;
 
-public class Utilities {
+public final class Utilities {
+
+    private Utilities() { }
 
     public static String formatTemperature(final Context context, final double temperature) {
         return formatTemperature(context, temperature, isMetric(context));
@@ -29,7 +31,8 @@ public class Utilities {
 
     public static boolean isMetric(final Context context) {
         final SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
-        return prefs.getString(context.getString(R.string.pref_unit_key), context.getString(R.string.prefs_units_imperial)).equals(context.getString(R.string.prefs_units_imperial));
+        return prefs.getString(context.getString(R.string.pref_unit_key),
+            context.getString(R.string.prefs_units_imperial)).equals(context.getString(R.string.prefs_units_imperial));
     }
 
     public static String getLocationSettings(final Context context) {
@@ -54,7 +57,7 @@ public class Utilities {
         return prefs.getBoolean(context.getString(R.string.pref_enable_notifications_key), Boolean.parseBoolean(context.getString(R.string.pref_enable_notifications_default)));
     }
 
-    public static String getFriendlyDay(Context context, long dateInMillis, boolean displayLongToday) {
+    public static String getFriendlyDay(final Context context, final long dateInMillis, final boolean displayLongToday) {
         Time time = new Time();
         time.setToNow();
         int julianDay = Time.getJulianDay(dateInMillis, time.gmtoff);
@@ -64,7 +67,7 @@ public class Utilities {
             String today = context.getString(R.string.today);
             int formatId = R.string.format_full_friendly_date;
             return context.getString(formatId, today, getFormattedMonthDay(dateInMillis));
-        } else if ( julianDay < currentJulianDay + 7 ) {
+        } else if (julianDay < currentJulianDay + 7) {
             return getDayName(context, dateInMillis);
         } else {
             SimpleDateFormat shortenedDateFormat = new SimpleDateFormat("EEE MMM dd", Locale.getDefault());
@@ -89,14 +92,14 @@ public class Utilities {
         }
     }
 
-    public static String getFormattedMonthDay(long dateInMillis) {
+    public static String getFormattedMonthDay(final long dateInMillis) {
         Time time = new Time();
         time.setToNow();
         SimpleDateFormat monthDayFormat = new SimpleDateFormat("MMMM dd", Locale.getDefault());
         return monthDayFormat.format(dateInMillis);
     }
 
-    public static int getIconResourceForWeatherCondition(int weatherId) {
+    public static int getIconResourceForWeatherCondition(final int weatherId) {
         if (weatherId >= 200 && weatherId <= 232) {
             return R.drawable.ic_storm;
         } else if (weatherId >= 300 && weatherId <= 321) {
@@ -123,7 +126,7 @@ public class Utilities {
         return -1;
     }
 
-    public static int getArtResourceForWeatherCondition(int weatherId) {
+    public static int getArtResourceForWeatherCondition(final int weatherId) {
         if (weatherId >= 200 && weatherId <= 232) {
             return R.drawable.art_storm;
         } else if (weatherId >= 300 && weatherId <= 321) {
@@ -157,9 +160,8 @@ public class Utilities {
     }
 
     @SuppressWarnings("ResourceType")
-    public static
     @ServerStatus
-    int getServerStatus(final Context context) {
+    public static int getServerStatus(final Context context) {
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
         return preferences.getInt(context.getString(R.string.prefs_server_status), ServerStatus.SERVER_STATUS_UNKNOWN);
     }
@@ -171,7 +173,7 @@ public class Utilities {
         editor.apply();
     }
 
-    public static String getFullFriendlyDayString(Context context, long dateInMillis) {
+    public static String getFullFriendlyDayString(final Context context, final long dateInMillis) {
         String day = getDayName(context, dateInMillis);
         int formatId = R.string.format_full_friendly_date;
         return context.getString(formatId, day, getFormattedMonthDay(dateInMillis));

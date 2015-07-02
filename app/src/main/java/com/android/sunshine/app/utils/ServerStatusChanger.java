@@ -25,7 +25,7 @@ public class ServerStatusChanger {
         }
     }
 
-    private void setServerStatus(final @ServerStatus int serverStatus) {
+    private void setServerStatus(@ServerStatus final int serverStatus) {
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
         SharedPreferences.Editor editor = preferences.edit();
         editor.putInt(context.getString(R.string.prefs_server_status), serverStatus);

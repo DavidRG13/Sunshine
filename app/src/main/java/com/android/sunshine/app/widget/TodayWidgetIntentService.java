@@ -37,7 +37,7 @@ public class TodayWidgetIntentService extends IntentService {
     }
 
     @Override
-    protected void onHandleIntent(Intent intent) {
+    protected void onHandleIntent(final Intent intent) {
         AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(this);
         int[] appWidgetIds = appWidgetManager.getAppWidgetIds(new ComponentName(this, TodayWidgetProvider.class));
 
@@ -93,7 +93,7 @@ public class TodayWidgetIntentService extends IntentService {
         }
     }
 
-    private int getWidgetWidth(AppWidgetManager appWidgetManager, int appWidgetId) {
+    private int getWidgetWidth(final AppWidgetManager appWidgetManager, final int appWidgetId) {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.JELLY_BEAN) {
             return getResources().getDimensionPixelSize(R.dimen.widget_today_default_width);
         }
@@ -101,7 +101,7 @@ public class TodayWidgetIntentService extends IntentService {
     }
 
     @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
-    private int getWidgetWidthFromOptions(AppWidgetManager appWidgetManager, int appWidgetId) {
+    private int getWidgetWidthFromOptions(final AppWidgetManager appWidgetManager, final int appWidgetId) {
         Bundle options = appWidgetManager.getAppWidgetOptions(appWidgetId);
         if (options.containsKey(AppWidgetManager.OPTION_APPWIDGET_MIN_WIDTH)) {
             int minWidthDp = options.getInt(AppWidgetManager.OPTION_APPWIDGET_MIN_WIDTH);
@@ -112,7 +112,7 @@ public class TodayWidgetIntentService extends IntentService {
     }
 
     @TargetApi(Build.VERSION_CODES.ICE_CREAM_SANDWICH_MR1)
-    private void setRemoteContentDescription(RemoteViews views, String description) {
+    private void setRemoteContentDescription(final RemoteViews views, final String description) {
         views.setContentDescription(R.id.widget_icon, description);
     }
 }

@@ -7,44 +7,44 @@ import android.accounts.NetworkErrorException;
 import android.content.Context;
 import android.os.Bundle;
 
-public class Authenticator extends AbstractAccountAuthenticator{
+public class Authenticator extends AbstractAccountAuthenticator {
 
-    public Authenticator(Context context) {
+    public Authenticator(final Context context) {
         super(context);
     }
 
     @Override
-    public Bundle editProperties(AccountAuthenticatorResponse r, String s) {
+    public Bundle editProperties(final AccountAuthenticatorResponse r, final String s) {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public Bundle addAccount(AccountAuthenticatorResponse r, String s, String s2, String[] strings, Bundle bundle) throws NetworkErrorException {
+    public Bundle addAccount(final AccountAuthenticatorResponse r, final String s, final String s2, final String[] strings, final Bundle bundle) throws NetworkErrorException {
         return null;
     }
 
     @Override
-    public Bundle confirmCredentials(AccountAuthenticatorResponse r, Account account, Bundle bundle) throws NetworkErrorException {
+    public Bundle confirmCredentials(final AccountAuthenticatorResponse r, final Account account, final Bundle bundle) throws NetworkErrorException {
         return null;
     }
 
     @Override
-    public Bundle getAuthToken(AccountAuthenticatorResponse r, Account account, String s, Bundle bundle) throws NetworkErrorException {
+    public Bundle getAuthToken(final AccountAuthenticatorResponse r, final Account account, final String s, final Bundle bundle) throws NetworkErrorException {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public String getAuthTokenLabel(String s) {
+    public String getAuthTokenLabel(final String s) {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public Bundle updateCredentials(AccountAuthenticatorResponse r, Account account, String s, Bundle bundle) throws NetworkErrorException {
+    public Bundle updateCredentials(final AccountAuthenticatorResponse r, final Account account, final String s, final Bundle bundle) throws NetworkErrorException {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public Bundle hasFeatures(AccountAuthenticatorResponse r, Account account, String[] strings) throws NetworkErrorException {
+    public Bundle hasFeatures(final AccountAuthenticatorResponse r, final Account account, final String[] strings) throws NetworkErrorException {
         throw new UnsupportedOperationException();
     }
 }

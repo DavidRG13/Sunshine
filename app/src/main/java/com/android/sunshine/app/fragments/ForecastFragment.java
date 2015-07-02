@@ -47,16 +47,17 @@ import static com.android.sunshine.app.model.WeatherContract.WeatherEntry;
 public class ForecastFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor>, OnSharedPreferenceChangeListener, OnAdapterItemClickListener {
 
     public static final int FORECAST_LOADER = 0;
-    private String location;
-    private ForecastCursorAdapter adapter;
-
     private static final String[] FORECAST_COLUMNS = new String[] {
-        WeatherEntry.TABLE_NAME + "." + WeatherEntry._ID, WeatherEntry.COLUMN_DATE, WeatherEntry.COLUMN_SHORT_DESC, WeatherEntry.COLUMN_MAX_TEMP, WeatherEntry.COLUMN_MIN_TEMP, WeatherEntry.COLUMN_WEATHER_ID,
+        WeatherEntry.TABLE_NAME + "." + WeatherEntry._ID, WeatherEntry.COLUMN_DATE, WeatherEntry.COLUMN_SHORT_DESC, WeatherEntry.COLUMN_MAX_TEMP,
+        WeatherEntry.COLUMN_MIN_TEMP, WeatherEntry.COLUMN_WEATHER_ID,
         WeatherEntry.COLUMN_WEATHER_ID, LocationEntry.COLUMN_LOCATION_SETTING, LocationEntry.COLUMN_COORD_LAT, LocationEntry.COLUMN_COORD_LONG
     };
 
     @Bind(R.id.recycler_view_forecast) RecyclerView forecastList;
     @Bind(R.id.listview_forecast_empty) TextView emptyView;
+
+    private String location;
+    private ForecastCursorAdapter adapter;
     private boolean autoSelectView;
     private int choiceMode;
     private boolean holdForTransition;
@@ -66,7 +67,7 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
     }
 
     @Override
-    public void onActivityCreated(Bundle savedInstanceState) {
+    public void onActivityCreated(final Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         if (holdForTransition) {
             getActivity().supportPostponeEnterTransition();
@@ -75,7 +76,7 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+    public View onCreateView(final LayoutInflater inflater, final ViewGroup container, final Bundle savedInstanceState) {
         setHasOptionsMenu(true);
         final View rootView = inflater.inflate(R.layout.fragment_main, container, false);
         ButterKnife.bind(this, rootView);
@@ -94,7 +95,7 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
                 forecastList.addOnScrollListener(new RecyclerView.OnScrollListener() {
                     @TargetApi(Build.VERSION_CODES.HONEYCOMB)
                     @Override
-                    public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+                    public void onScrolled(final RecyclerView recyclerView, final int dx, final int dy) {
                         super.onScrolled(recyclerView, dx, dy);
                         int max = parallaxView.getHeight();
                         if (dy > 0) {
@@ -107,14 +108,14 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
             }
         }
 
-        final AppBarLayout appbarView = (AppBarLayout)rootView.findViewById(R.id.appbar);
+        final AppBarLayout appbarView = (AppBarLayout) rootView.findViewById(R.id.appbar);
         if (null != appbarView) {
             ViewCompat.setElevation(appbarView, 0);
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                 forecastList.addOnScrollListener(new RecyclerView.OnScrollListener() {
                     @TargetApi(Build.VERSION_CODES.LOLLIPOP)
                     @Override
-                    public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+                    public void onScrolled(final RecyclerView recyclerView, final int dx, final int dy) {
                         if (0 == forecastList.computeVerticalScrollOffset()) {
                             appbarView.setElevation(0);
                         } else {
@@ -129,7 +130,7 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
     }
 
     @Override
-    public void onInflate(Activity activity, AttributeSet attrs, Bundle savedInstanceState) {
+    public void onInflate(final Activity activity, final AttributeSet attrs, final Bundle savedInstanceState) {
         super.onInflate(activity, attrs, savedInstanceState);
         TypedArray a = activity.obtainStyledAttributes(attrs, R.styleable.ForecastFragment, 0, 0);
         choiceMode = a.getInt(R.styleable.ForecastFragment_android_choiceMode, AbsListView.CHOICE_MODE_NONE);
@@ -156,12 +157,12 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
     }
 
     @Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater menuInflater) {
+    public void onCreateOptionsMenu(final Menu menu, final MenuInflater menuInflater) {
         menuInflater.inflate(R.menu.forecast_fragment, menu);
     }
 
     @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
+    public boolean onOptionsItemSelected(final MenuItem item) {
         final int itemId = item.getItemId();
         if (itemId == R.id.action_refresh) {
             refreshWeatherData();
@@ -173,7 +174,7 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
     }
 
     @Override
-    public void onSaveInstanceState(Bundle outState) {
+    public void onSaveInstanceState(final Bundle outState) {
         adapter.onSaveInstanceState(outState);
         super.onSaveInstanceState(outState);
     }
@@ -184,7 +185,7 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
     }
 
     @Override
-    public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+    public Loader<Cursor> onCreateLoader(final int id, final Bundle args) {
         String sortOrder = WeatherEntry.COLUMN_DATE + " ASC";
 
         location = Utilities.getLocationSettings(getActivity());
@@ -194,7 +195,7 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
     }
 
     @Override
-    public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+    public void onLoadFinished(final Loader<Cursor> loader, final Cursor data) {
         adapter.swapCursor(data);
         updateEmptyView();
         if (data.getCount() == 0) {
@@ -210,9 +211,9 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
                             Cursor data = adapter.getCursor();
                             int count = data.getCount();
                             int dateColumn = data.getColumnIndex(WeatherContract.WeatherEntry.COLUMN_DATE);
-                            for ( int i = 0; i < count; i++ ) {
+                            for (int i = 0; i < count; i++) {
                                 data.moveToPosition(i);
-                                if ( data.getLong(dateColumn) == mInitialSelectedDate ) {
+                                if (data.getLong(dateColumn) == mInitialSelectedDate) {
                                     position = i;
                                     break;
                                 }
@@ -226,7 +227,7 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
                         if (null != vh && autoSelectView) {
                             adapter.selectView(vh);
                         }
-                        if ( holdForTransition ) {
+                        if (holdForTransition) {
                             getActivity().supportStartPostponedEnterTransition();
                         }
                         return true;
@@ -261,11 +262,11 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
     }
 
     @Override
-    public void onLoaderReset(Loader<Cursor> loader) {
+    public void onLoaderReset(final Loader<Cursor> loader) {
         adapter.swapCursor(null);
     }
 
-    public void setUseTodayLayout(boolean useTodayLayout) {
+    public void setUseTodayLayout(final boolean useTodayLayout) {
         if (adapter != null) {
             adapter.setUseTodayLayout(useTodayLayout);
         }
@@ -275,7 +276,7 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
         SyncAdapter.syncImmediately(getActivity());
     }
 
-    public void setInitialSelectedDate(long initialSelectedDate) {
+    public void setInitialSelectedDate(final long initialSelectedDate) {
         mInitialSelectedDate = initialSelectedDate;
     }
 

@@ -35,7 +35,8 @@ public class UserNotificator {
                 int iconId = Utilities.getIconResourceForWeatherCondition(weatherId);
                 String title = context.getString(R.string.app_name);
 
-                String contentText = String.format(context.getString(R.string.format_notification), desc, Utilities.formatTemperature(context, high), Utilities.formatTemperature(context, low));
+                String contentText = String.format(context.getString(R.string.format_notification),
+                    desc, Utilities.formatTemperature(context, high), Utilities.formatTemperature(context, low));
 
                 NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(context).setSmallIcon(iconId).setContentTitle(title).setContentText(contentText);
 

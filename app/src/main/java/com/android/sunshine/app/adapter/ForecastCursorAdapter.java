@@ -27,7 +27,7 @@ public class ForecastCursorAdapter extends RecyclerView.Adapter<ForecastCursorAd
     private Context context;
     private View emptyView;
     private OnAdapterItemClickListener onAdapterItemClickListener;
-    final private ItemChoiceManager itemChoiceManager;
+    private final ItemChoiceManager itemChoiceManager;
 
     public ForecastCursorAdapter(final Context context, final View emptyView, final OnAdapterItemClickListener onAdapterItemClickListener, final int choiceMode) {
         this.context = context;
@@ -41,12 +41,14 @@ public class ForecastCursorAdapter extends RecyclerView.Adapter<ForecastCursorAd
     public ViewHolder onCreateViewHolder(final ViewGroup viewGroup, final int viewType) {
         if (viewGroup instanceof RecyclerView) {
             int layoutId = -1;
-            switch (viewType){
+            switch (viewType) {
                 case TODAY_VIEW_TYPE:
                     layoutId = R.layout.today_list_item;
                     break;
                 case FUTURE_DAY_VIEW_TYPE:
                     layoutId = R.layout.forecast_list_item;
+                    break;
+                default:
                     break;
             }
             final View view = LayoutInflater.from(context).inflate(layoutId, viewGroup, false);
@@ -68,10 +70,10 @@ public class ForecastCursorAdapter extends RecyclerView.Adapter<ForecastCursorAd
         final float minTemp = cursor.getFloat(cursor.getColumnIndex(WeatherEntry.COLUMN_MIN_TEMP));
 
         boolean useLongToday;
-        if(getItemViewType(cursor.getPosition()) == TODAY_VIEW_TYPE){
+        if (getItemViewType(cursor.getPosition()) == TODAY_VIEW_TYPE) {
             useLongToday = true;
             viewHolder.forecastIcon.setImageResource(Utilities.getArtResourceForWeatherCondition(weatherId));
-        }else{
+        } else {
             useLongToday = false;
             viewHolder.forecastIcon.setImageResource(Utilities.getIconResourceForWeatherCondition(weatherId));
         }
@@ -86,11 +88,11 @@ public class ForecastCursorAdapter extends RecyclerView.Adapter<ForecastCursorAd
     }
 
     @Override
-    public int getItemViewType(int position) {
+    public int getItemViewType(final int position) {
         return (position == 0 && useTodayLayout) ? TODAY_VIEW_TYPE : FUTURE_DAY_VIEW_TYPE;
     }
 
-    public void setUseTodayLayout(boolean useTodayLayout) {
+    public void setUseTodayLayout(final boolean useTodayLayout) {
         this.useTodayLayout = useTodayLayout;
     }
 
@@ -122,18 +124,18 @@ public class ForecastCursorAdapter extends RecyclerView.Adapter<ForecastCursorAd
         itemChoiceManager.onClick(viewHolder);
     }
 
-    public void selectView(RecyclerView.ViewHolder viewHolder) {
-        if ( viewHolder instanceof ViewHolder ) {
-            ViewHolder holder = (ViewHolder)viewHolder;
+    public void selectView(final RecyclerView.ViewHolder viewHolder) {
+        if (viewHolder instanceof ViewHolder) {
+            ViewHolder holder = (ViewHolder) viewHolder;
             holder.onClick(holder.itemView);
         }
     }
 
-    public void onRestoreInstanceState(Bundle savedInstanceState) {
+    public void onRestoreInstanceState(final Bundle savedInstanceState) {
         itemChoiceManager.onRestoreInstanceState(savedInstanceState);
     }
 
-    public void onSaveInstanceState(Bundle outState) {
+    public void onSaveInstanceState(final Bundle outState) {
         itemChoiceManager.onSaveInstanceState(outState);
     }
 
@@ -141,7 +143,8 @@ public class ForecastCursorAdapter extends RecyclerView.Adapter<ForecastCursorAd
         return itemChoiceManager.getSelectedItemPosition();
     }
 
-    public static class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+    public static final class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+
         @Bind(R.id.list_item_icon) public ImageView forecastIcon;
         @Bind(R.id.list_item_date_textview) public TextView dateWeather;
         @Bind(R.id.list_item_forecast_textview) public TextView forecastDescription;
@@ -149,7 +152,7 @@ public class ForecastCursorAdapter extends RecyclerView.Adapter<ForecastCursorAd
         @Bind(R.id.list_item_low_textview) public TextView min;
         private final OnItemClickHandler onItemClickHandler;
 
-        private ViewHolder(View view, final OnItemClickHandler onItemClickHandler) {
+        private ViewHolder(final View view, final OnItemClickHandler onItemClickHandler) {
             super(view);
             ButterKnife.bind(this, view);
             this.onItemClickHandler = onItemClickHandler;

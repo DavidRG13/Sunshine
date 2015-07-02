@@ -5,7 +5,6 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
-import com.android.sunshine.app.location.LocationProvider;
 import com.android.sunshine.app.model.OWMResponse;
 import com.android.sunshine.app.model.OWMWeatherForecast;
 import com.android.sunshine.app.model.WeatherContract;
@@ -27,7 +26,7 @@ public class WeatherRepository {
         this.userNotificator = userNotificator;
     }
 
-    public void saveWeatherForLocation(OWMResponse owmResponse, String locationSettings) {
+    public void saveWeatherForLocation(final OWMResponse owmResponse, final String locationSettings) {
         String cityName = owmResponse.getCity().getName();
         double cityLatitude = owmResponse.getCity().getCoord().getLat();
         double cityLongitude = owmResponse.getCity().getCoord().getLon();
@@ -72,7 +71,7 @@ public class WeatherRepository {
         Calendar cal = Calendar.getInstance();
         cal.add(Calendar.DATE, -1);
         String yesterdayDate = WeatherContract.getDbDateString(cal.getTime());
-        context.getContentResolver().delete(WeatherContract.WeatherEntry.CONTENT_URI, WeatherContract.WeatherEntry.COLUMN_DATE + " <= ?", new String[] { yesterdayDate });
+        context.getContentResolver().delete(WeatherContract.WeatherEntry.CONTENT_URI, WeatherContract.WeatherEntry.COLUMN_DATE + " <= ?", new String[] {yesterdayDate });
     }
 
     private void updateWidgets() {
@@ -88,8 +87,8 @@ public class WeatherRepository {
         locationValues.put(WeatherContract.LocationEntry.COLUMN_COORD_LONG, cityLongitude);
 
         long result;
-        final Cursor cursor = context.getContentResolver()
-            .query(WeatherContract.LocationEntry.CONTENT_URI, new String[] { WeatherContract.LocationEntry._ID }, WeatherContract.LocationEntry.COLUMN_LOCATION_SETTING + " = ?", new String[] { locationSettings }, null);
+        final Cursor cursor = context.getContentResolver().query(WeatherContract.LocationEntry.CONTENT_URI, new String[] {WeatherContract.LocationEntry._ID },
+            WeatherContract.LocationEntry.COLUMN_LOCATION_SETTING + " = ?", new String[] {locationSettings }, null);
         if (cursor.moveToFirst()) {
             result = cursor.getColumnIndex(WeatherContract.LocationEntry._ID);
         } else {

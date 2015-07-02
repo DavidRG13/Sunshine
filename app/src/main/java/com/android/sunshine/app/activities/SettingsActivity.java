@@ -18,7 +18,7 @@ import com.android.sunshine.app.utils.Utilities;
 public class SettingsActivity extends PreferenceActivity implements Preference.OnPreferenceChangeListener, SharedPreferences.OnSharedPreferenceChangeListener {
 
     @Override
-    public void onCreate(Bundle savedInstanceState) {
+    public void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         addPreferencesFromResource(R.xml.pref_general);
         bindPreferenceSummaryToValue(findPreference(getString(R.string.pref_location_key)));
@@ -40,7 +40,7 @@ public class SettingsActivity extends PreferenceActivity implements Preference.O
     }
 
     @Override
-    public boolean onPreferenceChange(Preference preference, Object value) {
+    public boolean onPreferenceChange(final Preference preference, final Object value) {
         setPreferenceSummary(preference, value);
         return true;
     }
@@ -51,12 +51,12 @@ public class SettingsActivity extends PreferenceActivity implements Preference.O
         return super.getParentActivityIntent().addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
     }
 
-    private void bindPreferenceSummaryToValue(Preference preference) {
+    private void bindPreferenceSummaryToValue(final Preference preference) {
         preference.setOnPreferenceChangeListener(this);
         setPreferenceSummary(preference, PreferenceManager.getDefaultSharedPreferences(preference.getContext()).getString(preference.getKey(), ""));
     }
 
-    private void setPreferenceSummary(Preference preference, Object value) {
+    private void setPreferenceSummary(final Preference preference, final Object value) {
         String stringValue = value.toString();
         String key = preference.getKey();
 
@@ -91,12 +91,12 @@ public class SettingsActivity extends PreferenceActivity implements Preference.O
 
     @Override
     public void onSharedPreferenceChanged(final SharedPreferences sharedPreferences, final String key) {
-        if ( key.equals(getString(R.string.pref_location_key)) ) {
+        if (key.equals(getString(R.string.pref_location_key))) {
             Utilities.resetServerStatus(this);
             SyncAdapter.syncImmediately(this);
-        } else if ( key.equals(getString(R.string.pref_unit_key)) ) {
+        } else if (key.equals(getString(R.string.pref_unit_key))) {
             getContentResolver().notifyChange(WeatherContract.WeatherEntry.CONTENT_URI, null);
-        } else if ( key.equals(getString(R.string.prefs_server_status)) ) {
+        } else if (key.equals(getString(R.string.prefs_server_status))) {
             Preference locationPreference = findPreference(getString(R.string.pref_location_key));
             bindPreferenceSummaryToValue(locationPreference);
         }

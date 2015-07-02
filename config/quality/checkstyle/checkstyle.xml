@@ -18,7 +18,7 @@
         <!-- Checks for long lines. !-->
         <module name="LineLength">
             <property name="ignorePattern" value="^$"/>
-            <property name="max" value="120"/>
+            <property name="max" value="180"/>
         </module>
 
         <!-- Checks the number of methods declared in each type. This includes the number of each scope !-->
@@ -248,73 +248,70 @@
         </module>
 
     </module>
-    <module name="TreeWalker">
+    <!--<module name="TreeWalker">-->
 
-        <!-- Validates Javadoc comments to help ensure they are well formed. !-->
-        <!-- See http://checkstyle.sf.net/config_javadoc.html#JavadocStyle !-->
-        <module name="JavadocStyle">
-            <property name="scope" value="private"/>
-            <!--
-            <property name="excludeScope"        value=""/>
-            !-->
-            <property name="checkFirstSentence" value="false"/>
-            <property name="endOfSentenceFormat" value="([.?!][ \t\n\r\f&lt;])|([.?!]$)"/>
-            <property name="checkEmptyJavadoc" value="false"/>
-            <property name="checkHtml" value="true"/>
-            <property name="tokens"
-                value="INTERFACE_DEF, CLASS_DEF, METHOD_DEF, CTOR_DEF, VARIABLE_DEF"/>
-        </module>
+        <!--&lt;!&ndash; Validates Javadoc comments to help ensure they are well formed. !&ndash;&gt;-->
+        <!--&lt;!&ndash; See http://checkstyle.sf.net/config_javadoc.html#JavadocStyle !&ndash;&gt;-->
+        <!--&lt;!&ndash;<module name="JavadocStyle">&ndash;&gt;-->
+            <!--&lt;!&ndash;<property name="scope" value="private"/>&ndash;&gt;-->
+            <!--&lt;!&ndash;&lt;!&ndash;&ndash;&gt;-->
+            <!--&lt;!&ndash;<property name="excludeScope"        value=""/>&ndash;&gt;-->
+            <!--&lt;!&ndash;!&ndash;&gt;&ndash;&gt;-->
+            <!--&lt;!&ndash;<property name="checkFirstSentence" value="false"/>&ndash;&gt;-->
+            <!--&lt;!&ndash;<property name="endOfSentenceFormat" value="([.?!][ \t\n\r\f&lt;])|([.?!]$)"/>&ndash;&gt;-->
+            <!--&lt;!&ndash;<property name="checkEmptyJavadoc" value="false"/>&ndash;&gt;-->
+            <!--&lt;!&ndash;<property name="checkHtml" value="true"/>&ndash;&gt;-->
+            <!--&lt;!&ndash;<property name="tokens"&ndash;&gt;-->
+                <!--&lt;!&ndash;value="INTERFACE_DEF, CLASS_DEF, METHOD_DEF, CTOR_DEF, VARIABLE_DEF"/>&ndash;&gt;-->
+        <!--&lt;!&ndash;</module>&ndash;&gt;-->
 
-        <!-- Checks Javadoc comments for class and interface definitions. !-->
-        <!-- See http://checkstyle.sf.net/config_javadoc.html#JavadocType !-->
-        <module name="JavadocType">
-            <property name="scope" value="package"/>
-            <!--
-            <property name="excludeScope"          value=""/>
-            !-->
-            <!--<property name="authorFormat"          value=""/>!-->
-            <!--<property name="versionFormat"         value=""/>!-->
-            <property name="allowMissingParamTags" value="false"/>
-            <property name="allowUnknownTags" value="false"/>
-            <property name="tokens" value="INTERFACE_DEF, CLASS_DEF"/>
-        </module>
+        <!--&lt;!&ndash; Checks Javadoc comments for class and interface definitions. !&ndash;&gt;-->
+        <!--&lt;!&ndash; See http://checkstyle.sf.net/config_javadoc.html#JavadocType !&ndash;&gt;-->
+        <!--&lt;!&ndash;<module name="JavadocType">&ndash;&gt;-->
+            <!--&lt;!&ndash;<property name="scope" value="package"/>&ndash;&gt;-->
+            <!--&lt;!&ndash;&lt;!&ndash;&ndash;&gt;-->
+            <!--&lt;!&ndash;<property name="excludeScope"          value=""/>&ndash;&gt;-->
+            <!--&lt;!&ndash;!&ndash;&gt;&ndash;&gt;-->
+            <!--&lt;!&ndash;&lt;!&ndash;<property name="authorFormat"          value=""/>!&ndash;&gt;&ndash;&gt;-->
+            <!--&lt;!&ndash;&lt;!&ndash;<property name="versionFormat"         value=""/>!&ndash;&gt;&ndash;&gt;-->
+            <!--&lt;!&ndash;<property name="allowMissingParamTags" value="false"/>&ndash;&gt;-->
+            <!--&lt;!&ndash;<property name="allowUnknownTags" value="false"/>&ndash;&gt;-->
+            <!--&lt;!&ndash;<property name="tokens" value="INTERFACE_DEF, CLASS_DEF"/>&ndash;&gt;-->
+        <!--&lt;!&ndash;</module>&ndash;&gt;-->
 
-        <!-- Checks to ensure that the javadoc tags exist (if required) !-->
-        <!-- See http://checkstyle.sf.net/config_javadoc.html#JavadocMethod !-->
-        <module name="JavadocMethod">
-            <property name="scope" value="package"/>
-            <!--
-            <property name="excludeScope"                 value=""/>
-            !-->
-            <property name="allowUndeclaredRTE" value="false"/>
-            <property name="allowThrowsTagsForSubclasses" value="false"/>
-            <property name="allowMissingParamTags" value="false"/>
-            <property name="allowMissingThrowsTags" value="false"/>
-            <property name="allowMissingReturnTag" value="false"/>
-            <property name="allowMissingJavadoc" value="false"/>
-            <property name="allowMissingPropertyJavadoc" value="false"/>
-            <property name="logLoadErrors" value="true"/>
-            <property name="suppressLoadErrors" value="false"/>
-            <property name="tokens" value="METHOD_DEF, CTOR_DEF"/>
-        </module>
+        <!--&lt;!&ndash; Checks to ensure that the javadoc tags exist (if required) !&ndash;&gt;-->
+        <!--&lt;!&ndash; See http://checkstyle.sf.net/config_javadoc.html#JavadocMethod !&ndash;&gt;-->
+        <!--&lt;!&ndash;<module name="JavadocMethod">&ndash;&gt;-->
+            <!--&lt;!&ndash;<property name="scope" value="package"/>&ndash;&gt;-->
+            <!--&lt;!&ndash;&lt;!&ndash;&ndash;&gt;-->
+            <!--&lt;!&ndash;<property name="excludeScope"                 value=""/>&ndash;&gt;-->
+            <!--&lt;!&ndash;!&ndash;&gt;&ndash;&gt;-->
+            <!--&lt;!&ndash;<property name="allowUndeclaredRTE" value="false"/>&ndash;&gt;-->
+            <!--&lt;!&ndash;<property name="allowThrowsTagsForSubclasses" value="false"/>&ndash;&gt;-->
+            <!--&lt;!&ndash;<property name="allowMissingParamTags" value="false"/>&ndash;&gt;-->
+            <!--&lt;!&ndash;<property name="allowMissingThrowsTags" value="false"/>&ndash;&gt;-->
+            <!--&lt;!&ndash;<property name="allowMissingReturnTag" value="false"/>&ndash;&gt;-->
+            <!--&lt;!&ndash;<property name="allowMissingJavadoc" value="false"/>&ndash;&gt;-->
+            <!--&lt;!&ndash;<property name="allowMissingPropertyJavadoc" value="false"/>&ndash;&gt;-->
+            <!--&lt;!&ndash;<property name="logLoadErrors" value="true"/>&ndash;&gt;-->
+            <!--&lt;!&ndash;<property name="suppressLoadErrors" value="false"/>&ndash;&gt;-->
+            <!--&lt;!&ndash;<property name="tokens" value="METHOD_DEF, CTOR_DEF"/>&ndash;&gt;-->
+        <!--&lt;!&ndash;</module>&ndash;&gt;-->
 
-        <!-- Checks that variables have Javadoc comments. !-->
-        <!-- See http://checkstyle.sf.net/config_javadoc.html#JavadocVariable !-->
-        <module name="JavadocVariable">
-            <property name="scope" value="package"/>
-            <!--
-            <property name="excludeScope" value=""/>
-            !-->
-        </module>
+        <!--&lt;!&ndash; Checks that variables have Javadoc comments. !&ndash;&gt;-->
+        <!--&lt;!&ndash; See http://checkstyle.sf.net/config_javadoc.html#JavadocVariable !&ndash;&gt;-->
+        <!--&lt;!&ndash;<module name="JavadocVariable">&ndash;&gt;-->
+            <!--&lt;!&ndash;<property name="scope" value="package"/>&ndash;&gt;-->
+            <!--&lt;!&ndash;&lt;!&ndash;&ndash;&gt;-->
+            <!--&lt;!&ndash;<property name="excludeScope" value=""/>&ndash;&gt;-->
+            <!--&lt;!&ndash;!&ndash;&gt;&ndash;&gt;-->
+        <!--&lt;!&ndash;</module>&ndash;&gt;-->
 
-    </module>
+    <!--</module>-->
     <module name="TreeWalker">
 
         <!-- Ensure a class has a package declaration. !-->
-        <!-- See http://checkstyle.sf.net/config_coding.html !-->
-        <module name="PackageDeclaration">
-            <property name="ignoreDirectoryName" value="true"/>
-        </module>
+        <module name="PackageDeclaration"/>
 
     </module>
     <module name="TreeWalker">

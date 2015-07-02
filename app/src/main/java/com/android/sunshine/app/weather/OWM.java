@@ -2,7 +2,6 @@ package com.android.sunshine.app.weather;
 
 import com.android.sunshine.app.model.OWMResponse;
 import retrofit.http.GET;
-import retrofit.http.Path;
 import retrofit.http.Query;
 
 public interface OWM {

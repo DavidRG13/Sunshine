@@ -20,15 +20,15 @@ public class DetailWidgetRemoteViewsService extends RemoteViewsService {
         WeatherContract.WeatherEntry.TABLE_NAME + "." + WeatherContract.WeatherEntry._ID, WeatherContract.WeatherEntry.COLUMN_DATE, WeatherContract.WeatherEntry.COLUMN_WEATHER_ID,
         WeatherContract.WeatherEntry.COLUMN_SHORT_DESC, WeatherContract.WeatherEntry.COLUMN_MAX_TEMP, WeatherContract.WeatherEntry.COLUMN_MIN_TEMP
     };
-    static final int INDEX_WEATHER_ID = 0;
-    static final int INDEX_WEATHER_DATE = 1;
-    static final int INDEX_WEATHER_CONDITION_ID = 2;
-    static final int INDEX_WEATHER_DESC = 3;
-    static final int INDEX_WEATHER_MAX_TEMP = 4;
-    static final int INDEX_WEATHER_MIN_TEMP = 5;
+    private static final int INDEX_WEATHER_ID = 0;
+    private static final int INDEX_WEATHER_DATE = 1;
+    private static final int INDEX_WEATHER_CONDITION_ID = 2;
+    private static final int INDEX_WEATHER_DESC = 3;
+    private static final int INDEX_WEATHER_MAX_TEMP = 4;
+    private static final int INDEX_WEATHER_MIN_TEMP = 5;
 
     @Override
-    public RemoteViewsFactory onGetViewFactory(Intent intent) {
+    public RemoteViewsFactory onGetViewFactory(final Intent intent) {
         return new RemoteViewsFactory() {
             private Cursor data = null;
 
@@ -62,9 +62,9 @@ public class DetailWidgetRemoteViewsService extends RemoteViewsService {
             }
 
             @Override
-            public RemoteViews getViewAt(int position) {
-                if (position == AdapterView.INVALID_POSITION ||
-                    data == null || !data.moveToPosition(position)) {
+            public RemoteViews getViewAt(final int position) {
+                if (position == AdapterView.INVALID_POSITION
+                    || data == null || !data.moveToPosition(position)) {
                     return null;
                 }
                 RemoteViews views = new RemoteViews(getPackageName(), R.layout.widget_detail_list_item);
@@ -95,7 +95,7 @@ public class DetailWidgetRemoteViewsService extends RemoteViewsService {
             }
 
             @TargetApi(Build.VERSION_CODES.ICE_CREAM_SANDWICH_MR1)
-            private void setRemoteContentDescription(RemoteViews views, String description) {
+            private void setRemoteContentDescription(final RemoteViews views, final String description) {
                 views.setContentDescription(R.id.widget_icon, description);
             }
 
@@ -110,8 +110,10 @@ public class DetailWidgetRemoteViewsService extends RemoteViewsService {
             }
 
             @Override
-            public long getItemId(int position) {
-                if (data.moveToPosition(position)) return data.getLong(INDEX_WEATHER_ID);
+            public long getItemId(final int position) {
+                if (data.moveToPosition(position)) {
+                    return data.getLong(INDEX_WEATHER_ID);
+                }
                 return position;
             }
 

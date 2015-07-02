@@ -19,7 +19,7 @@ import com.android.sunshine.app.weather.WeatherRepository;
 @TargetApi(Build.VERSION_CODES.HONEYCOMB)
 public class DetailWidgetProvider extends AppWidgetProvider {
 
-    public void onUpdate(Context context, AppWidgetManager appWidgetManager, int[] appWidgetIds) {
+    public void onUpdate(final Context context, final AppWidgetManager appWidgetManager, final int[] appWidgetIds) {
         for (int appWidgetId : appWidgetIds) {
             RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.widget_detail);
 
@@ -34,7 +34,9 @@ public class DetailWidgetProvider extends AppWidgetProvider {
             }
             boolean useDetailActivity = context.getResources().getBoolean(R.bool.use_detail_activity);
             Intent clickIntentTemplate = useDetailActivity ? new Intent(context, DetailActivity.class) : new Intent(context, MainActivity.class);
-            PendingIntent clickPendingIntentTemplate = TaskStackBuilder.create(context).addNextIntentWithParentStack(clickIntentTemplate).getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT);
+            PendingIntent clickPendingIntentTemplate = TaskStackBuilder.create(context)
+                .addNextIntentWithParentStack(clickIntentTemplate)
+                .getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT);
             views.setPendingIntentTemplate(R.id.widget_list, clickPendingIntentTemplate);
             views.setEmptyView(R.id.widget_list, R.id.widget_empty);
 
@@ -43,7 +45,7 @@ public class DetailWidgetProvider extends AppWidgetProvider {
     }
 
     @Override
-    public void onReceive(@NonNull Context context, @NonNull Intent intent) {
+    public void onReceive(@NonNull final Context context, @NonNull final Intent intent) {
         super.onReceive(context, intent);
         if (WeatherRepository.ACTION_DATA_UPDATED.equals(intent.getAction())) {
             AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(context);
@@ -58,7 +60,7 @@ public class DetailWidgetProvider extends AppWidgetProvider {
      * @param views RemoteViews to set the RemoteAdapter
      */
     @TargetApi(Build.VERSION_CODES.ICE_CREAM_SANDWICH)
-    private void setRemoteAdapter(Context context, @NonNull final RemoteViews views) {
+    private void setRemoteAdapter(final Context context, @NonNull final RemoteViews views) {
         views.setRemoteAdapter(R.id.widget_list, new Intent(context, DetailWidgetRemoteViewsService.class));
     }
 
@@ -68,7 +70,7 @@ public class DetailWidgetProvider extends AppWidgetProvider {
      * @param views RemoteViews to set the RemoteAdapter
      */
     @SuppressWarnings("deprecation")
-    private void setRemoteAdapterV11(Context context, @NonNull final RemoteViews views) {
+    private void setRemoteAdapterV11(final Context context, @NonNull final RemoteViews views) {
         views.setRemoteAdapter(0, R.id.widget_list, new Intent(context, DetailWidgetRemoteViewsService.class));
     }
 }

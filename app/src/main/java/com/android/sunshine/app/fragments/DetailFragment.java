@@ -93,7 +93,7 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
         ButterKnife.bind(this, view);
         locationProvider = new PreferenceLocationProvider(getActivity());
         temperatureFormatter = new TemperatureFormatter(getActivity());
-        dateFormatter = new DateFormatter(getActivity());
+        dateFormatter = new DateFormatter(getString(R.string.today), getString(R.string.tomorrow));
         return view;
     }
 

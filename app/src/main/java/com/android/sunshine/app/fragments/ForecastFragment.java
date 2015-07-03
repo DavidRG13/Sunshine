@@ -89,7 +89,7 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
         forecastList.setLayoutManager(new LinearLayoutManager(getActivity()));
         forecastList.setHasFixedSize(true);
 
-        adapter = new ForecastCursorAdapter(getActivity(), emptyView, this, choiceMode, new TemperatureFormatter(getActivity()), new DateFormatter(getActivity()));
+        adapter = new ForecastCursorAdapter(getActivity(), emptyView, this, choiceMode, new TemperatureFormatter(getActivity()), new DateFormatter(getString(R.string.today), getString(R.string.tomorrow)));
         forecastList.setAdapter(adapter);
         if (savedInstanceState != null) {
             adapter.onRestoreInstanceState(savedInstanceState);

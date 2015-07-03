@@ -36,7 +36,7 @@ public class DetailWidgetRemoteViewsService extends RemoteViewsService {
 
         final LocationProvider locationProvider = new PreferenceLocationProvider(this);
         final TemperatureFormatter temperatureFormatter = new TemperatureFormatter(this);
-        final DateFormatter dateFormatter = new DateFormatter(this);
+        final DateFormatter dateFormatter = new DateFormatter(getString(R.string.today), getString(R.string.tomorrow));
 
         return new RemoteViewsFactory() {
             private Cursor data = null;

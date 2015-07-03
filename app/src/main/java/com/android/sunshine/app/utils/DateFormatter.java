@@ -9,10 +9,12 @@ import java.util.Locale;
 
 public class DateFormatter {
 
-    private Context context;
+    private final String todayString;
+    private final String tomorrowString;
 
-    public DateFormatter(final Context context) {
-        this.context = context;
+    public DateFormatter(final String todayString, final String tomorrowString) {
+        this.todayString = todayString;
+        this.tomorrowString = tomorrowString;
     }
 
     public String getFriendlyDay(final long dateInMillis, final boolean displayLongToday) {
@@ -20,8 +22,7 @@ public class DateFormatter {
         int today = getDayOfYearForToday();
 
         if (displayLongToday && inputDay == today) {
-            int formatId = R.string.format_full_friendly_date;
-            return context.getString(formatId, context.getString(R.string.today), getFormattedMonthDay(dateInMillis));
+            return todayString + ", " + getFormattedMonthDay(dateInMillis);
         } else if (inputDay < today + 7) {
             return getDayName(dateInMillis);
         } else {
@@ -40,9 +41,9 @@ public class DateFormatter {
         int inputDay = getDayOfYearFor(dateInMillis);
         int today = getDayOfYearForToday();
         if (inputDay == today) {
-            return context.getString(R.string.today);
+            return todayString;
         } else if (inputDay == today + 1) {
-            return context.getString(R.string.tomorrow);
+            return tomorrowString;
         } else {
             SimpleDateFormat dayFormat = new SimpleDateFormat("EEEE", Locale.getDefault());
             return dayFormat.format(dateInMillis);

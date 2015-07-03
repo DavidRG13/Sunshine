@@ -13,6 +13,7 @@ import com.android.sunshine.app.R;
 import com.android.sunshine.app.location.LocationProvider;
 import com.android.sunshine.app.location.PreferenceLocationProvider;
 import com.android.sunshine.app.model.WeatherContract;
+import com.android.sunshine.app.utils.DateFormatter;
 import com.android.sunshine.app.utils.TemperatureFormatter;
 import com.android.sunshine.app.utils.Utilities;
 
@@ -35,6 +36,7 @@ public class DetailWidgetRemoteViewsService extends RemoteViewsService {
 
         final LocationProvider locationProvider = new PreferenceLocationProvider(this);
         final TemperatureFormatter temperatureFormatter = new TemperatureFormatter(this);
+        final DateFormatter dateFormatter = new DateFormatter(this);
 
         return new RemoteViewsFactory() {
             private Cursor data = null;
@@ -78,7 +80,7 @@ public class DetailWidgetRemoteViewsService extends RemoteViewsService {
                 int weatherArtResourceId = Utilities.getIconResourceForWeatherCondition(weatherId);
                 String description = data.getString(INDEX_WEATHER_DESC);
                 long dateInMillis = data.getLong(INDEX_WEATHER_DATE);
-                String formattedDate = Utilities.getFriendlyDay(DetailWidgetRemoteViewsService.this, dateInMillis, false);
+                String formattedDate = dateFormatter.getFriendlyDay(dateInMillis, false);
                 double maxTemp = data.getDouble(INDEX_WEATHER_MAX_TEMP);
                 double minTemp = data.getDouble(INDEX_WEATHER_MIN_TEMP);
                 views.setImageViewResource(R.id.widget_icon, weatherArtResourceId);

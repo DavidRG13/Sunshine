@@ -27,6 +27,7 @@ import com.android.sunshine.app.activities.DetailActivity;
 import com.android.sunshine.app.location.LocationProvider;
 import com.android.sunshine.app.location.PreferenceLocationProvider;
 import com.android.sunshine.app.model.WeatherContract;
+import com.android.sunshine.app.utils.DateFormatter;
 import com.android.sunshine.app.utils.TemperatureFormatter;
 import com.android.sunshine.app.utils.Utilities;
 import java.util.Locale;
@@ -63,6 +64,7 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
     private String weatherData;
     private LocationProvider locationProvider;
     private TemperatureFormatter temperatureFormatter;
+    private DateFormatter dateFormatter;
 
     public DetailFragment() {
         setHasOptionsMenu(true);
@@ -91,6 +93,7 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
         ButterKnife.bind(this, view);
         locationProvider = new PreferenceLocationProvider(getActivity());
         temperatureFormatter = new TemperatureFormatter(getActivity());
+        dateFormatter = new DateFormatter(getActivity());
         return view;
     }
 
@@ -151,7 +154,7 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
             final String max = temperatureFormatter.format(maxTemp);
             final String min = temperatureFormatter.format(minTemp);
 
-            dateView.setText(Utilities.getFullFriendlyDayString(getActivity(), date));
+            dateView.setText(dateFormatter.getFullFriendlyDayString(getActivity(), date));
             mDescriptionView.setText(description);
             mHighTempView.setText(max);
             mLowTempView.setText(min);

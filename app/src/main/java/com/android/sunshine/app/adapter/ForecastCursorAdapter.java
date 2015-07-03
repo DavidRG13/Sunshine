@@ -13,6 +13,7 @@ import android.widget.TextView;
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import com.android.sunshine.app.R;
+import com.android.sunshine.app.utils.DateFormatter;
 import com.android.sunshine.app.utils.TemperatureFormatter;
 import com.android.sunshine.app.utils.Utilities;
 
@@ -29,14 +30,16 @@ public class ForecastCursorAdapter extends RecyclerView.Adapter<ForecastCursorAd
     private View emptyView;
     private OnAdapterItemClickListener onAdapterItemClickListener;
     private final TemperatureFormatter temperatureFormatter;
+    private final DateFormatter dateFormatter;
     private final ItemChoiceManager itemChoiceManager;
 
     public ForecastCursorAdapter(final Context context, final View emptyView, final OnAdapterItemClickListener onAdapterItemClickListener,
-        final int choiceMode, final TemperatureFormatter temperatureFormatter) {
+        final int choiceMode, final TemperatureFormatter temperatureFormatter, final DateFormatter dateFormatter) {
         this.context = context;
         this.emptyView = emptyView;
         this.onAdapterItemClickListener = onAdapterItemClickListener;
         this.temperatureFormatter = temperatureFormatter;
+        this.dateFormatter = dateFormatter;
         itemChoiceManager = new ItemChoiceManager(this);
         itemChoiceManager.setChoiceMode(choiceMode);
     }
@@ -81,7 +84,7 @@ public class ForecastCursorAdapter extends RecyclerView.Adapter<ForecastCursorAd
             viewHolder.forecastIcon.setImageResource(Utilities.getIconResourceForWeatherCondition(weatherId));
         }
 
-        viewHolder.dateWeather.setText(Utilities.getFriendlyDay(context, weatherDate, useLongToday));
+        viewHolder.dateWeather.setText(dateFormatter.getFriendlyDay(weatherDate, useLongToday));
         viewHolder.forecastDescription.setText(descriptionWeather);
         viewHolder.max.setText(temperatureFormatter.format(maxTemp));
         viewHolder.min.setText(temperatureFormatter.format(minTemp));

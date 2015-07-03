@@ -5,11 +5,8 @@ import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.preference.PreferenceManager;
-import android.text.format.Time;
 import com.android.sunshine.app.R;
 import com.android.sunshine.app.sync.ServerStatus;
-import java.text.SimpleDateFormat;
-import java.util.Locale;
 
 public final class Utilities {
 
@@ -30,48 +27,6 @@ public final class Utilities {
     public static boolean notificationsEnabled(final Context context) {
         final SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
         return prefs.getBoolean(context.getString(R.string.pref_enable_notifications_key), Boolean.parseBoolean(context.getString(R.string.pref_enable_notifications_default)));
-    }
-
-    public static String getFriendlyDay(final Context context, final long dateInMillis, final boolean displayLongToday) {
-        Time time = new Time();
-        time.setToNow();
-        int julianDay = Time.getJulianDay(dateInMillis, time.gmtoff);
-        int currentJulianDay = Time.getJulianDay(System.currentTimeMillis(), time.gmtoff);
-
-        if (displayLongToday && julianDay == currentJulianDay) {
-            String today = context.getString(R.string.today);
-            int formatId = R.string.format_full_friendly_date;
-            return context.getString(formatId, today, getFormattedMonthDay(dateInMillis));
-        } else if (julianDay < currentJulianDay + 7) {
-            return getDayName(context, dateInMillis);
-        } else {
-            SimpleDateFormat shortenedDateFormat = new SimpleDateFormat("EEE MMM dd", Locale.getDefault());
-            return shortenedDateFormat.format(dateInMillis);
-        }
-    }
-
-    public static String getDayName(Context context, long dateInMillis) {
-        Time t = new Time();
-        t.setToNow();
-        int julianDay = Time.getJulianDay(dateInMillis, t.gmtoff);
-        int currentJulianDay = Time.getJulianDay(System.currentTimeMillis(), t.gmtoff);
-        if (julianDay == currentJulianDay) {
-            return context.getString(R.string.today);
-        } else if (julianDay == currentJulianDay + 1) {
-            return context.getString(R.string.tomorrow);
-        } else {
-            Time time = new Time();
-            time.setToNow();
-            SimpleDateFormat dayFormat = new SimpleDateFormat("EEEE", Locale.getDefault());
-            return dayFormat.format(dateInMillis);
-        }
-    }
-
-    public static String getFormattedMonthDay(final long dateInMillis) {
-        Time time = new Time();
-        time.setToNow();
-        SimpleDateFormat monthDayFormat = new SimpleDateFormat("MMMM dd", Locale.getDefault());
-        return monthDayFormat.format(dateInMillis);
     }
 
     public static int getIconResourceForWeatherCondition(final int weatherId) {
@@ -146,11 +101,5 @@ public final class Utilities {
         SharedPreferences.Editor editor = preferences.edit();
         editor.putInt(context.getString(R.string.prefs_server_status), ServerStatus.SERVER_STATUS_UNKNOWN);
         editor.apply();
-    }
-
-    public static String getFullFriendlyDayString(final Context context, final long dateInMillis) {
-        String day = getDayName(context, dateInMillis);
-        int formatId = R.string.format_full_friendly_date;
-        return context.getString(formatId, day, getFormattedMonthDay(dateInMillis));
     }
 }

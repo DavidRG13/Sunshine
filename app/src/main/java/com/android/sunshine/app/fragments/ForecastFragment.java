@@ -40,6 +40,7 @@ import com.android.sunshine.app.location.PreferenceLocationProvider;
 import com.android.sunshine.app.model.WeatherContract;
 import com.android.sunshine.app.sync.ServerStatus;
 import com.android.sunshine.app.sync.SyncAdapter;
+import com.android.sunshine.app.utils.DateFormatter;
 import com.android.sunshine.app.utils.TemperatureFormatter;
 import com.android.sunshine.app.utils.Utilities;
 import java.util.Date;
@@ -88,7 +89,7 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
         forecastList.setLayoutManager(new LinearLayoutManager(getActivity()));
         forecastList.setHasFixedSize(true);
 
-        adapter = new ForecastCursorAdapter(getActivity(), emptyView, this, choiceMode, new TemperatureFormatter(getActivity()));
+        adapter = new ForecastCursorAdapter(getActivity(), emptyView, this, choiceMode, new TemperatureFormatter(getActivity()), new DateFormatter(getActivity()));
         forecastList.setAdapter(adapter);
         if (savedInstanceState != null) {
             adapter.onRestoreInstanceState(savedInstanceState);

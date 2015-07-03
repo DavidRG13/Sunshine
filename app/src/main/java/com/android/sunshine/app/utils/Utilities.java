@@ -12,23 +12,6 @@ public final class Utilities {
 
     private Utilities() { }
 
-    public static long getLastNotification(final Context context) {
-        final SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
-        return prefs.getLong(context.getString(R.string.pref_last_notification), 0);
-    }
-
-    public static void setLastNotification(final Context context) {
-        final SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
-        final SharedPreferences.Editor editor = prefs.edit();
-        editor.putLong(context.getString(R.string.pref_last_notification), System.currentTimeMillis());
-        editor.apply();
-    }
-
-    public static boolean notificationsEnabled(final Context context) {
-        final SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
-        return prefs.getBoolean(context.getString(R.string.pref_enable_notifications_key), Boolean.parseBoolean(context.getString(R.string.pref_enable_notifications_default)));
-    }
-
     public static int getIconResourceForWeatherCondition(final int weatherId) {
         if (weatherId >= 200 && weatherId <= 232) {
             return R.drawable.ic_storm;

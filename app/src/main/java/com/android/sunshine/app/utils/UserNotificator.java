@@ -4,6 +4,8 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.TaskStackBuilder;
 import com.android.sunshine.app.R;
@@ -24,8 +26,8 @@ public class UserNotificator {
     }
 
     public void notifyWeather(final OWMWeatherForecast owmWeatherForecast) {
-        if (Utilities.notificationsEnabled(context)) {
-            long lastSync = Utilities.getLastNotification(context);
+        if (notificationsEnabled()) {
+            long lastSync = getLastNotification();
 
             if (System.currentTimeMillis() - lastSync >= DAY_IN_MILLIS) {
 
@@ -55,8 +57,25 @@ public class UserNotificator {
                 NotificationManager mNotificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
                 mNotificationManager.notify(WEATHER_NOTIFICATION_ID, mBuilder.build());
 
-                Utilities.setLastNotification(context);
+                setLastNotification();
             }
         }
+    }
+
+    private boolean notificationsEnabled() {
+        final SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+        return prefs.getBoolean(context.getString(R.string.pref_enable_notifications_key), Boolean.parseBoolean(context.getString(R.string.pref_enable_notifications_default)));
+    }
+
+    public long getLastNotification() {
+        final SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+        return prefs.getLong(context.getString(R.string.pref_last_notification), 0);
+    }
+
+    public void setLastNotification() {
+        final SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+        final SharedPreferences.Editor editor = prefs.edit();
+        editor.putLong(context.getString(R.string.pref_last_notification), System.currentTimeMillis());
+        editor.apply();
     }
 }

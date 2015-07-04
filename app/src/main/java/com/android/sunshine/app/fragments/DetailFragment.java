@@ -154,7 +154,7 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
             final String max = temperatureFormatter.format(maxTemp);
             final String min = temperatureFormatter.format(minTemp);
 
-            dateView.setText(dateFormatter.getFullFriendlyDayString(getActivity(), date));
+            dateView.setText(dateFormatter.getFullFriendlyDayString(date));
             mDescriptionView.setText(description);
             mHighTempView.setText(max);
             mLowTempView.setText(min);

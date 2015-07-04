@@ -1,7 +1,5 @@
 package com.android.sunshine.app.utils;
 
-import android.content.Context;
-import com.android.sunshine.app.R;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
@@ -22,7 +20,7 @@ public class DateFormatter {
         int today = getDayOfYearForToday();
 
         if (displayLongToday && inputDay == today) {
-            return todayString + ", " + getFormattedMonthDay(dateInMillis);
+            return String.format("%s, %s", todayString, getFormattedMonthDay(dateInMillis));
         } else if (inputDay < today + 7) {
             return getDayName(dateInMillis);
         } else {
@@ -31,10 +29,8 @@ public class DateFormatter {
         }
     }
 
-    public String getFullFriendlyDayString(final Context context, final long dateInMillis) {
-        String day = getDayName(dateInMillis);
-        int formatId = R.string.format_full_friendly_date;
-        return context.getString(formatId, day, getFormattedMonthDay(dateInMillis));
+    public String getFullFriendlyDayString(final long dateInMillis) {
+        return String.format("%s , %s", getDayName(dateInMillis), getFormattedMonthDay(dateInMillis));
     }
 
     private String getDayName(long dateInMillis) {

@@ -13,7 +13,7 @@ import static com.android.sunshine.app.model.WeatherContract.WeatherEntry;
 public class DbUtilities {
 
     public static final String DEFAULT_LOCATION_SETTINGS = "99705";
-    public static final String DEFAULT_DATE = "20141205";
+    public static final long DEFAULT_DATE = 1417794745000L;
 
     static void dropDb(Context context) {
         context.deleteDatabase(DBHelper.DATABASE_NAME);

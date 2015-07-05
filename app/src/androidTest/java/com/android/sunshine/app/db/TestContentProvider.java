@@ -109,7 +109,7 @@ public class TestContentProvider extends AndroidTestCase {
         insertWeather(weatherValues);
 
         Cursor weatherCursor = getContentResolver().query(WeatherEntry
-                        .buildWeatherLocationWithStartDate(DbUtilities.DEFAULT_LOCATION_SETTINGS, "20151205"),
+                        .buildWeatherLocationWithStartDate(DbUtilities.DEFAULT_LOCATION_SETTINGS, 1417794745000L),
                 null, null, null, null);
         DbUtilities.validateCursor(weatherCursor, weatherValues);
     }
@@ -157,10 +157,9 @@ public class TestContentProvider extends AndroidTestCase {
         // vnd.android.cursor.dir/com.example.android.sunshine.app/weather
         assertEquals(WeatherEntry.CONTENT_TYPE, type);
 
-        String testDate = "20140612";
         // content://com.example.android.sunshine.app/weather/94074/20140612
         type = getContentResolver().getType(
-                WeatherEntry.buildWeatherLocationWithDate(testLocation, testDate));
+                WeatherEntry.buildWeatherLocationWithDate(testLocation, 1417794745000L));
         // vnd.android.cursor.item/com.example.android.sunshine.app/weather
         assertEquals(WeatherEntry.CONTENT_ITEM_TYPE, type);
 

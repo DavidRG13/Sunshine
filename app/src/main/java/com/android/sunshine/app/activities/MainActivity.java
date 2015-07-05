@@ -1,16 +1,11 @@
 package com.android.sunshine.app.activities;
 
-import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.app.ActivityOptionsCompat;
-import android.support.v4.util.Pair;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
 import com.android.sunshine.app.R;
 import com.android.sunshine.app.adapter.ForecastCursorAdapter;
 import com.android.sunshine.app.callbacks.ItemClickCallback;
@@ -18,15 +13,19 @@ import com.android.sunshine.app.fragments.DetailFragment;
 import com.android.sunshine.app.fragments.ForecastFragment;
 import com.android.sunshine.app.model.WeatherContract;
 import com.android.sunshine.app.sync.SyncAdapter;
+import com.android.sunshine.app.utils.IntentLauncher;
 
 public class MainActivity extends AppCompatActivity implements ItemClickCallback {
 
     private boolean twoPane;
+    private IntentLauncher intentLauncher;
 
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        intentLauncher = new IntentLauncher();
 
         Uri contentUri = getIntent() != null ? getIntent().getData() : null;
 
@@ -67,7 +66,7 @@ public class MainActivity extends AppCompatActivity implements ItemClickCallback
     @Override
     public boolean onOptionsItemSelected(final MenuItem item) {
         if (item.getItemId() == R.id.action_settings) {
-            startActivity(new Intent(this, SettingsActivity.class));
+            intentLauncher.launchSettingsActivity(this);
             return true;
         }
         return super.onOptionsItemSelected(item);
@@ -84,11 +83,7 @@ public class MainActivity extends AppCompatActivity implements ItemClickCallback
                     .replace(R.id.weather_detail_container, detailFragment)
                     .commitAllowingStateLoss();
         } else {
-            final Intent intent = new Intent(this, DetailActivity.class);
-            intent.putExtra(DetailActivity.DATE_KEY, date);
-            ActivityOptionsCompat activityOptions = ActivityOptionsCompat.makeSceneTransitionAnimation(this,
-                new Pair<View, String>(viewHolder.forecastIcon, getString(R.string.detail_icon_transition_name)));
-            ActivityCompat.startActivity(this, intent, activityOptions.toBundle());
+            intentLauncher.transitionToDetails(this, date, viewHolder.forecastIcon);
         }
     }
 }

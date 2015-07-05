@@ -2,7 +2,6 @@ package com.android.sunshine.app.fragments;
 
 import android.annotation.TargetApi;
 import android.app.Activity;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.content.res.TypedArray;
@@ -41,6 +40,7 @@ import com.android.sunshine.app.model.WeatherContract;
 import com.android.sunshine.app.sync.ServerStatus;
 import com.android.sunshine.app.sync.SyncAdapter;
 import com.android.sunshine.app.utils.DateFormatter;
+import com.android.sunshine.app.utils.IntentLauncher;
 import com.android.sunshine.app.utils.TemperatureFormatter;
 import com.android.sunshine.app.utils.Utilities;
 import java.util.Date;
@@ -67,6 +67,7 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
     private boolean holdForTransition;
     private long mInitialSelectedDate = -1;
     private LocationProvider locationProvider;
+    private IntentLauncher intentLauncher;
 
     public ForecastFragment() {
     }
@@ -86,6 +87,7 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
         final View rootView = inflater.inflate(R.layout.fragment_main, container, false);
         ButterKnife.bind(this, rootView);
         locationProvider = new PreferenceLocationProvider(getActivity());
+        intentLauncher = new IntentLauncher();
         forecastList.setLayoutManager(new LinearLayoutManager(getActivity()));
         forecastList.setHasFixedSize(true);
 
@@ -293,13 +295,9 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
                 c.moveToPosition(0);
                 String posLat = c.getString(c.getColumnIndex(LocationEntry.COLUMN_COORD_LAT));
                 String posLong = c.getString(c.getColumnIndex(LocationEntry.COLUMN_COORD_LONG));
-                Uri geoLocation = Uri.parse("geo:" + posLat + "," + posLong);
 
-                System.out.println("geoLocation = " + geoLocation);
-                Intent intent = new Intent(Intent.ACTION_VIEW);
-                intent.setData(geoLocation);
-
-                startActivity(intent);
+                intentLauncher.displayMapWithLocation(getActivity(), posLat, posLong);
+                // TODO: mejorar esto
             }
         }
     }

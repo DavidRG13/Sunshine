@@ -1,17 +1,34 @@
 package com.android.sunshine.app.sync;
 
-import android.support.annotation.IntDef;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
+import com.android.sunshine.app.R;
+import java.net.HttpURLConnection;
 
-@Retention(RetentionPolicy.SOURCE)
-@IntDef({ ServerStatus.SERVER_STATUS_OK, ServerStatus.SERVER_STATUS_DOWN, ServerStatus.SERVER_STATUS_INVALID,
-    ServerStatus.SERVER_STATUS_UNKNOWN, ServerStatus.SERVER_STATUS_LOCATION_INVALID })
-public @interface ServerStatus {
+public enum ServerStatus {
 
-    int SERVER_STATUS_OK = 0;
-    int SERVER_STATUS_DOWN = 1;
-    int SERVER_STATUS_INVALID = 2;
-    int SERVER_STATUS_UNKNOWN = 3;
-    int SERVER_STATUS_LOCATION_INVALID = 4;
+    SERVER_STATUS_OK(0),
+    SERVER_STATUS_DOWN(R.string.server_down),
+    SERVER_STATUS_INVALID(R.string.server_error),
+    SERVER_STATUS_UNKNOWN(R.string.noWeatherInfoAvailable),
+    SERVER_STATUS_LOCATION_INVALID(R.string.invalid_location),
+    NO_NETWORK_AVAILABLE(R.string.noWeatherInfoAvailableNoNetwork);
+
+    private final int messageResource;
+
+    ServerStatus(final int messageResource) {
+        this.messageResource = messageResource;
+    }
+
+    public static ServerStatus fromResponseCode(final int responseCode) {
+        if (responseCode == HttpURLConnection.HTTP_OK) {
+            return SERVER_STATUS_OK;
+        } else if (responseCode == HttpURLConnection.HTTP_NOT_FOUND) {
+            return SERVER_STATUS_LOCATION_INVALID;
+        } else {
+            return ServerStatus.SERVER_STATUS_DOWN;
+        }
+    }
+
+    public int getMessageResource() {
+        return messageResource;
+    }
 }

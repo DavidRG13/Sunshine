@@ -1,12 +1,6 @@
 package com.android.sunshine.app.utils;
 
-import android.content.Context;
-import android.content.SharedPreferences;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
-import android.preference.PreferenceManager;
 import com.android.sunshine.app.R;
-import com.android.sunshine.app.sync.ServerStatus;
 
 public final class Utilities {
 
@@ -64,25 +58,5 @@ public final class Utilities {
             return R.drawable.art_clouds;
         }
         return -1;
-    }
-
-    public static boolean isNetworkAvailable(final Context context) {
-        ConnectivityManager connectivityManager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
-        NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
-        return activeNetworkInfo != null && activeNetworkInfo.isConnectedOrConnecting();
-    }
-
-    @SuppressWarnings("ResourceType")
-    @ServerStatus
-    public static int getServerStatus(final Context context) {
-        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
-        return preferences.getInt(context.getString(R.string.prefs_server_status), ServerStatus.SERVER_STATUS_UNKNOWN);
-    }
-
-    public static void resetServerStatus(final Context context) {
-        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
-        SharedPreferences.Editor editor = preferences.edit();
-        editor.putInt(context.getString(R.string.prefs_server_status), ServerStatus.SERVER_STATUS_UNKNOWN);
-        editor.apply();
     }
 }

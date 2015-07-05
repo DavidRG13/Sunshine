@@ -2,10 +2,15 @@ package com.android.sunshine.app.utils;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.preference.PreferenceManager;
 import com.android.sunshine.app.R;
 import com.android.sunshine.app.sync.ServerStatus;
-import java.net.HttpURLConnection;
+
+import static com.android.sunshine.app.sync.ServerStatus.NO_NETWORK_AVAILABLE;
+import static com.android.sunshine.app.sync.ServerStatus.SERVER_STATUS_OK;
+import static com.android.sunshine.app.sync.ServerStatus.SERVER_STATUS_UNKNOWN;
 
 public class ServerStatusChanger {
 
@@ -16,19 +21,36 @@ public class ServerStatusChanger {
     }
 
     public void fromResponseCode(final int responseCode) {
-        if (responseCode == HttpURLConnection.HTTP_OK) {
-            setServerStatus(ServerStatus.SERVER_STATUS_OK);
-        } else if (responseCode == HttpURLConnection.HTTP_NOT_FOUND) {
-            setServerStatus(ServerStatus.SERVER_STATUS_LOCATION_INVALID);
-        } else {
-            setServerStatus(ServerStatus.SERVER_STATUS_DOWN);
-        }
+        setServerStatus(ServerStatus.fromResponseCode(responseCode));
     }
 
-    private void setServerStatus(@ServerStatus final int serverStatus) {
+    public boolean isNetworkAvailable() {
+        ConnectivityManager connectivityManager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
+        return activeNetworkInfo != null && activeNetworkInfo.isConnectedOrConnecting();
+    }
+
+    public ServerStatus getServerStatus() {
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
+        String string = preferences.getString(context.getString(R.string.prefs_server_status), SERVER_STATUS_UNKNOWN.toString());
+        ServerStatus serverStatus = ServerStatus.valueOf(string);
+        if (serverStatus == SERVER_STATUS_OK && !isNetworkAvailable()) {
+            return NO_NETWORK_AVAILABLE;
+        }
+        return serverStatus;
+    }
+
+    public void resetServerStatus() {
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
         SharedPreferences.Editor editor = preferences.edit();
-        editor.putInt(context.getString(R.string.prefs_server_status), serverStatus);
+        editor.putString(context.getString(R.string.prefs_server_status), SERVER_STATUS_UNKNOWN.toString());
+        editor.apply();
+    }
+
+    private void setServerStatus(final ServerStatus serverStatus) {
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
+        SharedPreferences.Editor editor = preferences.edit();
+        editor.putString(context.getString(R.string.prefs_server_status), serverStatus.toString());
         editor.apply();
     }
 }

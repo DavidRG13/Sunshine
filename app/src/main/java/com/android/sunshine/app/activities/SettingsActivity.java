@@ -11,11 +11,12 @@ import android.preference.PreferenceActivity;
 import android.preference.PreferenceManager;
 import com.android.sunshine.app.R;
 import com.android.sunshine.app.model.WeatherContract;
-import com.android.sunshine.app.sync.ServerStatus;
 import com.android.sunshine.app.sync.SyncAdapter;
-import com.android.sunshine.app.utils.Utilities;
+import com.android.sunshine.app.utils.ServerStatusChanger;
 
 public class SettingsActivity extends PreferenceActivity implements Preference.OnPreferenceChangeListener, SharedPreferences.OnSharedPreferenceChangeListener {
+
+    private ServerStatusChanger serverStatusChanger;
 
     @Override
     public void onCreate(final Bundle savedInstanceState) {
@@ -28,6 +29,7 @@ public class SettingsActivity extends PreferenceActivity implements Preference.O
     @Override
     protected void onResume() {
         super.onResume();
+        serverStatusChanger = new ServerStatusChanger(this);
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
         preferences.registerOnSharedPreferenceChangeListener(this);
     }
@@ -67,18 +69,17 @@ public class SettingsActivity extends PreferenceActivity implements Preference.O
                 preference.setSummary(listPreference.getEntries()[prefIndex]);
             }
         } else if (key.equals(getString(R.string.pref_location_key))) {
-            @ServerStatus int status = Utilities.getServerStatus(this);
-            switch (status) {
-                case ServerStatus.SERVER_STATUS_OK:
+            switch (serverStatusChanger.getServerStatus()) {
+                case SERVER_STATUS_OK:
                     preference.setSummary(stringValue);
                     break;
-                case ServerStatus.SERVER_STATUS_UNKNOWN:
+                case SERVER_STATUS_UNKNOWN:
                     preference.setSummary(getString(R.string.prefs_location_unknown_description, value.toString()));
                     break;
-                case ServerStatus.SERVER_STATUS_INVALID:
+                case SERVER_STATUS_INVALID:
                     preference.setSummary(getString(R.string.prefs_location_invalid_error_description, value.toString()));
                     break;
-                case ServerStatus.SERVER_STATUS_LOCATION_INVALID:
+                case SERVER_STATUS_LOCATION_INVALID:
                     preference.setSummary(getString(R.string.prefs_location_invalid_error_description, value.toString()));
                     break;
                 default:
@@ -92,7 +93,7 @@ public class SettingsActivity extends PreferenceActivity implements Preference.O
     @Override
     public void onSharedPreferenceChanged(final SharedPreferences sharedPreferences, final String key) {
         if (key.equals(getString(R.string.pref_location_key))) {
-            Utilities.resetServerStatus(this);
+            serverStatusChanger.resetServerStatus();
             SyncAdapter.syncImmediately(this);
         } else if (key.equals(getString(R.string.pref_unit_key))) {
             getContentResolver().notifyChange(WeatherContract.WeatherEntry.CONTENT_URI, null);

@@ -37,12 +37,11 @@ import com.android.sunshine.app.callbacks.ItemClickCallback;
 import com.android.sunshine.app.location.LocationProvider;
 import com.android.sunshine.app.location.PreferenceLocationProvider;
 import com.android.sunshine.app.model.WeatherContract;
-import com.android.sunshine.app.sync.ServerStatus;
 import com.android.sunshine.app.sync.SyncAdapter;
 import com.android.sunshine.app.utils.DateFormatter;
 import com.android.sunshine.app.utils.IntentLauncher;
+import com.android.sunshine.app.utils.ServerStatusChanger;
 import com.android.sunshine.app.utils.TemperatureFormatter;
-import com.android.sunshine.app.utils.Utilities;
 import java.util.Date;
 
 import static com.android.sunshine.app.model.WeatherContract.LocationEntry;
@@ -68,6 +67,7 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
     private long mInitialSelectedDate = -1;
     private LocationProvider locationProvider;
     private IntentLauncher intentLauncher;
+    private ServerStatusChanger serverStatusChanger;
 
     public ForecastFragment() {
     }
@@ -88,6 +88,7 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
         ButterKnife.bind(this, rootView);
         locationProvider = new PreferenceLocationProvider(getActivity());
         intentLauncher = new IntentLauncher();
+        serverStatusChanger = new ServerStatusChanger(getActivity());
         forecastList.setLayoutManager(new LinearLayoutManager(getActivity()));
         forecastList.setHasFixedSize(true);
 
@@ -248,24 +249,7 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
 
     private void updateEmptyView() {
         if (adapter.getItemCount() == 0) {
-            int message = R.string.noWeatherInfoAvailable;
-            @ServerStatus int status = Utilities.getServerStatus(getActivity());
-            switch (status) {
-                case ServerStatus.SERVER_STATUS_DOWN:
-                    message = R.string.server_down;
-                    break;
-                case ServerStatus.SERVER_STATUS_INVALID:
-                    message = R.string.server_error;
-                    break;
-                case ServerStatus.SERVER_STATUS_LOCATION_INVALID:
-                    message = R.string.invalid_location;
-                    break;
-                default:
-                    if (!Utilities.isNetworkAvailable(getActivity())) {
-                        emptyView.setText(R.string.noWeatherInfoAvailableNoNetwork);
-                    }
-            }
-            emptyView.setText(message);
+            emptyView.setText(serverStatusChanger.getServerStatus().getMessageResource());
         }
     }
 

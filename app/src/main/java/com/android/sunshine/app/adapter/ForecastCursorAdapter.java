@@ -13,9 +13,9 @@ import android.widget.TextView;
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import com.android.sunshine.app.R;
+import com.android.sunshine.app.model.OWMWeather;
 import com.android.sunshine.app.utils.DateFormatter;
 import com.android.sunshine.app.utils.TemperatureFormatter;
-import com.android.sunshine.app.utils.Utilities;
 
 import static com.android.sunshine.app.model.WeatherContract.WeatherEntry;
 
@@ -78,10 +78,10 @@ public class ForecastCursorAdapter extends RecyclerView.Adapter<ForecastCursorAd
         boolean useLongToday;
         if (getItemViewType(cursor.getPosition()) == TODAY_VIEW_TYPE) {
             useLongToday = true;
-            viewHolder.forecastIcon.setImageResource(Utilities.getArtResourceForWeatherCondition(weatherId));
+            viewHolder.forecastIcon.setImageResource(OWMWeather.getArtResourceForWeatherCondition(weatherId));
         } else {
             useLongToday = false;
-            viewHolder.forecastIcon.setImageResource(Utilities.getIconResourceForWeatherCondition(weatherId));
+            viewHolder.forecastIcon.setImageResource(OWMWeather.getIconResourceForWeatherCondition(weatherId));
         }
 
         viewHolder.dateWeather.setText(dateFormatter.getFriendlyDay(weatherDate, useLongToday));

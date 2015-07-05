@@ -37,7 +37,7 @@ public class UserNotificator {
             String contentText = context.getString(R.string.format_notification, weather.getDescription(), temperatureFormatter.format(temp.getMax(), temp.getMin()));
 
             NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(context)
-                .setSmallIcon(Utilities.getIconResourceForWeatherCondition(weather.getId()))
+                .setSmallIcon(OWMWeather.getIconResourceForWeatherCondition(weather.getId()))
                 .setContentTitle(context.getString(R.string.app_name))
                 .setContentText(contentText);
 

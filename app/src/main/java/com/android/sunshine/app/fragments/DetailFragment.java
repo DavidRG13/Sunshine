@@ -26,10 +26,10 @@ import com.android.sunshine.app.R;
 import com.android.sunshine.app.activities.DetailActivity;
 import com.android.sunshine.app.location.LocationProvider;
 import com.android.sunshine.app.location.PreferenceLocationProvider;
+import com.android.sunshine.app.model.OWMWeather;
 import com.android.sunshine.app.model.WeatherContract;
 import com.android.sunshine.app.utils.DateFormatter;
 import com.android.sunshine.app.utils.TemperatureFormatter;
-import com.android.sunshine.app.utils.Utilities;
 import java.util.Locale;
 
 public class DetailFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
@@ -161,7 +161,7 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
             mHumidityView.setText(humidity);
             mWindView.setText(wind);
             mPressureView.setText(pressure);
-            iconView.setImageResource(Utilities.getArtResourceForWeatherCondition(weatherId));
+            iconView.setImageResource(OWMWeather.getArtResourceForWeatherCondition(weatherId));
 
             weatherData = String.format(Locale.getDefault(), "%s - %s - %s/%s", date, description, max, min);
 

@@ -17,9 +17,9 @@ import com.android.sunshine.app.R;
 import com.android.sunshine.app.activities.MainActivity;
 import com.android.sunshine.app.location.LocationProvider;
 import com.android.sunshine.app.location.PreferenceLocationProvider;
+import com.android.sunshine.app.model.OWMWeather;
 import com.android.sunshine.app.model.WeatherContract;
 import com.android.sunshine.app.utils.TemperatureFormatter;
-import com.android.sunshine.app.utils.Utilities;
 
 public class TodayWidgetIntentService extends IntentService {
 
@@ -61,7 +61,7 @@ public class TodayWidgetIntentService extends IntentService {
         }
 
         int weatherId = data.getInt(INDEX_WEATHER_ID);
-        int weatherArtResourceId = Utilities.getArtResourceForWeatherCondition(weatherId);
+        int weatherArtResourceId = OWMWeather.getArtResourceForWeatherCondition(weatherId);
         String description = data.getString(INDEX_SHORT_DESC);
         double maxTemp = data.getDouble(INDEX_MAX_TEMP);
         double minTemp = data.getDouble(INDEX_MIN_TEMP);

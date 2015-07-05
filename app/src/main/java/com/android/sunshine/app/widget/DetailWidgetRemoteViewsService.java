@@ -12,10 +12,10 @@ import android.widget.RemoteViewsService;
 import com.android.sunshine.app.R;
 import com.android.sunshine.app.location.LocationProvider;
 import com.android.sunshine.app.location.PreferenceLocationProvider;
+import com.android.sunshine.app.model.OWMWeather;
 import com.android.sunshine.app.model.WeatherContract;
 import com.android.sunshine.app.utils.DateFormatter;
 import com.android.sunshine.app.utils.TemperatureFormatter;
-import com.android.sunshine.app.utils.Utilities;
 
 @TargetApi(Build.VERSION_CODES.HONEYCOMB)
 public class DetailWidgetRemoteViewsService extends RemoteViewsService {
@@ -77,7 +77,7 @@ public class DetailWidgetRemoteViewsService extends RemoteViewsService {
                 }
                 RemoteViews views = new RemoteViews(getPackageName(), R.layout.widget_detail_list_item);
                 int weatherId = data.getInt(INDEX_WEATHER_CONDITION_ID);
-                int weatherArtResourceId = Utilities.getIconResourceForWeatherCondition(weatherId);
+                int weatherArtResourceId = OWMWeather.getIconResourceForWeatherCondition(weatherId);
                 String description = data.getString(INDEX_WEATHER_DESC);
                 long dateInMillis = data.getLong(INDEX_WEATHER_DATE);
                 String formattedDate = dateFormatter.getFriendlyDay(dateInMillis, false);

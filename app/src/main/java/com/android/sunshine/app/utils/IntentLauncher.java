@@ -11,11 +11,12 @@ import android.view.View;
 import com.android.sunshine.app.R;
 import com.android.sunshine.app.activities.DetailActivity;
 import com.android.sunshine.app.activities.SettingsActivity;
+import com.android.sunshine.app.location.LatLong;
 
 public class IntentLauncher {
 
-    public void displayMapWithLocation(final Context context, final String posLat, final String posLong) {
-        Uri geoLocation = Uri.parse("geo:" + posLat + "," + posLong);
+    public void displayMapWithLocation(final Context context, final LatLong latLong) {
+        Uri geoLocation = Uri.parse("geo:" + latLong.getLatitude() + "," + latLong.getLongitude());
 
         System.out.println("geoLocation = " + geoLocation);
         Intent intent = new Intent(Intent.ACTION_VIEW);

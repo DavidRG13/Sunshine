@@ -109,7 +109,7 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
     public void onResume() {
         super.onResume();
         final Bundle arguments = getArguments();
-        if (arguments != null && !location.equals(locationProvider.getLocation())
+        if (arguments != null && !location.equals(locationProvider.getPostCode())
                 && arguments.containsKey(DetailActivity.DATE_KEY)) {
             getLoaderManager().restartLoader(DETAIL_LOADER, null, this);
         }
@@ -126,7 +126,7 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
     @Override
     public Loader<Cursor> onCreateLoader(final int id, final Bundle args) {
         final long date = getArguments().getLong(DetailActivity.DATE_KEY);
-        location = locationProvider.getLocation();
+        location = locationProvider.getPostCode();
         final Uri weatherUri = WeatherContract.WeatherEntry.buildWeatherLocationWithDate(location, date);
         ViewParent vp = getView().getParent();
         if (vp instanceof CardView) {

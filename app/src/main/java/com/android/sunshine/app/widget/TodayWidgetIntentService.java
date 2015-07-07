@@ -49,7 +49,7 @@ public class TodayWidgetIntentService extends IntentService {
         int[] appWidgetIds = appWidgetManager.getAppWidgetIds(new ComponentName(this, TodayWidgetProvider.class));
 
         Uri weatherForLocationUri = WeatherContract.WeatherEntry.buildWeatherLocationWithStartDate(
-            locationProvider.getLocation(), System.currentTimeMillis());
+            locationProvider.getPostCode(), System.currentTimeMillis());
         Cursor data = getContentResolver().query(weatherForLocationUri, FORECAST_COLUMNS, null,
             null, WeatherContract.WeatherEntry.COLUMN_DATE + " ASC");
         if (data == null) {

@@ -5,7 +5,7 @@ import java.net.HttpURLConnection;
 
 public enum ServerStatus {
 
-    SERVER_STATUS_OK(0),
+    SERVER_STATUS_OK(R.string.ok),
     SERVER_STATUS_DOWN(R.string.server_down),
     SERVER_STATUS_INVALID(R.string.server_error),
     SERVER_STATUS_UNKNOWN(R.string.noWeatherInfoAvailable),

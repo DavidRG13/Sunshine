@@ -5,6 +5,7 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
+import com.android.sunshine.app.location.LocationProvider;
 import com.android.sunshine.app.model.OWMResponse;
 import com.android.sunshine.app.model.OWMWeatherForecast;
 import com.android.sunshine.app.model.WeatherContract;
@@ -20,10 +21,12 @@ public class WeatherRepository {
 
     private final Context context;
     private final UserNotificator userNotificator;
+    private final LocationProvider locationProvider;
 
-    public WeatherRepository(final Context context, final UserNotificator userNotificator) {
+    public WeatherRepository(final Context context, final UserNotificator userNotificator, final LocationProvider locationProvider) {
         this.context = context;
         this.userNotificator = userNotificator;
+        this.locationProvider = locationProvider;
     }
 
     public void saveWeatherForLocation(final OWMResponse owmResponse, final String locationSettings) {
@@ -80,6 +83,7 @@ public class WeatherRepository {
     }
 
     private long addLocation(final String locationSettings, final String cityName, final double cityLatitude, final double cityLongitude) {
+        locationProvider.saveLocation(cityLatitude, cityLongitude);
         ContentValues locationValues = new ContentValues();
         locationValues.put(WeatherContract.LocationEntry.COLUMN_LOCATION_SETTING, locationSettings);
         locationValues.put(WeatherContract.LocationEntry.COLUMN_CITY_NAME, cityName);

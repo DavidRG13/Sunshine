@@ -153,7 +153,7 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
         super.onResume();
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
         preferences.registerOnSharedPreferenceChangeListener(this);
-        if (location != null && !location.equals(locationProvider.getLocation())) {
+        if (location != null && !location.equals(locationProvider.getPostCode())) {
             getLoaderManager().restartLoader(FORECAST_LOADER, null, this);
         }
     }
@@ -197,7 +197,7 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
     public Loader<Cursor> onCreateLoader(final int id, final Bundle args) {
         String sortOrder = WeatherEntry.COLUMN_DATE + " ASC";
 
-        location = locationProvider.getLocation();
+        location = locationProvider.getPostCode();
         Uri weatherForLocationUri = WeatherEntry.buildWeatherLocationWithStartDate(location, new Date().getTime());
 
         return new CursorLoader(getActivity(), weatherForLocationUri, FORECAST_COLUMNS, null, null, sortOrder);
@@ -274,15 +274,7 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
 
     private void showCurrentLocation() {
         if (null != adapter) {
-            Cursor c = adapter.getCursor();
-            if (null != c) {
-                c.moveToPosition(0);
-                String posLat = c.getString(c.getColumnIndex(LocationEntry.COLUMN_COORD_LAT));
-                String posLong = c.getString(c.getColumnIndex(LocationEntry.COLUMN_COORD_LONG));
-
-                intentLauncher.displayMapWithLocation(getActivity(), posLat, posLong);
-                // TODO: mejorar esto
-            }
+            intentLauncher.displayMapWithLocation(getActivity(), locationProvider.getLocation());
         }
     }
 

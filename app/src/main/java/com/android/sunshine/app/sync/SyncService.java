@@ -20,7 +20,8 @@ public class SyncService extends Service {
         synchronized (S_SYNC_ADAPTER_LOCK) {
             if (sSunshineSyncAdapter == null) {
                 sSunshineSyncAdapter = new SyncAdapter(new PreferenceLocationProvider(this),
-                    new WeatherRepository(this, new UserNotificator(this, new TemperatureFormatter(this))), new ServerStatusChanger(this), new RetrofitWeatherFetcher(), getApplicationContext(), true);
+                    new WeatherRepository(this, new UserNotificator(this, new TemperatureFormatter(this)), new PreferenceLocationProvider(this)),
+                    new ServerStatusChanger(this), new RetrofitWeatherFetcher(), getApplicationContext(), true);
             }
         }
     }

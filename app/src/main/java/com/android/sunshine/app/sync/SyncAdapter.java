@@ -39,7 +39,7 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
 
     @Override
     public void onPerformSync(final Account account, final Bundle extras, final String authority, final ContentProviderClient provider, final SyncResult syncResult) {
-        final String location = locationProvider.getLocation();
+        final String location = locationProvider.getPostCode();
 
         OWMResponse response = weatherFetcher.forecastForLocation(location);
 

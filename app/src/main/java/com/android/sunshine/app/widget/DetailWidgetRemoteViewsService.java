@@ -51,7 +51,7 @@ public class DetailWidgetRemoteViewsService extends RemoteViewsService {
                     data.close();
                 }
                 final long identityToken = Binder.clearCallingIdentity();
-                Uri weatherForLocationUri = WeatherContract.WeatherEntry.buildWeatherLocationWithStartDate(locationProvider.getLocation(), System.currentTimeMillis());
+                Uri weatherForLocationUri = WeatherContract.WeatherEntry.buildWeatherLocationWithStartDate(locationProvider.getPostCode(), System.currentTimeMillis());
                 data = getContentResolver().query(weatherForLocationUri, FORECAST_COLUMNS, null, null, WeatherContract.WeatherEntry.COLUMN_DATE + " ASC");
                 Binder.restoreCallingIdentity(identityToken);
             }
@@ -93,7 +93,7 @@ public class DetailWidgetRemoteViewsService extends RemoteViewsService {
                 views.setTextViewText(R.id.widget_low_temperature, temperatureFormatter.format(minTemp));
 
                 final Intent fillInIntent = new Intent();
-                Uri weatherUri = WeatherContract.WeatherEntry.buildWeatherLocationWithDate(locationProvider.getLocation(), dateInMillis);
+                Uri weatherUri = WeatherContract.WeatherEntry.buildWeatherLocationWithDate(locationProvider.getPostCode(), dateInMillis);
                 fillInIntent.setData(weatherUri);
                 views.setOnClickFillInIntent(R.id.widget_list_item, fillInIntent);
                 return views;

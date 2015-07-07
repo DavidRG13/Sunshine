@@ -46,3 +46,9 @@
 -keep class retrofit.** { *; }
 -keepattributes Signature
 -keepattributes Exceptions
+
+
+# Dagger
+#-dontwarn dagger.shaded.**
+#-dontwarn dagger.internal.**
+#-dontwarn com.google.common.**

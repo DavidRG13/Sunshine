@@ -12,8 +12,13 @@ import com.android.sunshine.app.R;
 import com.android.sunshine.app.activities.DetailActivity;
 import com.android.sunshine.app.activities.SettingsActivity;
 import com.android.sunshine.app.location.LatLong;
+import javax.inject.Inject;
 
 public class IntentLauncher {
+
+    @Inject
+    public IntentLauncher() {
+    }
 
     public void displayMapWithLocation(final Context context, final LatLong latLong) {
         Uri geoLocation = Uri.parse("geo:" + latLong.getLatitude() + "," + latLong.getLongitude());

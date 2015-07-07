@@ -7,6 +7,7 @@ import android.net.NetworkInfo;
 import android.preference.PreferenceManager;
 import com.android.sunshine.app.R;
 import com.android.sunshine.app.sync.ServerStatus;
+import javax.inject.Inject;
 
 import static com.android.sunshine.app.sync.ServerStatus.NO_NETWORK_AVAILABLE;
 import static com.android.sunshine.app.sync.ServerStatus.SERVER_STATUS_OK;
@@ -16,6 +17,7 @@ public class ServerStatusChanger {
 
     private Context context;
 
+    @Inject
     public ServerStatusChanger(final Context context) {
         this.context = context;
     }

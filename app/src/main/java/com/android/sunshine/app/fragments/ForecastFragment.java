@@ -30,6 +30,7 @@ import android.widget.AbsListView;
 import android.widget.TextView;
 import butterknife.Bind;
 import butterknife.ButterKnife;
+import com.android.sunshine.app.App;
 import com.android.sunshine.app.R;
 import com.android.sunshine.app.adapter.ForecastCursorAdapter;
 import com.android.sunshine.app.adapter.OnAdapterItemClickListener;
@@ -43,6 +44,7 @@ import com.android.sunshine.app.utils.IntentLauncher;
 import com.android.sunshine.app.utils.ServerStatusChanger;
 import com.android.sunshine.app.utils.TemperatureFormatter;
 import java.util.Date;
+import javax.inject.Inject;
 
 import static com.android.sunshine.app.model.WeatherContract.LocationEntry;
 import static com.android.sunshine.app.model.WeatherContract.WeatherEntry;
@@ -65,9 +67,15 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
     private int choiceMode;
     private boolean holdForTransition;
     private long mInitialSelectedDate = -1;
-    private LocationProvider locationProvider;
-    private IntentLauncher intentLauncher;
-    private ServerStatusChanger serverStatusChanger;
+
+    @Inject
+    LocationProvider locationProvider;
+
+    @Inject
+    IntentLauncher intentLauncher;
+
+    @Inject
+    ServerStatusChanger serverStatusChanger;
 
     public ForecastFragment() {
     }
@@ -75,6 +83,7 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
     @Override
     public void onActivityCreated(final Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
+        ((App) getActivity().getApplication()).getComponent().inject(this);
         if (holdForTransition) {
             getActivity().supportPostponeEnterTransition();
         }
@@ -86,9 +95,6 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
         setHasOptionsMenu(true);
         final View rootView = inflater.inflate(R.layout.fragment_main, container, false);
         ButterKnife.bind(this, rootView);
-        locationProvider = new PreferenceLocationProvider(getActivity());
-        intentLauncher = new IntentLauncher();
-        serverStatusChanger = new ServerStatusChanger(getActivity());
         forecastList.setLayoutManager(new LinearLayoutManager(getActivity()));
         forecastList.setHasFixedSize(true);
 

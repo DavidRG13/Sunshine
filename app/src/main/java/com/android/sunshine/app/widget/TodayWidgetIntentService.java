@@ -5,6 +5,7 @@ import android.app.IntentService;
 import android.app.PendingIntent;
 import android.appwidget.AppWidgetManager;
 import android.content.ComponentName;
+import android.content.ContentResolver;
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
@@ -42,6 +43,9 @@ public class TodayWidgetIntentService extends IntentService {
     @Inject
     TemperatureFormatter temperatureFormatter;
 
+    @Inject
+    ContentResolver contentResolver;
+
     public TodayWidgetIntentService() {
         super("TodayWidgetIntentService");
     }
@@ -55,7 +59,7 @@ public class TodayWidgetIntentService extends IntentService {
 
         Uri weatherForLocationUri = WeatherContract.WeatherEntry.buildWeatherLocationWithStartDate(
             locationProvider.getPostCode(), System.currentTimeMillis());
-        Cursor data = getContentResolver().query(weatherForLocationUri, FORECAST_COLUMNS, null,
+        Cursor data = contentResolver.query(weatherForLocationUri, FORECAST_COLUMNS, null,
             null, WeatherContract.WeatherEntry.COLUMN_DATE + " ASC");
         if (data == null) {
             return;

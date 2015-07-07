@@ -1,6 +1,7 @@
 package com.android.sunshine.app.activities;
 
 import android.annotation.TargetApi;
+import android.content.ContentResolver;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Build;
@@ -23,6 +24,9 @@ public class SettingsActivity extends PreferenceActivity implements Preference.O
 
     @Inject
     SharedPreferences preferences;
+
+    @Inject
+    ContentResolver contentResolver;
 
     @Override
     public void onCreate(final Bundle savedInstanceState) {
@@ -101,7 +105,7 @@ public class SettingsActivity extends PreferenceActivity implements Preference.O
             serverStatusChanger.resetServerStatus();
             SyncAdapter.syncImmediately(this);
         } else if (key.equals(getString(R.string.pref_unit_key))) {
-            getContentResolver().notifyChange(WeatherContract.WeatherEntry.CONTENT_URI, null);
+            contentResolver.notifyChange(WeatherContract.WeatherEntry.CONTENT_URI, null);
         } else if (key.equals(getString(R.string.prefs_server_status))) {
             Preference locationPreference = findPreference(getString(R.string.pref_location_key));
             bindPreferenceSummaryToValue(locationPreference);

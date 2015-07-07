@@ -1,6 +1,7 @@
 package com.android.sunshine.app.widget;
 
 import android.annotation.TargetApi;
+import android.content.ContentResolver;
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
@@ -40,6 +41,9 @@ public class DetailWidgetRemoteViewsService extends RemoteViewsService {
     @Inject
     DateFormatter dateFormatter;
 
+    @Inject
+    ContentResolver contentResolver;
+
     @Override
     public RemoteViewsFactory onGetViewFactory(final Intent intent) {
         return new RemoteViewsFactory() {
@@ -56,7 +60,7 @@ public class DetailWidgetRemoteViewsService extends RemoteViewsService {
                 }
                 final long identityToken = Binder.clearCallingIdentity();
                 Uri weatherForLocationUri = WeatherContract.WeatherEntry.buildWeatherLocationWithStartDate(locationProvider.getPostCode(), System.currentTimeMillis());
-                data = getContentResolver().query(weatherForLocationUri, FORECAST_COLUMNS, null, null, WeatherContract.WeatherEntry.COLUMN_DATE + " ASC");
+                data = contentResolver.query(weatherForLocationUri, FORECAST_COLUMNS, null, null, WeatherContract.WeatherEntry.COLUMN_DATE + " ASC");
                 Binder.restoreCallingIdentity(identityToken);
             }
 

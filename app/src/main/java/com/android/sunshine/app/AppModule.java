@@ -1,6 +1,7 @@
 package com.android.sunshine.app;
 
 import android.app.Application;
+import android.content.ContentResolver;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
@@ -30,6 +31,11 @@ public class AppModule {
     @Provides
     SharedPreferences provideSharedPrefs() {
         return PreferenceManager.getDefaultSharedPreferences(application);
+    }
+
+    @Provides
+    ContentResolver provideContentResolver() {
+        return application.getContentResolver();
     }
 
     @Provides

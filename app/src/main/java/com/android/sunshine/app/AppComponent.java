@@ -6,6 +6,7 @@ import com.android.sunshine.app.activities.SettingsActivity;
 import com.android.sunshine.app.fragments.DetailFragment;
 import com.android.sunshine.app.fragments.ForecastFragment;
 import com.android.sunshine.app.sync.SyncService;
+import com.android.sunshine.app.widget.TodayWidgetIntentService;
 import dagger.Component;
 import javax.inject.Singleton;
 
@@ -24,4 +25,6 @@ public interface AppComponent {
     void inject(SyncService syncService);
 
     void inject(DetailActivity detailActivity);
+
+    void inject(TodayWidgetIntentService todayWidgetIntentService);
 }

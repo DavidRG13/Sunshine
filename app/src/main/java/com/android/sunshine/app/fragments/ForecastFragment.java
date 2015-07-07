@@ -3,16 +3,13 @@ package com.android.sunshine.app.fragments;
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.SharedPreferences;
-import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.content.res.TypedArray;
 import android.database.Cursor;
-import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.design.widget.AppBarLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
-import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.support.v4.view.ViewCompat;
 import android.support.v7.widget.LinearLayoutManager;
@@ -36,25 +33,17 @@ import com.android.sunshine.app.adapter.OnAdapterItemClickListener;
 import com.android.sunshine.app.callbacks.ItemClickCallback;
 import com.android.sunshine.app.location.LocationProvider;
 import com.android.sunshine.app.model.WeatherContract;
+import com.android.sunshine.app.sync.ServerStatus;
 import com.android.sunshine.app.sync.SyncAdapter;
 import com.android.sunshine.app.utils.DateFormatter;
 import com.android.sunshine.app.utils.IntentLauncher;
+import com.android.sunshine.app.utils.LoaderHelper;
 import com.android.sunshine.app.utils.ServerStatusChanger;
+import com.android.sunshine.app.utils.ServerStatusListener;
 import com.android.sunshine.app.utils.TemperatureFormatter;
-import java.util.Date;
 import javax.inject.Inject;
 
-import static com.android.sunshine.app.model.WeatherContract.LocationEntry;
-import static com.android.sunshine.app.model.WeatherContract.WeatherEntry;
-
-public class ForecastFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor>, OnSharedPreferenceChangeListener, OnAdapterItemClickListener {
-
-    public static final int FORECAST_LOADER = 0;
-    private static final String[] FORECAST_COLUMNS = new String[] {
-        WeatherEntry.TABLE_NAME + "." + WeatherEntry._ID, WeatherEntry.COLUMN_DATE, WeatherEntry.COLUMN_SHORT_DESC, WeatherEntry.COLUMN_MAX_TEMP,
-        WeatherEntry.COLUMN_MIN_TEMP, WeatherEntry.COLUMN_WEATHER_ID,
-        WeatherEntry.COLUMN_WEATHER_ID, LocationEntry.COLUMN_LOCATION_SETTING, LocationEntry.COLUMN_COORD_LAT, LocationEntry.COLUMN_COORD_LONG
-    };
+public class ForecastFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor>, OnAdapterItemClickListener, ServerStatusListener {
 
     @Bind(R.id.recycler_view_forecast) RecyclerView forecastList;
     @Bind(R.id.listview_forecast_empty) TextView emptyView;
@@ -77,7 +66,9 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
     @Inject
     SharedPreferences preferences;
 
-    private String location;
+    @Inject
+    LoaderHelper loaderHelper;
+
     private ForecastCursorAdapter adapter;
     private boolean autoSelectView;
     private int choiceMode;
@@ -93,7 +84,6 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
         if (holdForTransition) {
             getActivity().supportPostponeEnterTransition();
         }
-        getLoaderManager().initLoader(FORECAST_LOADER, null, this);
     }
 
     @Override
@@ -164,16 +154,8 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
     @Override
     public void onResume() {
         super.onResume();
-        preferences.registerOnSharedPreferenceChangeListener(this);
-        if (location != null && !location.equals(locationProvider.getPostCode())) {
-            getLoaderManager().restartLoader(FORECAST_LOADER, null, this);
-        }
-    }
-
-    @Override
-    public void onPause() {
-        super.onPause();
-        preferences.unregisterOnSharedPreferenceChangeListener(this);
+        serverStatusChanger.addListener(this);
+        getLoaderManager().initLoader(loaderHelper.getForecastLoaderId(), null, this);
     }
 
     @Override
@@ -206,12 +188,7 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
 
     @Override
     public Loader<Cursor> onCreateLoader(final int id, final Bundle args) {
-        String sortOrder = WeatherEntry.COLUMN_DATE + " ASC";
-
-        location = locationProvider.getPostCode();
-        Uri weatherForLocationUri = WeatherEntry.buildWeatherLocationWithStartDate(location, new Date().getTime());
-
-        return new CursorLoader(getActivity(), weatherForLocationUri, FORECAST_COLUMNS, null, null, sortOrder);
+        return loaderHelper.getForecastCursorLoader(getActivity());
     }
 
     @Override
@@ -258,15 +235,20 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
         }
     }
 
-    private void updateEmptyView() {
-        if (adapter.getItemCount() == 0) {
-            emptyView.setText(serverStatusChanger.getServerStatus().getMessageResource());
-        }
+    @Override
+    public void onServerStatusChanged(final ServerStatus status) {
+        updateEmptyView();
     }
 
     @Override
     public void onLoaderReset(final Loader<Cursor> loader) {
         adapter.swapCursor(null);
+    }
+
+    private void updateEmptyView() {
+        if (adapter.getItemCount() == 0) {
+            emptyView.setText(serverStatusChanger.getServerStatus().getMessageResource());
+        }
     }
 
     public void setUseTodayLayout(final boolean useTodayLayout) {
@@ -286,13 +268,6 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
     private void showCurrentLocation() {
         if (null != adapter) {
             intentLauncher.displayMapWithLocation(getActivity(), locationProvider.getLocation());
-        }
-    }
-
-    @Override
-    public void onSharedPreferenceChanged(final SharedPreferences sharedPreferences, final String key) {
-        if (key.equals(getString(R.string.prefs_server_status))) {
-            updateEmptyView();
         }
     }
 }

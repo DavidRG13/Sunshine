@@ -13,6 +13,7 @@ import android.os.Bundle;
 import android.util.DisplayMetrics;
 import android.util.TypedValue;
 import android.widget.RemoteViews;
+import com.android.sunshine.app.App;
 import com.android.sunshine.app.R;
 import com.android.sunshine.app.activities.MainActivity;
 import com.android.sunshine.app.location.LocationProvider;
@@ -47,6 +48,8 @@ public class TodayWidgetIntentService extends IntentService {
 
     @Override
     protected void onHandleIntent(final Intent intent) {
+        ((App) getApplication()).getComponent().inject(this);
+
         AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(this);
         int[] appWidgetIds = appWidgetManager.getAppWidgetIds(new ComponentName(this, TodayWidgetProvider.class));
 

@@ -6,6 +6,7 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.preference.PreferenceManager;
 import com.android.sunshine.app.R;
+import com.android.sunshine.app.fragments.ForecastFragment;
 import com.android.sunshine.app.sync.ServerStatus;
 import javax.inject.Inject;
 
@@ -16,6 +17,7 @@ import static com.android.sunshine.app.sync.ServerStatus.SERVER_STATUS_UNKNOWN;
 public class ServerStatusChanger {
 
     private Context context;
+    private ServerStatusListener statusListener;
 
     @Inject
     public ServerStatusChanger(final Context context) {
@@ -50,9 +52,16 @@ public class ServerStatusChanger {
     }
 
     private void setServerStatus(final ServerStatus serverStatus) {
+        if (statusListener != null) {
+            statusListener.onServerStatusChanged(serverStatus);
+        }
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
         SharedPreferences.Editor editor = preferences.edit();
         editor.putString(context.getString(R.string.prefs_server_status), serverStatus.toString());
         editor.apply();
+    }
+
+    public void addListener(final ServerStatusListener statusListener) {
+        this.statusListener = statusListener;
     }
 }

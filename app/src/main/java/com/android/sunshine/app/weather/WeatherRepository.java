@@ -113,8 +113,8 @@ public class WeatherRepository {
         locationValues.put(WeatherContract.LocationEntry.COLUMN_COORD_LONG, cityLongitude);
 
         long result;
-        final Cursor cursor = contentResolver.query(WeatherContract.LocationEntry.CONTENT_URI, new String[] {WeatherContract.LocationEntry._ID },
-            WeatherContract.LocationEntry.COLUMN_LOCATION_SETTING + " = ?", new String[] {locationSettings }, null);
+        final Cursor cursor = contentResolver.query(WeatherContract.LocationEntry.CONTENT_URI, new String[] { WeatherContract.LocationEntry._ID }, WeatherContract.LocationEntry.COLUMN_LOCATION_SETTING + " = ?",
+            new String[] { locationSettings }, null);
         if (cursor.moveToFirst()) {
             result = cursor.getColumnIndex(WeatherContract.LocationEntry._ID);
         } else {
@@ -130,7 +130,9 @@ public class WeatherRepository {
         for (int i = 0; i < weatherForecasts.size(); i++) {
             OWMWeatherForecast weatherForecast = weatherForecasts.get(i);
             ContentValues weatherValues = new ContentValues();
-            calendar.add(Calendar.DAY_OF_YEAR, 1);
+            if (i > 0) {
+                calendar.add(Calendar.DAY_OF_YEAR, 1);
+            }
 
             weatherValues.put(WeatherContract.WeatherEntry.COLUMN_LOC_KEY, locationId);
             weatherValues.put(WeatherContract.WeatherEntry.COLUMN_DATE, calendar.getTimeInMillis());

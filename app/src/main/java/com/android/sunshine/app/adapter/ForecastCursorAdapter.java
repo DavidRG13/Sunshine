@@ -70,7 +70,7 @@ public class ForecastCursorAdapter extends RecyclerView.Adapter<ForecastCursorAd
         cursor.moveToPosition(position);
 
         final int weatherId = cursor.getInt(cursor.getColumnIndex(WeatherEntry.COLUMN_WEATHER_ID));
-        final long weatherDate = cursor.getInt(cursor.getColumnIndex(WeatherEntry.COLUMN_DATE));
+        final long weatherDate = cursor.getLong(cursor.getColumnIndex(WeatherEntry.COLUMN_DATE));
         final String descriptionWeather = cursor.getString(cursor.getColumnIndex(WeatherEntry.COLUMN_SHORT_DESC));
         final float maxTemp = cursor.getFloat(cursor.getColumnIndex(WeatherEntry.COLUMN_MAX_TEMP));
         final float minTemp = cursor.getFloat(cursor.getColumnIndex(WeatherEntry.COLUMN_MIN_TEMP));

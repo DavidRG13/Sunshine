@@ -1,5 +1,6 @@
 package com.android.sunshine.app;
 
+import com.android.sunshine.app.activities.DetailActivity;
 import com.android.sunshine.app.activities.MainActivity;
 import com.android.sunshine.app.activities.SettingsActivity;
 import com.android.sunshine.app.fragments.DetailFragment;
@@ -21,4 +22,6 @@ public interface AppComponent {
     void inject(SettingsActivity settingsActivity);
 
     void inject(SyncService syncService);
+
+    void inject(DetailActivity detailActivity);
 }

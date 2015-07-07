@@ -4,17 +4,22 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
+import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v4.util.Pair;
+import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import com.android.sunshine.app.R;
 import com.android.sunshine.app.activities.DetailActivity;
 import com.android.sunshine.app.activities.SettingsActivity;
+import com.android.sunshine.app.fragments.DetailFragment;
 import com.android.sunshine.app.location.LatLong;
 import javax.inject.Inject;
 
 public class IntentLauncher {
+
+    public static final String DATE_KEY = "forecast_date";
 
     @Inject
     public IntentLauncher() {
@@ -36,9 +41,51 @@ public class IntentLauncher {
 
     public void transitionToDetails(final Activity activity, final long date, final View sharedView) {
         final Intent intent = new Intent(activity, DetailActivity.class);
-        intent.putExtra(DetailActivity.DATE_KEY, date);
+        intent.putExtra(DATE_KEY, date);
         ActivityOptionsCompat activityOptions = ActivityOptionsCompat.makeSceneTransitionAnimation(activity,
             new Pair<>(sharedView, activity.getString(R.string.detail_icon_transition_name)));
         ActivityCompat.startActivity(activity, intent, activityOptions.toBundle());
+    }
+
+    public void twoPaneDetails(final long date, final AppCompatActivity fromActivity) {
+        final Bundle args = new Bundle();
+        args.putLong(DATE_KEY, date);
+        final DetailFragment detailFragment = new DetailFragment();
+        detailFragment.setArguments(args);
+        fromActivity.getSupportFragmentManager().beginTransaction()
+            .replace(R.id.weather_detail_container, detailFragment)
+            .commitAllowingStateLoss();
+    }
+
+    public void displayTwoPaneDetails(final Uri contentUri, final AppCompatActivity fromActivity) {
+        DetailFragment fragment = new DetailFragment();
+        if (contentUri != null) {
+            Bundle args = new Bundle();
+            args.putParcelable(DetailFragment.DETAIL_URI, contentUri);
+            fragment.setArguments(args);
+        }
+        fromActivity.getSupportFragmentManager().beginTransaction()
+            .replace(R.id.weather_detail_container, new DetailFragment())
+            .commit();
+    }
+
+    public void detailsWithTransitionEnabled(final long date, final AppCompatActivity fromActivity) {
+        final Bundle bundle = new Bundle();
+        bundle.putLong(DATE_KEY, date);
+        bundle.putBoolean(DetailFragment.DETAIL_TRANSITION_ANIMATION, true);
+        final DetailFragment detailFragment = new DetailFragment();
+        detailFragment.setArguments(bundle);
+        fromActivity.getSupportFragmentManager().beginTransaction()
+            .add(R.id.fragment_detail_container, detailFragment)
+            .commit();
+        fromActivity.supportPostponeEnterTransition();
+    }
+
+    public Intent createShareIntent(final String weatherData) {
+        Intent shareIntent = new Intent(Intent.ACTION_SEND);
+        shareIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET);
+        shareIntent.setType("text/plain");
+        shareIntent.putExtra(Intent.EXTRA_TEXT, weatherData + " #sunshine");
+        return shareIntent;
     }
 }

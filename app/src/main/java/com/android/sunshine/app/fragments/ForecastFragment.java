@@ -59,13 +59,6 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
     @Bind(R.id.recycler_view_forecast) RecyclerView forecastList;
     @Bind(R.id.listview_forecast_empty) TextView emptyView;
 
-    private String location;
-    private ForecastCursorAdapter adapter;
-    private boolean autoSelectView;
-    private int choiceMode;
-    private boolean holdForTransition;
-    private long mInitialSelectedDate = -1;
-
     @Inject
     LocationProvider locationProvider;
 
@@ -84,13 +77,19 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
     @Inject
     SharedPreferences preferences;
 
+    private String location;
+    private ForecastCursorAdapter adapter;
+    private boolean autoSelectView;
+    private int choiceMode;
+    private boolean holdForTransition;
+    private long mInitialSelectedDate = -1;
+
     public ForecastFragment() {
     }
 
     @Override
     public void onActivityCreated(final Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        ((App) getActivity().getApplication()).getComponent().inject(this);
         if (holdForTransition) {
             getActivity().supportPostponeEnterTransition();
         }
@@ -101,6 +100,7 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
     public View onCreateView(final LayoutInflater inflater, final ViewGroup container, final Bundle savedInstanceState) {
         setHasOptionsMenu(true);
         final View rootView = inflater.inflate(R.layout.fragment_main, container, false);
+        ((App) getActivity().getApplication()).getComponent().inject(this);
         ButterKnife.bind(this, rootView);
         forecastList.setLayoutManager(new LinearLayoutManager(getActivity()));
         forecastList.setHasFixedSize(true);

@@ -1,6 +1,5 @@
 package com.android.sunshine.app.fragments;
 
-import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
@@ -26,10 +25,10 @@ import com.android.sunshine.app.App;
 import com.android.sunshine.app.R;
 import com.android.sunshine.app.activities.DetailActivity;
 import com.android.sunshine.app.location.LocationProvider;
-import com.android.sunshine.app.location.PreferenceLocationProvider;
 import com.android.sunshine.app.model.OWMWeather;
 import com.android.sunshine.app.model.WeatherContract;
 import com.android.sunshine.app.utils.DateFormatter;
+import com.android.sunshine.app.utils.IntentLauncher;
 import com.android.sunshine.app.utils.TemperatureFormatter;
 import java.util.Locale;
 import javax.inject.Inject;
@@ -70,6 +69,9 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
     @Inject
     DateFormatter dateFormatter;
 
+    @Inject
+    IntentLauncher intentLauncher;
+
     private boolean transitionAnimation;
     private String location;
     private String weatherData;
@@ -87,7 +89,7 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
             location = savedInstanceState.getString(LOCATION_KEY);
         }
         final Bundle arguments = getArguments();
-        if (arguments != null && arguments.containsKey(DetailActivity.DATE_KEY)) {
+        if (arguments != null && arguments.containsKey(IntentLauncher.DATE_KEY)) {
             getLoaderManager().initLoader(DETAIL_LOADER, null, this);
         }
     }
@@ -117,7 +119,7 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
         super.onResume();
         final Bundle arguments = getArguments();
         if (arguments != null && !location.equals(locationProvider.getPostCode())
-                && arguments.containsKey(DetailActivity.DATE_KEY)) {
+                && arguments.containsKey(IntentLauncher.DATE_KEY)) {
             getLoaderManager().restartLoader(DETAIL_LOADER, null, this);
         }
     }
@@ -132,7 +134,7 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
 
     @Override
     public Loader<Cursor> onCreateLoader(final int id, final Bundle args) {
-        final long date = getArguments().getLong(DetailActivity.DATE_KEY);
+        final long date = getArguments().getLong(IntentLauncher.DATE_KEY);
         location = locationProvider.getPostCode();
         final Uri weatherUri = WeatherContract.WeatherEntry.buildWeatherLocationWithDate(location, date);
         ViewParent vp = getView().getParent();
@@ -205,14 +207,6 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
 
     private void finishCreatingMenu(final Menu menu) {
         MenuItem menuItem = menu.findItem(R.id.action_share);
-        menuItem.setIntent(createShareIntent());
-    }
-
-    private Intent createShareIntent() {
-        Intent shareIntent = new Intent(Intent.ACTION_SEND);
-        shareIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET);
-        shareIntent.setType("text/plain");
-        shareIntent.putExtra(Intent.EXTRA_TEXT, weatherData + " #sunshine");
-        return shareIntent;
+        menuItem.setIntent(intentLauncher.createShareIntent(weatherData));
     }
 }

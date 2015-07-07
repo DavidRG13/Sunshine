@@ -10,7 +10,6 @@ import com.android.sunshine.app.App;
 import com.android.sunshine.app.R;
 import com.android.sunshine.app.adapter.ForecastCursorAdapter;
 import com.android.sunshine.app.callbacks.ItemClickCallback;
-import com.android.sunshine.app.fragments.DetailFragment;
 import com.android.sunshine.app.fragments.ForecastFragment;
 import com.android.sunshine.app.model.WeatherContract;
 import com.android.sunshine.app.sync.SyncAdapter;
@@ -40,15 +39,7 @@ public class MainActivity extends AppCompatActivity implements ItemClickCallback
         if (findViewById(R.id.weather_detail_container) != null) {
             twoPane = true;
             if (savedInstanceState == null) {
-                DetailFragment fragment = new DetailFragment();
-                if (contentUri != null) {
-                    Bundle args = new Bundle();
-                    args.putParcelable(DetailFragment.DETAIL_URI, contentUri);
-                    fragment.setArguments(args);
-                }
-                getSupportFragmentManager().beginTransaction()
-                        .replace(R.id.weather_detail_container, new DetailFragment())
-                        .commit();
+                intentLauncher.displayTwoPaneDetails(contentUri, this);
             }
         } else {
             twoPane = false;
@@ -79,13 +70,7 @@ public class MainActivity extends AppCompatActivity implements ItemClickCallback
     @Override
     public void onItemSelected(final long date, final ForecastCursorAdapter.ViewHolder viewHolder) {
         if (twoPane) {
-            final Bundle args = new Bundle();
-            args.putLong(DetailActivity.DATE_KEY, date);
-            final DetailFragment detailFragment = new DetailFragment();
-            detailFragment.setArguments(args);
-            getSupportFragmentManager().beginTransaction()
-                    .replace(R.id.weather_detail_container, detailFragment)
-                    .commitAllowingStateLoss();
+            intentLauncher.twoPaneDetails(date, this);
         } else {
             intentLauncher.transitionToDetails(this, date, viewHolder.forecastIcon);
         }

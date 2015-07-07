@@ -5,11 +5,14 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
+import android.net.Uri;
 import com.android.sunshine.app.location.LocationProvider;
 import com.android.sunshine.app.model.OWMResponse;
 import com.android.sunshine.app.model.OWMWeatherForecast;
 import com.android.sunshine.app.model.WeatherContract;
+import com.android.sunshine.app.utils.TemperatureFormatter;
 import com.android.sunshine.app.utils.UserNotificator;
+import com.android.sunshine.app.utils.WeatherNotification;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
@@ -20,15 +23,29 @@ public class WeatherRepository {
 
     public static final String ACTION_DATA_UPDATED = "com.example.android.sunshine.app.ACTION_DATA_UPDATED";
 
+    private static final String[] COLUMNS = new String[]{
+        WeatherContract.WeatherEntry.TABLE_NAME + "." + WeatherContract.WeatherEntry._ID,
+        WeatherContract.WeatherEntry.COLUMN_DATE,
+        WeatherContract.WeatherEntry.COLUMN_SHORT_DESC,
+        WeatherContract.WeatherEntry.COLUMN_MAX_TEMP,
+        WeatherContract.WeatherEntry.COLUMN_MIN_TEMP,
+        WeatherContract.WeatherEntry.COLUMN_HUMIDITY,
+        WeatherContract.WeatherEntry.COLUMN_PRESSURE,
+        WeatherContract.WeatherEntry.COLUMN_WIND_SPEED,
+        WeatherContract.WeatherEntry.COLUMN_WEATHER_ID
+    };
     private final Context context;
     private final UserNotificator userNotificator;
     private final LocationProvider locationProvider;
 
+    private TemperatureFormatter temperatureFormatter;
+
     @Inject
-    public WeatherRepository(final Context context, final UserNotificator userNotificator, final LocationProvider locationProvider) {
+    public WeatherRepository(final Context context, final UserNotificator userNotificator, final LocationProvider locationProvider, final TemperatureFormatter temperatureFormatter) {
         this.context = context;
         this.userNotificator = userNotificator;
         this.locationProvider = locationProvider;
+        this.temperatureFormatter = temperatureFormatter;
     }
 
     public void saveWeatherForLocation(final OWMResponse owmResponse, final String locationSettings) {
@@ -102,5 +119,27 @@ public class WeatherRepository {
         }
         cursor.close();
         return result;
+    }
+
+    public WeatherNotification getForecastFor(final long date, final String location) {
+        final Uri weatherUri = WeatherContract.WeatherEntry.buildWeatherLocationWithDate(location, date);
+        Cursor cursor = context.getContentResolver().query(weatherUri, COLUMNS, null, null, WeatherContract.WeatherEntry.COLUMN_DATE + " ASC");
+        WeatherNotification weatherNotification = WeatherNotification.INVALID_OBJECT;
+        if (cursor.moveToFirst()) {
+            final int weatherId = cursor.getInt(cursor.getColumnIndex(WeatherContract.WeatherEntry.COLUMN_WEATHER_ID));
+            final String description = cursor.getString(cursor.getColumnIndex(WeatherContract.WeatherEntry.COLUMN_SHORT_DESC));
+            final long forecastDate = cursor.getLong(cursor.getColumnIndex(WeatherContract.WeatherEntry.COLUMN_DATE));
+            final String wind = cursor.getString(cursor.getColumnIndex(WeatherContract.WeatherEntry.COLUMN_WIND_SPEED));
+            final String pressure = cursor.getString(cursor.getColumnIndex(WeatherContract.WeatherEntry.COLUMN_PRESSURE));
+            final String humidity = cursor.getString(cursor.getColumnIndex(WeatherContract.WeatherEntry.COLUMN_HUMIDITY));
+            final double maxTemp = cursor.getDouble(cursor.getColumnIndex(WeatherContract.WeatherEntry.COLUMN_MAX_TEMP));
+            final double minTemp = cursor.getDouble(cursor.getColumnIndex(WeatherContract.WeatherEntry.COLUMN_MIN_TEMP));
+            final String max = temperatureFormatter.format(maxTemp);
+            final String min = temperatureFormatter.format(minTemp);
+
+            weatherNotification = new WeatherNotification(weatherId, description, forecastDate, wind, pressure, humidity, max, min);
+        }
+        cursor.close();
+        return weatherNotification;
     }
 }

@@ -2,11 +2,16 @@ package com.android.sunshine.app;
 
 import android.app.Application;
 import android.content.Context;
+import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
 import com.android.sunshine.app.location.LocationProvider;
 import com.android.sunshine.app.location.PreferenceLocationProvider;
-import com.android.sunshine.app.utils.IntentLauncher;
+import com.android.sunshine.app.utils.DateFormatter;
+import com.android.sunshine.app.weather.RetrofitWeatherFetcher;
+import com.android.sunshine.app.weather.WeatherFetcher;
 import dagger.Module;
 import dagger.Provides;
+import javax.inject.Named;
 
 @Module
 public class AppModule {
@@ -23,7 +28,28 @@ public class AppModule {
     }
 
     @Provides
+    SharedPreferences provideSharedPrefs() {
+        return PreferenceManager.getDefaultSharedPreferences(application);
+    }
+
+    @Provides
+    @Named("autoInitialize")
+    Boolean provideAutoInitialize() {
+        return true;
+    }
+
+    @Provides
     LocationProvider provideLocationProvider(PreferenceLocationProvider locationProvider) {
         return locationProvider;
+    }
+
+    @Provides
+    DateFormatter providesDateFormatter() {
+        return new DateFormatter(application.getString(R.string.today), application.getString(R.string.tomorrow));
+    }
+
+    @Provides
+    WeatherFetcher providesWeatherFetcher() {
+        return new RetrofitWeatherFetcher();
     }
 }

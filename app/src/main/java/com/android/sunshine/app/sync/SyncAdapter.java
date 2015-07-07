@@ -17,6 +17,8 @@ import com.android.sunshine.app.utils.ServerStatusChanger;
 import com.android.sunshine.app.weather.WeatherFetcher;
 import com.android.sunshine.app.weather.WeatherRepository;
 import java.net.HttpURLConnection;
+import javax.inject.Inject;
+import javax.inject.Named;
 
 public class SyncAdapter extends AbstractThreadedSyncAdapter {
 
@@ -28,8 +30,9 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
     private final ServerStatusChanger serverStatusChanger;
     private final WeatherFetcher weatherFetcher;
 
+    @Inject
     public SyncAdapter(final LocationProvider locationProvider, final WeatherRepository weatherRepository, final ServerStatusChanger serverStatusChanger,
-        final WeatherFetcher weatherFetcher, final Context context, boolean autoInitialize) {
+        final WeatherFetcher weatherFetcher, final Context context, @Named("autoInitialize") boolean autoInitialize) {
         super(context, autoInitialize);
         this.locationProvider = locationProvider;
         this.weatherRepository = weatherRepository;

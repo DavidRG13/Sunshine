@@ -13,6 +13,7 @@ import com.android.sunshine.app.activities.MainActivity;
 import com.android.sunshine.app.model.OWMTemperatures;
 import com.android.sunshine.app.model.OWMWeather;
 import com.android.sunshine.app.model.OWMWeatherForecast;
+import javax.inject.Inject;
 
 public class UserNotificator {
 
@@ -23,6 +24,7 @@ public class UserNotificator {
     private TemperatureFormatter temperatureFormatter;
     private final SharedPreferences preferences;
 
+    @Inject
     public UserNotificator(final Context context, final TemperatureFormatter temperatureFormatter) {
         this.context = context;
         this.temperatureFormatter = temperatureFormatter;

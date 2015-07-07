@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.Vector;
+import javax.inject.Inject;
 
 public class WeatherRepository {
 
@@ -23,6 +24,7 @@ public class WeatherRepository {
     private final UserNotificator userNotificator;
     private final LocationProvider locationProvider;
 
+    @Inject
     public WeatherRepository(final Context context, final UserNotificator userNotificator, final LocationProvider locationProvider) {
         this.context = context;
         this.userNotificator = userNotificator;

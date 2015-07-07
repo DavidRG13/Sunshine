@@ -22,6 +22,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import butterknife.Bind;
 import butterknife.ButterKnife;
+import com.android.sunshine.app.App;
 import com.android.sunshine.app.R;
 import com.android.sunshine.app.activities.DetailActivity;
 import com.android.sunshine.app.location.LocationProvider;
@@ -31,6 +32,7 @@ import com.android.sunshine.app.model.WeatherContract;
 import com.android.sunshine.app.utils.DateFormatter;
 import com.android.sunshine.app.utils.TemperatureFormatter;
 import java.util.Locale;
+import javax.inject.Inject;
 
 public class DetailFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
 
@@ -59,12 +61,18 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
     @Bind(R.id.detail_wind_textview) TextView mWindView;
     @Bind(R.id.detail_pressure_textview) TextView mPressureView;
 
+    @Inject
+    LocationProvider locationProvider;
+
+    @Inject
+    TemperatureFormatter temperatureFormatter;
+
+    @Inject
+    DateFormatter dateFormatter;
+
     private boolean transitionAnimation;
     private String location;
     private String weatherData;
-    private LocationProvider locationProvider;
-    private TemperatureFormatter temperatureFormatter;
-    private DateFormatter dateFormatter;
 
     public DetailFragment() {
         setHasOptionsMenu(true);
@@ -73,6 +81,8 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
     @Override
     public void onActivityCreated(final Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
+        ((App) getActivity().getApplication()).getComponent().inject(this);
+
         if (savedInstanceState != null) {
             location = savedInstanceState.getString(LOCATION_KEY);
         }
@@ -91,9 +101,6 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
 
         final View view = inflater.inflate(R.layout.fragment_detail_start, container, false);
         ButterKnife.bind(this, view);
-        locationProvider = new PreferenceLocationProvider(getActivity());
-        temperatureFormatter = new TemperatureFormatter(getActivity());
-        dateFormatter = new DateFormatter(getString(R.string.today), getString(R.string.tomorrow));
         return view;
     }
 

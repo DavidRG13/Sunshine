@@ -4,11 +4,13 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 import com.android.sunshine.app.R;
+import javax.inject.Inject;
 
 public class TemperatureFormatter {
 
     private Context context;
 
+    @Inject
     public TemperatureFormatter(final Context context) {
         this.context = context;
     }

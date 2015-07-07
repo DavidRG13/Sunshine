@@ -9,18 +9,26 @@ import android.preference.ListPreference;
 import android.preference.Preference;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceManager;
+import com.android.sunshine.app.App;
 import com.android.sunshine.app.R;
 import com.android.sunshine.app.model.WeatherContract;
 import com.android.sunshine.app.sync.SyncAdapter;
 import com.android.sunshine.app.utils.ServerStatusChanger;
+import javax.inject.Inject;
 
 public class SettingsActivity extends PreferenceActivity implements Preference.OnPreferenceChangeListener, SharedPreferences.OnSharedPreferenceChangeListener {
 
-    private ServerStatusChanger serverStatusChanger;
+    @Inject
+    ServerStatusChanger serverStatusChanger;
+
+    @Inject
+    SharedPreferences preferences;
 
     @Override
     public void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        ((App) getApplication()).getComponent().inject(this);
+
         addPreferencesFromResource(R.xml.pref_general);
         bindPreferenceSummaryToValue(findPreference(getString(R.string.pref_location_key)));
         bindPreferenceSummaryToValue(findPreference(getString(R.string.pref_unit_key)));
@@ -29,15 +37,12 @@ public class SettingsActivity extends PreferenceActivity implements Preference.O
     @Override
     protected void onResume() {
         super.onResume();
-        serverStatusChanger = new ServerStatusChanger(this);
-        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
         preferences.registerOnSharedPreferenceChangeListener(this);
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
         preferences.unregisterOnSharedPreferenceChangeListener(this);
     }
 

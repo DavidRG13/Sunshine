@@ -16,10 +16,10 @@ import android.widget.RemoteViews;
 import com.android.sunshine.app.R;
 import com.android.sunshine.app.activities.MainActivity;
 import com.android.sunshine.app.location.LocationProvider;
-import com.android.sunshine.app.location.PreferenceLocationProvider;
 import com.android.sunshine.app.model.OWMWeather;
 import com.android.sunshine.app.model.WeatherContract;
 import com.android.sunshine.app.utils.TemperatureFormatter;
+import javax.inject.Inject;
 
 public class TodayWidgetIntentService extends IntentService {
 
@@ -34,13 +34,15 @@ public class TodayWidgetIntentService extends IntentService {
     private static final int INDEX_SHORT_DESC = 1;
     private static final int INDEX_MAX_TEMP = 2;
     private static final int INDEX_MIN_TEMP = 3;
-    private final LocationProvider locationProvider;
-    private final TemperatureFormatter temperatureFormatter;
+
+    @Inject
+    LocationProvider locationProvider;
+
+    @Inject
+    TemperatureFormatter temperatureFormatter;
 
     public TodayWidgetIntentService() {
         super("TodayWidgetIntentService");
-        locationProvider = new PreferenceLocationProvider(this);
-        temperatureFormatter = new TemperatureFormatter(this);
     }
 
     @Override

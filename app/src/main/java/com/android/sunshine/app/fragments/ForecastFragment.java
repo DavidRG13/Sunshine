@@ -9,7 +9,6 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.support.design.widget.AppBarLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
@@ -36,7 +35,6 @@ import com.android.sunshine.app.adapter.ForecastCursorAdapter;
 import com.android.sunshine.app.adapter.OnAdapterItemClickListener;
 import com.android.sunshine.app.callbacks.ItemClickCallback;
 import com.android.sunshine.app.location.LocationProvider;
-import com.android.sunshine.app.location.PreferenceLocationProvider;
 import com.android.sunshine.app.model.WeatherContract;
 import com.android.sunshine.app.sync.SyncAdapter;
 import com.android.sunshine.app.utils.DateFormatter;
@@ -77,6 +75,15 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
     @Inject
     ServerStatusChanger serverStatusChanger;
 
+    @Inject
+    TemperatureFormatter temperatureFormatter;
+
+    @Inject
+    DateFormatter dateFormatter;
+
+    @Inject
+    SharedPreferences preferences;
+
     public ForecastFragment() {
     }
 
@@ -98,7 +105,7 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
         forecastList.setLayoutManager(new LinearLayoutManager(getActivity()));
         forecastList.setHasFixedSize(true);
 
-        adapter = new ForecastCursorAdapter(getActivity(), emptyView, this, choiceMode, new TemperatureFormatter(getActivity()), new DateFormatter(getString(R.string.today), getString(R.string.tomorrow)));
+        adapter = new ForecastCursorAdapter(getActivity(), emptyView, this, choiceMode, temperatureFormatter, dateFormatter);
         forecastList.setAdapter(adapter);
         if (savedInstanceState != null) {
             adapter.onRestoreInstanceState(savedInstanceState);
@@ -157,7 +164,6 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
     @Override
     public void onResume() {
         super.onResume();
-        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
         preferences.registerOnSharedPreferenceChangeListener(this);
         if (location != null && !location.equals(locationProvider.getPostCode())) {
             getLoaderManager().restartLoader(FORECAST_LOADER, null, this);
@@ -167,7 +173,6 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
     @Override
     public void onPause() {
         super.onPause();
-        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
         preferences.unregisterOnSharedPreferenceChangeListener(this);
     }
 

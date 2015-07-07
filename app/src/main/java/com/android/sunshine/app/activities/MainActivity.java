@@ -6,6 +6,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import com.android.sunshine.app.App;
 import com.android.sunshine.app.R;
 import com.android.sunshine.app.adapter.ForecastCursorAdapter;
 import com.android.sunshine.app.callbacks.ItemClickCallback;
@@ -14,18 +15,21 @@ import com.android.sunshine.app.fragments.ForecastFragment;
 import com.android.sunshine.app.model.WeatherContract;
 import com.android.sunshine.app.sync.SyncAdapter;
 import com.android.sunshine.app.utils.IntentLauncher;
+import javax.inject.Inject;
 
 public class MainActivity extends AppCompatActivity implements ItemClickCallback {
 
+    @Inject
+    IntentLauncher intentLauncher;
+
     private boolean twoPane;
-    private IntentLauncher intentLauncher;
 
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        intentLauncher = new IntentLauncher();
+        ((App) getApplication()).getComponent().inject(this);
 
         Uri contentUri = getIntent() != null ? getIntent().getData() : null;
 

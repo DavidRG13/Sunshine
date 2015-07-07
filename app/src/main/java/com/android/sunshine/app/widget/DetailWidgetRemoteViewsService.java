@@ -11,11 +11,11 @@ import android.widget.RemoteViews;
 import android.widget.RemoteViewsService;
 import com.android.sunshine.app.R;
 import com.android.sunshine.app.location.LocationProvider;
-import com.android.sunshine.app.location.PreferenceLocationProvider;
 import com.android.sunshine.app.model.OWMWeather;
 import com.android.sunshine.app.model.WeatherContract;
 import com.android.sunshine.app.utils.DateFormatter;
 import com.android.sunshine.app.utils.TemperatureFormatter;
+import javax.inject.Inject;
 
 @TargetApi(Build.VERSION_CODES.HONEYCOMB)
 public class DetailWidgetRemoteViewsService extends RemoteViewsService {
@@ -31,13 +31,17 @@ public class DetailWidgetRemoteViewsService extends RemoteViewsService {
     private static final int INDEX_WEATHER_MAX_TEMP = 4;
     private static final int INDEX_WEATHER_MIN_TEMP = 5;
 
+    @Inject
+    LocationProvider locationProvider;
+
+    @Inject
+    TemperatureFormatter temperatureFormatter;
+
+    @Inject
+    DateFormatter dateFormatter;
+
     @Override
     public RemoteViewsFactory onGetViewFactory(final Intent intent) {
-
-        final LocationProvider locationProvider = new PreferenceLocationProvider(this);
-        final TemperatureFormatter temperatureFormatter = new TemperatureFormatter(this);
-        final DateFormatter dateFormatter = new DateFormatter(getString(R.string.today), getString(R.string.tomorrow));
-
         return new RemoteViewsFactory() {
             private Cursor data = null;
 

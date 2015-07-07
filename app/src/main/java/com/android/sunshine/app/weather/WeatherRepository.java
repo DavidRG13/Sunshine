@@ -96,7 +96,7 @@ public class WeatherRepository {
         Calendar cal = Calendar.getInstance();
         cal.add(Calendar.DATE, -1);
         String yesterdayDate = WeatherContract.getDbDateString(cal.getTime());
-        contentResolver.delete(WeatherContract.WeatherEntry.CONTENT_URI, WeatherContract.WeatherEntry.COLUMN_DATE + " <= ?", new String[] { yesterdayDate });
+        contentResolver.delete(WeatherContract.WeatherEntry.CONTENT_URI, WeatherContract.WeatherEntry.COLUMN_DATE + " <= ?", new String[] {yesterdayDate});
     }
 
     private void updateWidgets() {
@@ -113,8 +113,8 @@ public class WeatherRepository {
         locationValues.put(WeatherContract.LocationEntry.COLUMN_COORD_LONG, cityLongitude);
 
         long result;
-        final Cursor cursor = contentResolver.query(WeatherContract.LocationEntry.CONTENT_URI, new String[] { WeatherContract.LocationEntry._ID }, WeatherContract.LocationEntry.COLUMN_LOCATION_SETTING + " = ?",
-            new String[] { locationSettings }, null);
+        final Cursor cursor = contentResolver.query(WeatherContract.LocationEntry.CONTENT_URI, new String[] {WeatherContract.LocationEntry._ID },
+            WeatherContract.LocationEntry.COLUMN_LOCATION_SETTING + " = ?", new String[] {locationSettings}, null);
         if (cursor.moveToFirst()) {
             result = cursor.getColumnIndex(WeatherContract.LocationEntry._ID);
         } else {

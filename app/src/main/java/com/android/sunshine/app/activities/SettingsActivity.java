@@ -28,6 +28,9 @@ public class SettingsActivity extends PreferenceActivity implements Preference.O
     @Inject
     ContentResolver contentResolver;
 
+    @Inject
+    SyncAdapter syncAdapter;
+
     @Override
     public void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -103,7 +106,7 @@ public class SettingsActivity extends PreferenceActivity implements Preference.O
     public void onSharedPreferenceChanged(final SharedPreferences sharedPreferences, final String key) {
         if (key.equals(getString(R.string.pref_location_key))) {
             serverStatusChanger.resetServerStatus();
-            SyncAdapter.syncImmediately(this);
+            syncAdapter.syncImmediately();
         } else if (key.equals(getString(R.string.pref_unit_key))) {
             contentResolver.notifyChange(WeatherContract.WeatherEntry.CONTENT_URI, null);
         } else if (key.equals(getString(R.string.prefs_server_status))) {

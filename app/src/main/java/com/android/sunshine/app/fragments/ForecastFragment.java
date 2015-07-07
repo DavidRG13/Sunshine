@@ -69,6 +69,9 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
     @Inject
     LoaderHelper loaderHelper;
 
+    @Inject
+    SyncAdapter syncAdapter;
+
     private ForecastCursorAdapter adapter;
     private boolean autoSelectView;
     private int choiceMode;
@@ -258,7 +261,7 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
     }
 
     private void refreshWeatherData() {
-        SyncAdapter.syncImmediately(getActivity());
+        syncAdapter.syncImmediately();
     }
 
     public void setInitialSelectedDate(final long initialSelectedDate) {

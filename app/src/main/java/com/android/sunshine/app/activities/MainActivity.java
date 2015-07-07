@@ -21,6 +21,9 @@ public class MainActivity extends AppCompatActivity implements ItemClickCallback
     @Inject
     IntentLauncher intentLauncher;
 
+    @Inject
+    SyncAdapter syncAdapter;
+
     private boolean twoPane;
 
     @Override
@@ -44,7 +47,7 @@ public class MainActivity extends AppCompatActivity implements ItemClickCallback
         } else {
             twoPane = false;
         }
-        SyncAdapter.initializeSyncAdapter(this);
+        syncAdapter.initializeSyncAdapter();
         final ForecastFragment forecastFragment = (ForecastFragment) getSupportFragmentManager().findFragmentById(R.id.fragment_forecast);
         forecastFragment.setUseTodayLayout(!twoPane);
         if (contentUri != null) {

@@ -18,6 +18,7 @@ import com.android.sunshine.app.utils.TemperatureFormatter;
 import com.android.sunshine.app.utils.UserNotificator;
 import com.android.sunshine.app.utils.WeatherNotification;
 import com.android.sunshine.app.widget.ForecastDetailWidget;
+import com.android.sunshine.app.widget.TodayForecast;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
@@ -42,6 +43,17 @@ public class WeatherRepository {
         WeatherContract.WeatherEntry.TABLE_NAME + "." + WeatherContract.WeatherEntry._ID, WeatherContract.WeatherEntry.COLUMN_DATE, WeatherContract.WeatherEntry.COLUMN_WEATHER_ID,
         WeatherContract.WeatherEntry.COLUMN_SHORT_DESC, WeatherContract.WeatherEntry.COLUMN_MAX_TEMP, WeatherContract.WeatherEntry.COLUMN_MIN_TEMP
     };
+    private static final String[] TODAY_WIDGET_FORECAST_COLUMNS = {
+        WeatherContract.WeatherEntry.COLUMN_WEATHER_ID,
+        WeatherContract.WeatherEntry.COLUMN_SHORT_DESC,
+        WeatherContract.WeatherEntry.COLUMN_MAX_TEMP,
+        WeatherContract.WeatherEntry.COLUMN_MIN_TEMP
+    };
+    private static final int TODAY_WIDGET_INDEX_WEATHER_ID = 0;
+    private static final int TODAY_WIDGET_INDEX_SHORT_DESC = 1;
+    private static final int TODAY_WIDGET_INDEX_MAX_TEMP = 2;
+    private static final int TODAY_WIDGET_INDEX_MIN_TEMP = 3;
+
     private static final int INDEX_WEATHER_ID = 0;
     private static final int INDEX_WEATHER_DATE = 1;
     private static final int INDEX_WEATHER_CONDITION_ID = 2;
@@ -183,5 +195,23 @@ public class WeatherRepository {
         }
         data.close();
         return forecasts;
+    }
+
+    public TodayForecast getForecastForNowAndCurrentPosition() {
+        Uri weatherForLocationUri = WeatherContract.WeatherEntry.buildWeatherLocationWithStartDate(locationProvider.getPostCode(), System.currentTimeMillis());
+        Cursor data = contentResolver.query(weatherForLocationUri, TODAY_WIDGET_FORECAST_COLUMNS, null, null, WeatherContract.WeatherEntry.COLUMN_DATE + " ASC");
+        TodayForecast todayForecast = TodayForecast.INVALID_OBJECT;
+        if (data.moveToFirst()) {
+            int weatherId = data.getInt(TODAY_WIDGET_INDEX_WEATHER_ID);
+            int weatherArtResourceId = OWMWeather.getArtResourceForWeatherCondition(weatherId);
+            String description = data.getString(TODAY_WIDGET_INDEX_SHORT_DESC);
+            double maxTemp = data.getDouble(TODAY_WIDGET_INDEX_MAX_TEMP);
+            double minTemp = data.getDouble(TODAY_WIDGET_INDEX_MIN_TEMP);
+            String formattedMaxTemperature = temperatureFormatter.format(maxTemp);
+            String formattedMinTemperature = temperatureFormatter.format(minTemp);
+            todayForecast = new TodayForecast(weatherArtResourceId, description, formattedMaxTemperature, formattedMinTemperature);
+        }
+        data.close();
+        return todayForecast;
     }
 }

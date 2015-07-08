@@ -1,6 +1,7 @@
 package com.android.sunshine.app.utils;
 
 import android.app.Activity;
+import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
@@ -12,6 +13,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import com.android.sunshine.app.R;
 import com.android.sunshine.app.activities.DetailActivity;
+import com.android.sunshine.app.activities.MainActivity;
 import com.android.sunshine.app.activities.SettingsActivity;
 import com.android.sunshine.app.fragments.DetailFragment;
 import com.android.sunshine.app.location.LatLong;
@@ -95,5 +97,10 @@ public class IntentLauncher {
         Uri weatherUri = WeatherContract.WeatherEntry.buildWeatherLocationWithDate(postCode, dateInMillis);
         fillInIntent.setData(weatherUri);
         return fillInIntent;
+    }
+
+    public PendingIntent pendingToMain(final Context context) {
+        Intent launchIntent = new Intent(context, MainActivity.class);
+        return PendingIntent.getActivity(context, 0, launchIntent, 0);
     }
 }

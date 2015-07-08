@@ -2,13 +2,9 @@ package com.android.sunshine.app.widget;
 
 import android.annotation.TargetApi;
 import android.app.IntentService;
-import android.app.PendingIntent;
 import android.appwidget.AppWidgetManager;
 import android.content.ComponentName;
-import android.content.ContentResolver;
 import android.content.Intent;
-import android.database.Cursor;
-import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
@@ -16,35 +12,17 @@ import android.util.TypedValue;
 import android.widget.RemoteViews;
 import com.android.sunshine.app.App;
 import com.android.sunshine.app.R;
-import com.android.sunshine.app.activities.MainActivity;
-import com.android.sunshine.app.location.LocationProvider;
-import com.android.sunshine.app.model.OWMWeather;
-import com.android.sunshine.app.model.WeatherContract;
-import com.android.sunshine.app.utils.TemperatureFormatter;
+import com.android.sunshine.app.utils.IntentLauncher;
+import com.android.sunshine.app.weather.WeatherRepository;
 import javax.inject.Inject;
 
 public class TodayWidgetIntentService extends IntentService {
 
-    private static final String[] FORECAST_COLUMNS = {
-        WeatherContract.WeatherEntry.COLUMN_WEATHER_ID,
-        WeatherContract.WeatherEntry.COLUMN_SHORT_DESC,
-        WeatherContract.WeatherEntry.COLUMN_MAX_TEMP,
-        WeatherContract.WeatherEntry.COLUMN_MIN_TEMP
-    };
-    // these indices must match the projection
-    private static final int INDEX_WEATHER_ID = 0;
-    private static final int INDEX_SHORT_DESC = 1;
-    private static final int INDEX_MAX_TEMP = 2;
-    private static final int INDEX_MIN_TEMP = 3;
+    @Inject
+    WeatherRepository weatherRepository;
 
     @Inject
-    LocationProvider locationProvider;
-
-    @Inject
-    TemperatureFormatter temperatureFormatter;
-
-    @Inject
-    ContentResolver contentResolver;
+    IntentLauncher intentLauncher;
 
     public TodayWidgetIntentService() {
         super("TodayWidgetIntentService");
@@ -57,26 +35,7 @@ public class TodayWidgetIntentService extends IntentService {
         AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(this);
         int[] appWidgetIds = appWidgetManager.getAppWidgetIds(new ComponentName(this, TodayWidgetProvider.class));
 
-        Uri weatherForLocationUri = WeatherContract.WeatherEntry.buildWeatherLocationWithStartDate(
-            locationProvider.getPostCode(), System.currentTimeMillis());
-        Cursor data = contentResolver.query(weatherForLocationUri, FORECAST_COLUMNS, null,
-            null, WeatherContract.WeatherEntry.COLUMN_DATE + " ASC");
-        if (data == null) {
-            return;
-        }
-        if (!data.moveToFirst()) {
-            data.close();
-            return;
-        }
-
-        int weatherId = data.getInt(INDEX_WEATHER_ID);
-        int weatherArtResourceId = OWMWeather.getArtResourceForWeatherCondition(weatherId);
-        String description = data.getString(INDEX_SHORT_DESC);
-        double maxTemp = data.getDouble(INDEX_MAX_TEMP);
-        double minTemp = data.getDouble(INDEX_MIN_TEMP);
-        String formattedMaxTemperature = temperatureFormatter.format(maxTemp);
-        String formattedMinTemperature = temperatureFormatter.format(minTemp);
-        data.close();
+        TodayForecast todayForecast = weatherRepository.getForecastForNowAndCurrentPosition();
 
         for (int appWidgetId : appWidgetIds) {
             int widgetWidth = getWidgetWidth(appWidgetManager, appWidgetId);
@@ -92,17 +51,15 @@ public class TodayWidgetIntentService extends IntentService {
             }
             RemoteViews views = new RemoteViews(getPackageName(), layoutId);
 
-            views.setImageViewResource(R.id.widget_icon, weatherArtResourceId);
+            views.setImageViewResource(R.id.widget_icon, todayForecast.getIconResourceId());
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH_MR1) {
-                setRemoteContentDescription(views, description);
+                setRemoteContentDescription(views, todayForecast.getDescription());
             }
-            views.setTextViewText(R.id.widget_description, description);
-            views.setTextViewText(R.id.widget_high_temperature, formattedMaxTemperature);
-            views.setTextViewText(R.id.widget_low_temperature, formattedMinTemperature);
+            views.setTextViewText(R.id.widget_description, todayForecast.getDescription());
+            views.setTextViewText(R.id.widget_high_temperature, todayForecast.getMaxTemperature());
+            views.setTextViewText(R.id.widget_low_temperature, todayForecast.getMinTemperature());
 
-            Intent launchIntent = new Intent(this, MainActivity.class);
-            PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, launchIntent, 0);
-            views.setOnClickPendingIntent(R.id.widget, pendingIntent);
+            views.setOnClickPendingIntent(R.id.widget, intentLauncher.pendingToMain(this));
 
             appWidgetManager.updateAppWidget(appWidgetId, views);
         }

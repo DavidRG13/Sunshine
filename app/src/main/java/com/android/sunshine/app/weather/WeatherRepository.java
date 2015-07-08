@@ -7,13 +7,17 @@ import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
+import com.android.sunshine.app.R;
 import com.android.sunshine.app.location.LocationProvider;
 import com.android.sunshine.app.model.OWMResponse;
+import com.android.sunshine.app.model.OWMWeather;
 import com.android.sunshine.app.model.OWMWeatherForecast;
 import com.android.sunshine.app.model.WeatherContract;
+import com.android.sunshine.app.utils.DateFormatter;
 import com.android.sunshine.app.utils.TemperatureFormatter;
 import com.android.sunshine.app.utils.UserNotificator;
 import com.android.sunshine.app.utils.WeatherNotification;
+import com.android.sunshine.app.widget.ForecastDetailWidget;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
@@ -34,21 +38,34 @@ public class WeatherRepository {
         WeatherContract.WeatherEntry.COLUMN_WIND_SPEED,
         WeatherContract.WeatherEntry.COLUMN_WEATHER_ID
     };
+    private static final String[] FORECAST_COLUMNS = {
+        WeatherContract.WeatherEntry.TABLE_NAME + "." + WeatherContract.WeatherEntry._ID, WeatherContract.WeatherEntry.COLUMN_DATE, WeatherContract.WeatherEntry.COLUMN_WEATHER_ID,
+        WeatherContract.WeatherEntry.COLUMN_SHORT_DESC, WeatherContract.WeatherEntry.COLUMN_MAX_TEMP, WeatherContract.WeatherEntry.COLUMN_MIN_TEMP
+    };
+    private static final int INDEX_WEATHER_ID = 0;
+    private static final int INDEX_WEATHER_DATE = 1;
+    private static final int INDEX_WEATHER_CONDITION_ID = 2;
+    private static final int INDEX_WEATHER_DESC = 3;
+    private static final int INDEX_WEATHER_MAX_TEMP = 4;
+    private static final int INDEX_WEATHER_MIN_TEMP = 5;
+
     private final Context context;
     private final UserNotificator userNotificator;
     private final LocationProvider locationProvider;
 
     private TemperatureFormatter temperatureFormatter;
     private ContentResolver contentResolver;
+    private DateFormatter dateFormatter;
 
     @Inject
     public WeatherRepository(final Context context, final UserNotificator userNotificator, final LocationProvider locationProvider, 
-        final TemperatureFormatter temperatureFormatter, final ContentResolver contentResolver) {
+        final TemperatureFormatter temperatureFormatter, final ContentResolver contentResolver, final DateFormatter dateFormatter) {
         this.context = context;
         this.userNotificator = userNotificator;
         this.locationProvider = locationProvider;
         this.temperatureFormatter = temperatureFormatter;
         this.contentResolver = contentResolver;
+        this.dateFormatter = dateFormatter;
     }
 
     public void saveWeatherForLocation(final OWMResponse owmResponse, final String locationSettings) {
@@ -148,5 +165,23 @@ public class WeatherRepository {
             contentValues[i] = weatherValues;
         }
         return contentValues;
+    }
+
+    public ArrayList<ForecastDetailWidget> getForecastForDetailWidget() {
+        ArrayList<ForecastDetailWidget> forecasts = new ArrayList<>();
+        Uri weatherForLocationUri = WeatherContract.WeatherEntry.buildWeatherLocationWithStartDate(locationProvider.getPostCode(), System.currentTimeMillis());
+        Cursor data = contentResolver.query(weatherForLocationUri, FORECAST_COLUMNS, null, null, WeatherContract.WeatherEntry.COLUMN_DATE + " ASC");
+        while (data.moveToNext()) {
+            int weatherId = data.getInt(INDEX_WEATHER_CONDITION_ID);
+            int weatherArtResourceId = OWMWeather.getIconResourceForWeatherCondition(weatherId);
+            String description = data.getString(INDEX_WEATHER_DESC);
+            long dateInMillis = data.getLong(INDEX_WEATHER_DATE);
+            String formattedDate = dateFormatter.getFriendlyDay(dateInMillis, false);
+            double maxTemp = data.getDouble(INDEX_WEATHER_MAX_TEMP);
+            double minTemp = data.getDouble(INDEX_WEATHER_MIN_TEMP);
+            forecasts.add(new ForecastDetailWidget(weatherId, weatherArtResourceId, description, dateInMillis, formattedDate, temperatureFormatter.format(maxTemp), temperatureFormatter.format(minTemp), locationProvider.getPostCode()));
+        }
+        data.close();
+        return forecasts;
     }
 }

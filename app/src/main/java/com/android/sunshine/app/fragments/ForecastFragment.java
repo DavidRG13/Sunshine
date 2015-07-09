@@ -35,6 +35,7 @@ import com.android.sunshine.app.location.LocationProvider;
 import com.android.sunshine.app.model.WeatherContract;
 import com.android.sunshine.app.sync.ServerStatus;
 import com.android.sunshine.app.sync.SyncAdapter;
+import com.android.sunshine.app.utils.ApplicationPreferences;
 import com.android.sunshine.app.utils.DateFormatter;
 import com.android.sunshine.app.utils.IntentLauncher;
 import com.android.sunshine.app.utils.LoaderHelper;
@@ -72,11 +73,13 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
     @Inject
     SyncAdapter syncAdapter;
 
+    @Inject
+    ApplicationPreferences applicationPreferences;
+
     private ForecastCursorAdapter adapter;
     private boolean autoSelectView;
     private int choiceMode;
     private boolean holdForTransition;
-    private long mInitialSelectedDate = -1;
 
     public ForecastFragment() {
     }
@@ -97,8 +100,7 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
         ButterKnife.bind(this, rootView);
         forecastList.setLayoutManager(new LinearLayoutManager(getActivity()));
         forecastList.setHasFixedSize(true);
-
-        adapter = new ForecastCursorAdapter(getActivity(), emptyView, this, choiceMode, temperatureFormatter, dateFormatter);
+        adapter = new ForecastCursorAdapter(getActivity(), emptyView, this, choiceMode, temperatureFormatter, dateFormatter, applicationPreferences);
         forecastList.setAdapter(adapter);
         if (savedInstanceState != null) {
             adapter.onRestoreInstanceState(savedInstanceState);
@@ -204,6 +206,8 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
             forecastList.getViewTreeObserver().addOnPreDrawListener(new ViewTreeObserver.OnPreDrawListener() {
                 @Override
                 public boolean onPreDraw() {
+                    long mInitialSelectedDate = applicationPreferences.getInitialSelectedDate();
+
                     if (forecastList.getChildCount() > 0) {
                         forecastList.getViewTreeObserver().removeOnPreDrawListener(this);
                         int position = adapter.getSelectedItemPosition();
@@ -254,18 +258,8 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
         }
     }
 
-    public void setUseTodayLayout(final boolean useTodayLayout) {
-        if (adapter != null) {
-            adapter.setUseTodayLayout(useTodayLayout);
-        }
-    }
-
     private void refreshWeatherData() {
         syncAdapter.syncImmediately();
-    }
-
-    public void setInitialSelectedDate(final long initialSelectedDate) {
-        mInitialSelectedDate = initialSelectedDate;
     }
 
     private void showCurrentLocation() {

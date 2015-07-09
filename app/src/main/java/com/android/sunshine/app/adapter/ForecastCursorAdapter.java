@@ -14,6 +14,7 @@ import butterknife.Bind;
 import butterknife.ButterKnife;
 import com.android.sunshine.app.R;
 import com.android.sunshine.app.model.OWMWeather;
+import com.android.sunshine.app.utils.ApplicationPreferences;
 import com.android.sunshine.app.utils.DateFormatter;
 import com.android.sunshine.app.utils.TemperatureFormatter;
 
@@ -24,22 +25,23 @@ public class ForecastCursorAdapter extends RecyclerView.Adapter<ForecastCursorAd
     private static final int TODAY_VIEW_TYPE = 0;
     private static final int FUTURE_DAY_VIEW_TYPE = 1;
 
-    private boolean useTodayLayout;
     private Cursor cursor;
     private Context context;
     private View emptyView;
     private OnAdapterItemClickListener onAdapterItemClickListener;
     private final TemperatureFormatter temperatureFormatter;
     private final DateFormatter dateFormatter;
+    private final ApplicationPreferences applicationPreferences;
     private final ItemChoiceManager itemChoiceManager;
 
     public ForecastCursorAdapter(final Context context, final View emptyView, final OnAdapterItemClickListener onAdapterItemClickListener,
-        final int choiceMode, final TemperatureFormatter temperatureFormatter, final DateFormatter dateFormatter) {
+        final int choiceMode, final TemperatureFormatter temperatureFormatter, final DateFormatter dateFormatter, final ApplicationPreferences applicationPreferences) {
         this.context = context;
         this.emptyView = emptyView;
         this.onAdapterItemClickListener = onAdapterItemClickListener;
         this.temperatureFormatter = temperatureFormatter;
         this.dateFormatter = dateFormatter;
+        this.applicationPreferences = applicationPreferences;
         itemChoiceManager = new ItemChoiceManager(this);
         itemChoiceManager.setChoiceMode(choiceMode);
     }
@@ -95,11 +97,7 @@ public class ForecastCursorAdapter extends RecyclerView.Adapter<ForecastCursorAd
 
     @Override
     public int getItemViewType(final int position) {
-        return (position == 0 && useTodayLayout) ? TODAY_VIEW_TYPE : FUTURE_DAY_VIEW_TYPE;
-    }
-
-    public void setUseTodayLayout(final boolean useTodayLayout) {
-        this.useTodayLayout = useTodayLayout;
+        return (position == 0 && applicationPreferences.useTodayLayout()) ? TODAY_VIEW_TYPE : FUTURE_DAY_VIEW_TYPE;
     }
 
     @Override

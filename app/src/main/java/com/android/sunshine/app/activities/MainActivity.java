@@ -10,9 +10,9 @@ import com.android.sunshine.app.App;
 import com.android.sunshine.app.R;
 import com.android.sunshine.app.adapter.ForecastCursorAdapter;
 import com.android.sunshine.app.callbacks.ItemClickCallback;
-import com.android.sunshine.app.fragments.ForecastFragment;
 import com.android.sunshine.app.model.WeatherContract;
 import com.android.sunshine.app.sync.SyncAdapter;
+import com.android.sunshine.app.utils.ApplicationPreferences;
 import com.android.sunshine.app.utils.IntentLauncher;
 import javax.inject.Inject;
 
@@ -24,6 +24,9 @@ public class MainActivity extends AppCompatActivity implements ItemClickCallback
     @Inject
     SyncAdapter syncAdapter;
 
+    @Inject
+    ApplicationPreferences applicationPreferences;
+
     private boolean twoPane;
 
     @Override
@@ -34,6 +37,11 @@ public class MainActivity extends AppCompatActivity implements ItemClickCallback
         ((App) getApplication()).getComponent().inject(this);
 
         Uri contentUri = getIntent() != null ? getIntent().getData() : null;
+        long dateFromUri = 0;
+        if (contentUri != null) {
+            dateFromUri = WeatherContract.WeatherEntry.getDateFromUri(contentUri);
+            applicationPreferences.setInitialSelectedDate(dateFromUri);
+        }
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -42,17 +50,13 @@ public class MainActivity extends AppCompatActivity implements ItemClickCallback
         if (findViewById(R.id.weather_detail_container) != null) {
             twoPane = true;
             if (savedInstanceState == null) {
-                intentLauncher.displayTwoPaneDetails(contentUri, this);
+                intentLauncher.twoPaneDetails(dateFromUri, this);
             }
         } else {
             twoPane = false;
         }
         syncAdapter.initializeSyncAdapter();
-        final ForecastFragment forecastFragment = (ForecastFragment) getSupportFragmentManager().findFragmentById(R.id.fragment_forecast);
-        forecastFragment.setUseTodayLayout(!twoPane);
-        if (contentUri != null) {
-            forecastFragment.setInitialSelectedDate(WeatherContract.WeatherEntry.getDateFromUri(contentUri));
-        }
+        applicationPreferences.useTodayLayout(!twoPane);
     }
 
     @Override

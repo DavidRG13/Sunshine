@@ -53,23 +53,11 @@ public class IntentLauncher {
     public void twoPaneDetails(final long date, final AppCompatActivity fromActivity) {
         final Bundle args = new Bundle();
         args.putLong(DATE_KEY, date);
-        final DetailFragment detailFragment = new DetailFragment();
-        detailFragment.setArguments(args);
+        final DetailFragment fragment = new DetailFragment();
+        fragment.setArguments(args);
         fromActivity.getSupportFragmentManager().beginTransaction()
-            .replace(R.id.weather_detail_container, detailFragment)
+            .replace(R.id.weather_detail_container, fragment)
             .commitAllowingStateLoss();
-    }
-
-    public void displayTwoPaneDetails(final Uri contentUri, final AppCompatActivity fromActivity) {
-        DetailFragment fragment = new DetailFragment();
-        if (contentUri != null) {
-            Bundle args = new Bundle();
-            args.putParcelable(DetailFragment.DETAIL_URI, contentUri);
-            fragment.setArguments(args);
-        }
-        fromActivity.getSupportFragmentManager().beginTransaction()
-            .replace(R.id.weather_detail_container, new DetailFragment())
-            .commit();
     }
 
     public void detailsWithTransitionEnabled(final long date, final AppCompatActivity fromActivity) {

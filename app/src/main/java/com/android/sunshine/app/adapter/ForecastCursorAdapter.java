@@ -1,7 +1,6 @@
 package com.android.sunshine.app.adapter;
 
 import android.content.Context;
-import android.database.Cursor;
 import android.os.Bundle;
 import android.support.v4.view.ViewCompat;
 import android.support.v7.widget.RecyclerView;
@@ -13,34 +12,28 @@ import android.widget.TextView;
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import com.android.sunshine.app.R;
+import com.android.sunshine.app.fragments.ForecastFragmentWeather;
 import com.android.sunshine.app.model.OWMWeather;
 import com.android.sunshine.app.utils.ApplicationPreferences;
-import com.android.sunshine.app.utils.DateFormatter;
-import com.android.sunshine.app.utils.TemperatureFormatter;
-
-import static com.android.sunshine.app.model.WeatherContract.WeatherEntry;
+import java.util.List;
 
 public class ForecastCursorAdapter extends RecyclerView.Adapter<ForecastCursorAdapter.ViewHolder> implements OnItemClickHandler {
 
     private static final int TODAY_VIEW_TYPE = 0;
     private static final int FUTURE_DAY_VIEW_TYPE = 1;
 
-    private Cursor cursor;
     private Context context;
     private View emptyView;
     private OnAdapterItemClickListener onAdapterItemClickListener;
-    private final TemperatureFormatter temperatureFormatter;
-    private final DateFormatter dateFormatter;
     private final ApplicationPreferences applicationPreferences;
     private final ItemChoiceManager itemChoiceManager;
+    private List<ForecastFragmentWeather> data;
 
     public ForecastCursorAdapter(final Context context, final View emptyView, final OnAdapterItemClickListener onAdapterItemClickListener,
-        final int choiceMode, final TemperatureFormatter temperatureFormatter, final DateFormatter dateFormatter, final ApplicationPreferences applicationPreferences) {
+        final int choiceMode, final ApplicationPreferences applicationPreferences) {
         this.context = context;
         this.emptyView = emptyView;
         this.onAdapterItemClickListener = onAdapterItemClickListener;
-        this.temperatureFormatter = temperatureFormatter;
-        this.dateFormatter = dateFormatter;
         this.applicationPreferences = applicationPreferences;
         itemChoiceManager = new ItemChoiceManager(this);
         itemChoiceManager.setChoiceMode(choiceMode);
@@ -69,27 +62,19 @@ public class ForecastCursorAdapter extends RecyclerView.Adapter<ForecastCursorAd
 
     @Override
     public void onBindViewHolder(final ViewHolder viewHolder, final int position) {
-        cursor.moveToPosition(position);
+        ForecastFragmentWeather weather = data.get(position);
 
-        final int weatherId = cursor.getInt(cursor.getColumnIndex(WeatherEntry.COLUMN_WEATHER_ID));
-        final long weatherDate = cursor.getLong(cursor.getColumnIndex(WeatherEntry.COLUMN_DATE));
-        final String descriptionWeather = cursor.getString(cursor.getColumnIndex(WeatherEntry.COLUMN_SHORT_DESC));
-        final float maxTemp = cursor.getFloat(cursor.getColumnIndex(WeatherEntry.COLUMN_MAX_TEMP));
-        final float minTemp = cursor.getFloat(cursor.getColumnIndex(WeatherEntry.COLUMN_MIN_TEMP));
-
-        boolean useLongToday;
-        if (getItemViewType(cursor.getPosition()) == TODAY_VIEW_TYPE) {
-            useLongToday = true;
-            viewHolder.forecastIcon.setImageResource(OWMWeather.getArtResourceForWeatherCondition(weatherId));
+        if (getItemViewType(position) == TODAY_VIEW_TYPE) {
+            viewHolder.forecastIcon.setImageResource(OWMWeather.getArtResourceForWeatherCondition(weather.getWeatherId()));
+            viewHolder.dateWeather.setText(weather.getLongDate());
         } else {
-            useLongToday = false;
-            viewHolder.forecastIcon.setImageResource(OWMWeather.getIconResourceForWeatherCondition(weatherId));
+            viewHolder.forecastIcon.setImageResource(OWMWeather.getIconResourceForWeatherCondition(weather.getWeatherId()));
+            viewHolder.dateWeather.setText(weather.getShortDate());
         }
 
-        viewHolder.dateWeather.setText(dateFormatter.getFriendlyDay(weatherDate, useLongToday));
-        viewHolder.forecastDescription.setText(descriptionWeather);
-        viewHolder.max.setText(temperatureFormatter.format(maxTemp));
-        viewHolder.min.setText(temperatureFormatter.format(minTemp));
+        viewHolder.forecastDescription.setText(weather.getDescription());
+        viewHolder.max.setText(weather.getMaxTemp());
+        viewHolder.min.setText(weather.getMinTemp());
         ViewCompat.setTransitionName(viewHolder.forecastIcon, "iconView" + position);
 
         itemChoiceManager.onBindViewHolder(viewHolder, position);
@@ -102,29 +87,14 @@ public class ForecastCursorAdapter extends RecyclerView.Adapter<ForecastCursorAd
 
     @Override
     public int getItemCount() {
-        if (null == cursor) {
-            return 0;
-        } else {
-            return cursor.getCount();
-        }
-    }
-
-    public void swapCursor(final Cursor cursor) {
-        this.cursor = cursor;
-        notifyDataSetChanged();
-        emptyView.setVisibility(getItemCount() == 0 ? View.VISIBLE : View.GONE);
-    }
-
-    public Cursor getCursor() {
-        return cursor;
+        return data == null ? 0 : data.size();
     }
 
     @Override
     public void itemClick(final RecyclerView.ViewHolder viewHolder) {
         int position = viewHolder.getAdapterPosition();
-        cursor.moveToPosition(position);
-        long date = cursor.getLong(cursor.getColumnIndex(WeatherEntry.COLUMN_DATE));
-        onAdapterItemClickListener.onClick(date, (ViewHolder) viewHolder);
+        ForecastFragmentWeather weather = data.get(position);
+        onAdapterItemClickListener.onClick(weather.getDateInMillis(), (ViewHolder) viewHolder);
         itemChoiceManager.onClick(viewHolder);
     }
 
@@ -145,6 +115,12 @@ public class ForecastCursorAdapter extends RecyclerView.Adapter<ForecastCursorAd
 
     public int getSelectedItemPosition() {
         return itemChoiceManager.getSelectedItemPosition();
+    }
+
+    public void setData(final List<ForecastFragmentWeather> data) {
+        this.data = data;
+        notifyDataSetChanged();
+        emptyView.setVisibility(getItemCount() == 0 ? View.VISIBLE : View.GONE);
     }
 
     public static final class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {

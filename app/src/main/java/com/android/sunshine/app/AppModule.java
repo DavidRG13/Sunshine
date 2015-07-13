@@ -7,8 +7,13 @@ import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 import com.android.sunshine.app.location.LocationProvider;
 import com.android.sunshine.app.location.PreferenceLocationProvider;
+import com.android.sunshine.app.sync.SyncAdapter;
+import com.android.sunshine.app.sync.WeatherRepository;
 import com.android.sunshine.app.utils.DateFormatter;
+import com.android.sunshine.app.utils.ServerStatusChanger;
 import com.android.sunshine.app.weather.RetrofitWeatherFetcher;
+import com.android.sunshine.app.weather.SQLiteDataSource;
+import com.android.sunshine.app.weather.WeatherDataSource;
 import com.android.sunshine.app.weather.WeatherFetcher;
 import dagger.Module;
 import dagger.Provides;
@@ -57,5 +62,20 @@ public class AppModule {
     @Provides
     WeatherFetcher providesWeatherFetcher() {
         return new RetrofitWeatherFetcher();
+    }
+
+    @Provides
+    WeatherDataSource providesWeatherDataSource(SQLiteDataSource dataSource) {
+        return dataSource;
+    }
+
+    @Provides
+    WeatherRepository providesWeatherRepo(SyncAdapter weatherRepo) {
+        return weatherRepo;
+    }
+
+    @Provides
+    ServerStatusChanger providesServerStatusChanger() {
+        return new ServerStatusChanger(application.getApplicationContext());
     }
 }

@@ -13,7 +13,7 @@ import android.preference.PreferenceManager;
 import com.android.sunshine.app.App;
 import com.android.sunshine.app.R;
 import com.android.sunshine.app.model.WeatherContract;
-import com.android.sunshine.app.sync.SyncAdapter;
+import com.android.sunshine.app.sync.WeatherRepository;
 import com.android.sunshine.app.utils.ServerStatusChanger;
 import javax.inject.Inject;
 
@@ -29,7 +29,7 @@ public class SettingsActivity extends PreferenceActivity implements Preference.O
     ContentResolver contentResolver;
 
     @Inject
-    SyncAdapter syncAdapter;
+    WeatherRepository weatherRepository;
 
     @Override
     public void onCreate(final Bundle savedInstanceState) {
@@ -106,7 +106,7 @@ public class SettingsActivity extends PreferenceActivity implements Preference.O
     public void onSharedPreferenceChanged(final SharedPreferences sharedPreferences, final String key) {
         if (key.equals(getString(R.string.pref_location_key))) {
             serverStatusChanger.resetServerStatus();
-            syncAdapter.syncImmediately();
+            weatherRepository.syncImmediately();
         } else if (key.equals(getString(R.string.pref_unit_key))) {
             contentResolver.notifyChange(WeatherContract.WeatherEntry.CONTENT_URI, null);
         } else if (key.equals(getString(R.string.prefs_server_status))) {

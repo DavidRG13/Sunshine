@@ -23,6 +23,7 @@ import javax.inject.Inject;
 public class IntentLauncher {
 
     public static final String DATE_KEY = "forecast_date";
+    public static final String ACTION_DATA_UPDATED = "com.example.android.sunshine.app.ACTION_DATA_UPDATED";
 
     @Inject
     public IntentLauncher() {
@@ -90,5 +91,10 @@ public class IntentLauncher {
     public PendingIntent pendingToMain(final Context context) {
         Intent launchIntent = new Intent(context, MainActivity.class);
         return PendingIntent.getActivity(context, 0, launchIntent, 0);
+    }
+
+    public void updateWidgets(final Context context) {
+        Intent dataUpdatedIntent = new Intent(ACTION_DATA_UPDATED).setPackage(context.getPackageName());
+        context.sendBroadcast(dataUpdatedIntent);
     }
 }

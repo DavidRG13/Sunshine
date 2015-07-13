@@ -12,8 +12,8 @@ import android.util.TypedValue;
 import android.widget.RemoteViews;
 import com.android.sunshine.app.App;
 import com.android.sunshine.app.R;
+import com.android.sunshine.app.sync.WeatherRepository;
 import com.android.sunshine.app.utils.IntentLauncher;
-import com.android.sunshine.app.weather.WeatherRepository;
 import javax.inject.Inject;
 
 public class TodayWidgetIntentService extends IntentService {

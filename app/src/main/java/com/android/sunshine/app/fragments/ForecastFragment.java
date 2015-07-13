@@ -4,13 +4,10 @@ import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.SharedPreferences;
 import android.content.res.TypedArray;
-import android.database.Cursor;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.design.widget.AppBarLayout;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.LoaderManager;
-import android.support.v4.content.Loader;
 import android.support.v4.view.ViewCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -32,19 +29,17 @@ import com.android.sunshine.app.adapter.ForecastCursorAdapter;
 import com.android.sunshine.app.adapter.OnAdapterItemClickListener;
 import com.android.sunshine.app.callbacks.ItemClickCallback;
 import com.android.sunshine.app.location.LocationProvider;
-import com.android.sunshine.app.model.WeatherContract;
 import com.android.sunshine.app.sync.ServerStatus;
-import com.android.sunshine.app.sync.SyncAdapter;
+import com.android.sunshine.app.sync.WeatherRepository;
 import com.android.sunshine.app.utils.ApplicationPreferences;
-import com.android.sunshine.app.utils.DateFormatter;
 import com.android.sunshine.app.utils.IntentLauncher;
-import com.android.sunshine.app.utils.LoaderHelper;
 import com.android.sunshine.app.utils.ServerStatusChanger;
 import com.android.sunshine.app.utils.ServerStatusListener;
-import com.android.sunshine.app.utils.TemperatureFormatter;
+import com.android.sunshine.app.weather.NewForecastObserver;
+import java.util.List;
 import javax.inject.Inject;
 
-public class ForecastFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor>, OnAdapterItemClickListener, ServerStatusListener {
+public class ForecastFragment extends Fragment implements OnAdapterItemClickListener, ServerStatusListener, NewForecastObserver {
 
     @Bind(R.id.recycler_view_forecast) RecyclerView forecastList;
     @Bind(R.id.listview_forecast_empty) TextView emptyView;
@@ -59,22 +54,13 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
     ServerStatusChanger serverStatusChanger;
 
     @Inject
-    TemperatureFormatter temperatureFormatter;
-
-    @Inject
-    DateFormatter dateFormatter;
-
-    @Inject
     SharedPreferences preferences;
 
     @Inject
-    LoaderHelper loaderHelper;
-
-    @Inject
-    SyncAdapter syncAdapter;
-
-    @Inject
     ApplicationPreferences applicationPreferences;
+
+    @Inject
+    WeatherRepository weatherRepository;
 
     private ForecastCursorAdapter adapter;
     private boolean autoSelectView;
@@ -97,10 +83,11 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
         setHasOptionsMenu(true);
         final View rootView = inflater.inflate(R.layout.fragment_main, container, false);
         ((App) getActivity().getApplication()).getComponent().inject(this);
+
         ButterKnife.bind(this, rootView);
         forecastList.setLayoutManager(new LinearLayoutManager(getActivity()));
         forecastList.setHasFixedSize(true);
-        adapter = new ForecastCursorAdapter(getActivity(), emptyView, this, choiceMode, temperatureFormatter, dateFormatter, applicationPreferences);
+        adapter = new ForecastCursorAdapter(getActivity(), emptyView, this, choiceMode, applicationPreferences);
         forecastList.setAdapter(adapter);
         if (savedInstanceState != null) {
             adapter.onRestoreInstanceState(savedInstanceState);
@@ -142,7 +129,6 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
                 });
             }
         }
-
         return rootView;
     }
 
@@ -159,8 +145,8 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
     @Override
     public void onResume() {
         super.onResume();
+        onNewForecast(weatherRepository.getForecastList());
         serverStatusChanger.addListener(this);
-        getLoaderManager().initLoader(loaderHelper.getForecastLoaderId(), null, this);
     }
 
     @Override
@@ -192,15 +178,15 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
     }
 
     @Override
-    public Loader<Cursor> onCreateLoader(final int id, final Bundle args) {
-        return loaderHelper.getForecastCursorLoader(getActivity());
+    public void onServerStatusChanged(final ServerStatus status) {
+        updateEmptyView();
     }
 
     @Override
-    public void onLoadFinished(final Loader<Cursor> loader, final Cursor data) {
-        adapter.swapCursor(data);
+    public void onNewForecast(final List<ForecastFragmentWeather> weathers) {
+        adapter.setData(weathers);
         updateEmptyView();
-        if (data.getCount() == 0) {
+        if (weathers.size() == 0) {
             getActivity().supportStartPostponedEnterTransition();
         } else {
             forecastList.getViewTreeObserver().addOnPreDrawListener(new ViewTreeObserver.OnPreDrawListener() {
@@ -211,13 +197,10 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
                     if (forecastList.getChildCount() > 0) {
                         forecastList.getViewTreeObserver().removeOnPreDrawListener(this);
                         int position = adapter.getSelectedItemPosition();
-                        if (position == RecyclerView.NO_POSITION && -1 != mInitialSelectedDate) {
-                            Cursor data = adapter.getCursor();
-                            int count = data.getCount();
-                            int dateColumn = data.getColumnIndex(WeatherContract.WeatherEntry.COLUMN_DATE);
-                            for (int i = 0; i < count; i++) {
-                                data.moveToPosition(i);
-                                if (data.getLong(dateColumn) == mInitialSelectedDate) {
+                        if (position == RecyclerView.NO_POSITION && mInitialSelectedDate != -1) {
+                            for (int i = 0; i < weathers.size(); i++) {
+                                ForecastFragmentWeather weather = weathers.get(i);
+                                if (weather.getDateInMillis() == mInitialSelectedDate) {
                                     position = i;
                                     break;
                                 }
@@ -240,16 +223,7 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
                 }
             });
         }
-    }
 
-    @Override
-    public void onServerStatusChanged(final ServerStatus status) {
-        updateEmptyView();
-    }
-
-    @Override
-    public void onLoaderReset(final Loader<Cursor> loader) {
-        adapter.swapCursor(null);
     }
 
     private void updateEmptyView() {
@@ -259,11 +233,12 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
     }
 
     private void refreshWeatherData() {
-        syncAdapter.syncImmediately();
+        weatherRepository.syncImmediately();
+        // TODO: creo k no pinta la update
     }
 
     private void showCurrentLocation() {
-        if (null != adapter) {
+        if (adapter != null) {
             intentLauncher.displayMapWithLocation(getActivity(), locationProvider.getLocation());
         }
     }

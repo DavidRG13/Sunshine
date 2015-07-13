@@ -29,7 +29,7 @@
     </string>
     <string name="format_temperature"><xliff:g id="temp">%1.0f</xliff:g>\u00B0</string>
     <string name="format_notification">
-        Forecast: <xliff:g id="condition">%1$s</xliff:g> <xliff:g id="temperature">%2$s</xliff:g>
+        Forecast: <xliff:g id="condition">%1$s</xliff:g> <xliff:g id="temperatureMax">%2$s</xliff:g> <xliff:g id="temperatureMin">%3$s</xliff:g>
     </string>
     <string name="format_max_min">
         High: <xliff:g id="high">%1$s</xliff:g> Low: <xliff:g id="low">%2$s</xliff:g>

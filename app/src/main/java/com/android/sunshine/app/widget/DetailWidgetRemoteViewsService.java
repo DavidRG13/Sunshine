@@ -9,8 +9,8 @@ import android.widget.RemoteViews;
 import android.widget.RemoteViewsService;
 import com.android.sunshine.app.App;
 import com.android.sunshine.app.R;
+import com.android.sunshine.app.sync.WeatherRepository;
 import com.android.sunshine.app.utils.IntentLauncher;
-import com.android.sunshine.app.weather.WeatherRepository;
 import java.util.ArrayList;
 import javax.inject.Inject;
 

@@ -10,9 +10,7 @@ import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.TaskStackBuilder;
 import com.android.sunshine.app.R;
 import com.android.sunshine.app.activities.MainActivity;
-import com.android.sunshine.app.model.OWMTemperatures;
-import com.android.sunshine.app.model.OWMWeather;
-import com.android.sunshine.app.model.OWMWeatherForecast;
+import com.android.sunshine.app.widget.TodayForecast;
 import javax.inject.Inject;
 
 public class UserNotificator {
@@ -21,25 +19,20 @@ public class UserNotificator {
     private static final int WEATHER_NOTIFICATION_ID = 3004;
 
     private Context context;
-    private TemperatureFormatter temperatureFormatter;
     private final SharedPreferences preferences;
 
     @Inject
-    public UserNotificator(final Context context, final TemperatureFormatter temperatureFormatter) {
+    public UserNotificator(final Context context) {
         this.context = context;
-        this.temperatureFormatter = temperatureFormatter;
         preferences = PreferenceManager.getDefaultSharedPreferences(context);
     }
 
-    public void notifyWeather(final OWMWeatherForecast owmWeatherForecast) {
+    public void notifyWeather(final TodayForecast todayForecast) {
         if (shouldNotify()) {
-            OWMWeather weather = owmWeatherForecast.getWeather().get(0);
-            OWMTemperatures temp = owmWeatherForecast.getTemp();
-
-            String contentText = context.getString(R.string.format_notification, weather.getDescription(), temperatureFormatter.format(temp.getMax(), temp.getMin()));
+            String contentText = context.getString(R.string.format_notification, todayForecast.getDescription(), todayForecast.getMaxTemperature(), todayForecast.getMinTemperature());
 
             NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(context)
-                .setSmallIcon(OWMWeather.getIconResourceForWeatherCondition(weather.getId()))
+                .setSmallIcon(todayForecast.getIconResourceId())
                 .setContentTitle(context.getString(R.string.app_name))
                 .setContentText(contentText);
 

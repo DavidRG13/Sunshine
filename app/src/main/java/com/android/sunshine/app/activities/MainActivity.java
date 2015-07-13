@@ -11,7 +11,6 @@ import com.android.sunshine.app.R;
 import com.android.sunshine.app.adapter.ForecastCursorAdapter;
 import com.android.sunshine.app.callbacks.ItemClickCallback;
 import com.android.sunshine.app.model.WeatherContract;
-import com.android.sunshine.app.sync.SyncAdapter;
 import com.android.sunshine.app.utils.ApplicationPreferences;
 import com.android.sunshine.app.utils.IntentLauncher;
 import javax.inject.Inject;
@@ -20,9 +19,6 @@ public class MainActivity extends AppCompatActivity implements ItemClickCallback
 
     @Inject
     IntentLauncher intentLauncher;
-
-    @Inject
-    SyncAdapter syncAdapter;
 
     @Inject
     ApplicationPreferences applicationPreferences;
@@ -41,6 +37,7 @@ public class MainActivity extends AppCompatActivity implements ItemClickCallback
         if (contentUri != null) {
             dateFromUri = WeatherContract.WeatherEntry.getDateFromUri(contentUri);
             applicationPreferences.setInitialSelectedDate(dateFromUri);
+            // TODO: mirar para k usamos InitialSelectedDate
         }
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -55,7 +52,6 @@ public class MainActivity extends AppCompatActivity implements ItemClickCallback
         } else {
             twoPane = false;
         }
-        syncAdapter.initializeSyncAdapter();
         applicationPreferences.useTodayLayout(!twoPane);
     }
 

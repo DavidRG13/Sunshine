@@ -21,11 +21,11 @@ import com.android.sunshine.app.R;
 import com.android.sunshine.app.activities.DetailActivity;
 import com.android.sunshine.app.location.LocationProvider;
 import com.android.sunshine.app.model.OWMWeather;
+import com.android.sunshine.app.sync.WeatherRepository;
 import com.android.sunshine.app.utils.DateFormatter;
 import com.android.sunshine.app.utils.IntentLauncher;
 import com.android.sunshine.app.utils.TemperatureFormatter;
 import com.android.sunshine.app.utils.WeatherNotification;
-import com.android.sunshine.app.weather.WeatherRepository;
 import java.util.Locale;
 import javax.inject.Inject;
 

@@ -21,18 +21,4 @@ public class PreferenceLocationProvider implements LocationProvider {
     public String getPostCode() {
         return sharedPreferences.getString(context.getString(R.string.pref_location_key), context.getString(R.string.location_default));
     }
-
-    @Override
-    public void saveLocation(final double latitude, final double longitude) {
-        SharedPreferences.Editor edit = sharedPreferences.edit();
-        edit.putLong("lat", Double.doubleToRawLongBits(latitude));
-        edit.putLong("long", Double.doubleToRawLongBits(longitude));
-        edit.apply();
-    }
-
-    @Override
-    public LatLong getLocation() {
-        return new LatLong(Double.longBitsToDouble(sharedPreferences.getLong("lat", Double.doubleToLongBits(0))),
-            Double.longBitsToDouble(sharedPreferences.getLong("long", Double.doubleToLongBits(0))));
-    }
 }

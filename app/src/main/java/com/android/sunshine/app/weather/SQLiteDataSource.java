@@ -185,7 +185,6 @@ public class SQLiteDataSource implements WeatherDataSource {
     }
 
     private long addLocation(final String locationSettings, final String cityName, final double cityLatitude, final double cityLongitude) {
-        locationProvider.saveLocation(cityLatitude, cityLongitude);
         ContentValues locationValues = new ContentValues();
         locationValues.put(WeatherContract.LocationEntry.COLUMN_LOCATION_SETTING, locationSettings);
         locationValues.put(WeatherContract.LocationEntry.COLUMN_CITY_NAME, cityName);

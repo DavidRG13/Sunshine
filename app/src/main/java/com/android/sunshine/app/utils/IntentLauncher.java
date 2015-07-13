@@ -29,8 +29,8 @@ public class IntentLauncher {
     public IntentLauncher() {
     }
 
-    public void displayMapWithLocation(final Context context, final LatLong latLong) {
-        Uri geoLocation = Uri.parse("geo:" + latLong.getLatitude() + "," + latLong.getLongitude());
+    public void displayMapWithLocation(final Context context, final String postCode) {
+        Uri geoLocation = Uri.parse("geo:" + postCode);
 
         System.out.println("geoLocation = " + geoLocation);
         Intent intent = new Intent(Intent.ACTION_VIEW);

@@ -35,11 +35,10 @@ import com.android.sunshine.app.utils.ApplicationPreferences;
 import com.android.sunshine.app.utils.IntentLauncher;
 import com.android.sunshine.app.utils.ServerStatusChanger;
 import com.android.sunshine.app.utils.ServerStatusListener;
-import com.android.sunshine.app.weather.NewForecastObserver;
 import java.util.List;
 import javax.inject.Inject;
 
-public class ForecastFragment extends Fragment implements OnAdapterItemClickListener, ServerStatusListener, NewForecastObserver {
+public class ForecastFragment extends Fragment implements OnAdapterItemClickListener, ServerStatusListener {
 
     @Bind(R.id.recycler_view_forecast) RecyclerView forecastList;
     @Bind(R.id.listview_forecast_empty) TextView emptyView;
@@ -182,7 +181,6 @@ public class ForecastFragment extends Fragment implements OnAdapterItemClickList
         updateEmptyView();
     }
 
-    @Override
     public void onNewForecast(final List<ForecastFragmentWeather> weathers) {
         adapter.setData(weathers);
         updateEmptyView();
@@ -239,7 +237,7 @@ public class ForecastFragment extends Fragment implements OnAdapterItemClickList
 
     private void showCurrentLocation() {
         if (adapter != null) {
-            intentLauncher.displayMapWithLocation(getActivity(), locationProvider.getLocation());
+            intentLauncher.displayMapWithLocation(getActivity(), locationProvider.getPostCode());
         }
     }
 }

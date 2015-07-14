@@ -4,17 +4,23 @@ import android.app.Application;
 
 public class App extends Application {
 
-    private AppComponent component;
+    private ApplicationComponent component;
 
     @Override
     public void onCreate() {
         super.onCreate();
-        component = DaggerAppComponent.builder()
-            .appModule(new AppModule(this))
-            .build();
+        if (component == null) {
+            component = DaggerAppComponent.builder()
+                .appModule(new AppModule(this))
+                .build();
+        }
     }
 
-    public AppComponent getComponent() {
+    public ApplicationComponent getComponent() {
         return component;
+    }
+
+    public void setComponent(final ApplicationComponent component) {
+        this.component = component;
     }
 }

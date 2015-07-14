@@ -25,6 +25,8 @@ android {
         targetSdkVersion 22
         versionCode 1
         versionName "1.0"
+
+        testInstrumentationRunner 'android.support.test.runner.AndroidJUnitRunner'
     }
     packagingOptions {
         exclude 'LICENSE'
@@ -64,7 +66,9 @@ dependencies {
     apt 'com.google.dagger:dagger-compiler:2.0.1'
     provided 'org.glassfish:javax.annotation:10.0-b28'
 
+
     testCompile 'junit:junit:4.12'
+    androidTestApt 'com.google.dagger:dagger-compiler:2.0.1'
     androidTestCompile ('com.android.support.test.espresso:espresso-core:2.1') {
         exclude module: 'support-annotations'
     }

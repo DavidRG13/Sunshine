@@ -1,7 +1,6 @@
 package com.android.sunshine.app.db;
 
 import android.content.ContentProvider;
-import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.UriMatcher;
 import android.database.Cursor;
@@ -11,7 +10,6 @@ import android.database.sqlite.SQLiteQueryBuilder;
 import android.net.Uri;
 import com.android.sunshine.app.model.WeatherContract;
 
-import static com.android.sunshine.app.model.WeatherContract.LocationEntry;
 import static com.android.sunshine.app.model.WeatherContract.WeatherEntry;
 
 public class WeatherProvider extends ContentProvider {
@@ -19,22 +17,15 @@ public class WeatherProvider extends ContentProvider {
     private static final int WEATHER = 100;
     private static final int WEATHER_WITH_LOCATION = 101;
     private static final int WEATHER_WITH_LOCATION_AND_DATE = 102;
-    private static final int LOCATION = 300;
-    private static final int LOCATION_ID = 301;
     private static final UriMatcher URI_MATCHER = buildUriMatcher();
-    private static final String LOCATION_SETTINGS_SELECTION = LocationEntry.TABLE_NAME + "." + LocationEntry.COLUMN_LOCATION_SETTING + " = ?";
-    private static final String LOCATION_SETTINGS_WITH_START_DATE_SELECTION = LocationEntry.TABLE_NAME + "." + LocationEntry.COLUMN_LOCATION_SETTING
-        + " = ? AND " + WeatherEntry.COLUMN_DATE + " >= ? ";
-    private static final String LOCATION_SETTINGS_WITH_DAY_SELECTION = LocationEntry.TABLE_NAME + "." + LocationEntry.COLUMN_LOCATION_SETTING
-        + " = ? AND " + WeatherEntry.COLUMN_DATE + " = ? ";
+    private static final String LOCATION_SETTINGS_SELECTION = WeatherEntry.COLUMN_LOCATION_SETTINGS + " = ?";
+    private static final String LOCATION_SETTINGS_WITH_START_DATE_SELECTION = WeatherEntry.COLUMN_LOCATION_SETTINGS + " = ? AND " + WeatherEntry.COLUMN_DATE + " >= ? ";
+    private static final String LOCATION_SETTINGS_WITH_DAY_SELECTION = WeatherEntry.COLUMN_LOCATION_SETTINGS + " = ? AND " + WeatherEntry.COLUMN_DATE + " = ? ";
     private static SQLiteQueryBuilder weatherByLocationSettingsQueryBuilder;
 
     static {
         weatherByLocationSettingsQueryBuilder = new SQLiteQueryBuilder();
-        weatherByLocationSettingsQueryBuilder.setTables(
-                WeatherEntry.TABLE_NAME + " INNER JOIN " + LocationEntry.TABLE_NAME + " ON "
-                    + WeatherEntry.TABLE_NAME + "." + WeatherEntry.COLUMN_LOC_KEY + " = "
-                    + LocationEntry.TABLE_NAME + "." + LocationEntry._ID);
+        weatherByLocationSettingsQueryBuilder.setTables(WeatherEntry.TABLE_NAME);
     }
 
     private SQLiteDatabase db;
@@ -58,12 +49,6 @@ public class WeatherProvider extends ContentProvider {
             case WEATHER_WITH_LOCATION_AND_DATE:
                 cursor = getWeatherByLocationSettingsWithDate(uri, projection, sortOrder);
                 break;
-            case LOCATION:
-                cursor = db.query(LocationEntry.TABLE_NAME, projection, selection, selectionArgs, null, null, sortOrder);
-                break;
-            case LOCATION_ID:
-                cursor = db.query(LocationEntry.TABLE_NAME, projection, LocationEntry._ID + " = '" + ContentUris.parseId(uri) + "'", selectionArgs, null, null, sortOrder);
-                break;
             default:
                 throw new UnsupportedOperationException("Unknown uri: " + uri);
         }
@@ -80,10 +65,6 @@ public class WeatherProvider extends ContentProvider {
                 return WeatherEntry.CONTENT_TYPE;
             case WEATHER_WITH_LOCATION_AND_DATE:
                 return WeatherEntry.CONTENT_ITEM_TYPE;
-            case LOCATION:
-                return LocationEntry.CONTENT_TYPE;
-            case LOCATION_ID:
-                return LocationEntry.CONTENT_ITEM_TYPE;
             default:
                 throw new UnsupportedOperationException("Unknown uri: " + uri);
         }
@@ -95,9 +76,6 @@ public class WeatherProvider extends ContentProvider {
         switch (URI_MATCHER.match(uri)) {
             case WEATHER:
                 returnUri = insertInTo(WeatherEntry.TABLE_NAME, contentValues, uri);
-                break;
-            case LOCATION:
-                returnUri = insertInTo(LocationEntry.TABLE_NAME, contentValues, uri);
                 break;
             default:
                 throw new UnsupportedOperationException("Unknown uri: " + uri);
@@ -113,9 +91,6 @@ public class WeatherProvider extends ContentProvider {
             case WEATHER:
                 count = bulkInsertIn(WeatherEntry.TABLE_NAME, values);
                 break;
-            case LOCATION:
-                count = bulkInsertIn(LocationEntry.TABLE_NAME, values);
-                break;
             default:
                 return super.bulkInsert(uri, values);
         }
@@ -129,9 +104,6 @@ public class WeatherProvider extends ContentProvider {
         switch (URI_MATCHER.match(uri)) {
             case WEATHER:
                 rowsDeleted = db.delete(WeatherEntry.TABLE_NAME, whereClause, whereArgs);
-                break;
-            case LOCATION:
-                rowsDeleted = db.delete(LocationEntry.TABLE_NAME, whereClause, whereArgs);
                 break;
             default:
                 throw new UnsupportedOperationException("Unknown uri: " + uri);
@@ -148,9 +120,6 @@ public class WeatherProvider extends ContentProvider {
         switch (URI_MATCHER.match(uri)) {
             case WEATHER:
                 rowsUpdated = db.update(WeatherEntry.TABLE_NAME, contentValues, whereClause, whereArgs);
-                break;
-            case LOCATION:
-                rowsUpdated = db.update(LocationEntry.TABLE_NAME, contentValues, whereClause, whereArgs);
                 break;
             default:
                 throw new UnsupportedOperationException("Unknown uri: " + uri);
@@ -222,8 +191,6 @@ public class WeatherProvider extends ContentProvider {
         matcher.addURI(authority, WeatherContract.PATH_WEATHER, WEATHER);
         matcher.addURI(authority, WeatherContract.PATH_WEATHER + "/*", WEATHER_WITH_LOCATION);
         matcher.addURI(authority, WeatherContract.PATH_WEATHER + "/*/*", WEATHER_WITH_LOCATION_AND_DATE);
-        matcher.addURI(authority, WeatherContract.PATH_LOCATION, LOCATION);
-        matcher.addURI(authority, WeatherContract.PATH_LOCATION + "/#", LOCATION_ID);
 
         return matcher;
     }

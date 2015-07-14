@@ -1,7 +1,6 @@
 package com.android.sunshine.app.weather;
 
 import android.content.ContentResolver;
-import android.content.ContentUris;
 import android.content.ContentValues;
 import android.database.Cursor;
 import android.net.Uri;
@@ -160,11 +159,9 @@ public class SQLiteDataSource implements WeatherDataSource {
         double cityLatitude = owmResponse.getCity().getCoord().getLat();
         double cityLongitude = owmResponse.getCity().getCoord().getLon();
 
-        long locationId = addLocation(locationSettings, cityName, cityLatitude, cityLongitude);
-
         ArrayList<OWMWeatherForecast> weatherForecasts = owmResponse.getList();
         if (!weatherForecasts.isEmpty()) {
-            ContentValues[] contentValues = toContentValues(locationId, weatherForecasts);
+            ContentValues[] contentValues = toContentValues(weatherForecasts, cityName, cityLatitude, cityLongitude, locationSettings);
 
             contentResolver.bulkInsert(WeatherContract.WeatherEntry.CONTENT_URI, contentValues);
 
@@ -173,26 +170,8 @@ public class SQLiteDataSource implements WeatherDataSource {
         }
     }
 
-    private long addLocation(final String locationSettings, final String cityName, final double cityLatitude, final double cityLongitude) {
-        ContentValues locationValues = new ContentValues();
-        locationValues.put(WeatherContract.LocationEntry.COLUMN_LOCATION_SETTING, locationSettings);
-        locationValues.put(WeatherContract.LocationEntry.COLUMN_CITY_NAME, cityName);
-        locationValues.put(WeatherContract.LocationEntry.COLUMN_COORD_LAT, cityLatitude);
-        locationValues.put(WeatherContract.LocationEntry.COLUMN_COORD_LONG, cityLongitude);
-
-        long result;
-        final Cursor cursor = contentResolver.query(WeatherContract.LocationEntry.CONTENT_URI, new String[] {WeatherContract.LocationEntry._ID },
-            WeatherContract.LocationEntry.COLUMN_LOCATION_SETTING + " = ?", new String[] {locationSettings}, null);
-        if (cursor.moveToFirst()) {
-            result = cursor.getColumnIndex(WeatherContract.LocationEntry._ID);
-        } else {
-            result = ContentUris.parseId(contentResolver.insert(WeatherContract.LocationEntry.CONTENT_URI, locationValues));
-        }
-        cursor.close();
-        return result;
-    }
-
-    private ContentValues[] toContentValues(final long locationId, final ArrayList<OWMWeatherForecast> weatherForecasts) {
+    private ContentValues[] toContentValues(final ArrayList<OWMWeatherForecast> weatherForecasts, final String cityName, final double cityLatitude,
+        final double cityLongitude, final String locationSettings) {
         ContentValues[] contentValues = new ContentValues[weatherForecasts.size()];
         GregorianCalendar calendar = new GregorianCalendar();
         for (int i = 0; i < weatherForecasts.size(); i++) {
@@ -202,7 +181,6 @@ public class SQLiteDataSource implements WeatherDataSource {
                 calendar.add(Calendar.DAY_OF_YEAR, 1);
             }
 
-            weatherValues.put(WeatherContract.WeatherEntry.COLUMN_LOC_KEY, locationId);
             weatherValues.put(WeatherContract.WeatherEntry.COLUMN_DATE, calendar.getTimeInMillis());
             weatherValues.put(WeatherContract.WeatherEntry.COLUMN_HUMIDITY, weatherForecast.getHumidity());
             weatherValues.put(WeatherContract.WeatherEntry.COLUMN_PRESSURE, weatherForecast.getPressure());
@@ -212,6 +190,10 @@ public class SQLiteDataSource implements WeatherDataSource {
             weatherValues.put(WeatherContract.WeatherEntry.COLUMN_MIN_TEMP, weatherForecast.getTemp().getMin());
             weatherValues.put(WeatherContract.WeatherEntry.COLUMN_SHORT_DESC, weatherForecast.getWeather().get(0).getDescription());
             weatherValues.put(WeatherContract.WeatherEntry.COLUMN_WEATHER_ID, weatherForecast.getWeather().get(0).getId());
+            weatherValues.put(WeatherContract.WeatherEntry.COLUMN_CITY, cityName);
+            weatherValues.put(WeatherContract.WeatherEntry.COLUMN_LATITUDE, cityLatitude);
+            weatherValues.put(WeatherContract.WeatherEntry.COLUMN_LONGITUDE, cityLongitude);
+            weatherValues.put(WeatherContract.WeatherEntry.COLUMN_LOCATION_SETTINGS, locationSettings);
 
             contentValues[i] = weatherValues;
         }

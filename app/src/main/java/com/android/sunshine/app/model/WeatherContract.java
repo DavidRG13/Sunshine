@@ -12,7 +12,6 @@ public final class WeatherContract {
     public static final String CONTENT_AUTHORITY = "com.android.sunshine.app";
     public static final Uri BASE_CONTENT_URI = Uri.parse("content://" + CONTENT_AUTHORITY);
     public static final String PATH_WEATHER = "weather";
-    public static final String PATH_LOCATION = "location";
     public static final String DATE_FORMAT = "yyyyMMdd";
 
     private WeatherContract() { }
@@ -29,7 +28,6 @@ public final class WeatherContract {
         public static final String CONTENT_ITEM_TYPE = "vnd.android.cursor.item/" + CONTENT_AUTHORITY + "/" + PATH_WEATHER;
 
         public static final String TABLE_NAME = "weather";
-        public static final String COLUMN_LOC_KEY = "location_id";
         public static final String COLUMN_DATE = "date";
         public static final String COLUMN_WEATHER_ID = "weather_id";
         public static final String COLUMN_SHORT_DESC = "short_desc";
@@ -39,6 +37,10 @@ public final class WeatherContract {
         public static final String COLUMN_PRESSURE = "pressure";
         public static final String COLUMN_WIND_SPEED = "wind";
         public static final String COLUMN_DEGREES = "degrees";
+        public static final String COLUMN_LATITUDE = "latitude";
+        public static final String COLUMN_LONGITUDE = "longitude";
+        public static final String COLUMN_CITY = "city";
+        public static final String COLUMN_LOCATION_SETTINGS = "locSettings";
 
         public static Uri buildWeatherUri(final long id) {
             return ContentUris.withAppendedId(CONTENT_URI, id);
@@ -66,22 +68,6 @@ public final class WeatherContract {
 
         public static String getStartDateFromUri(final Uri uri) {
             return uri.getQueryParameter(COLUMN_DATE);
-        }
-    }
-
-    public static final class LocationEntry implements BaseColumns {
-        public static final Uri CONTENT_URI = BASE_CONTENT_URI.buildUpon().appendPath(PATH_LOCATION).build();
-        public static final String CONTENT_TYPE = "vnd.android.cursor.dir/" + CONTENT_AUTHORITY + "/" + PATH_LOCATION;
-        public static final String CONTENT_ITEM_TYPE = "vnd.android.cursor.item/" + CONTENT_AUTHORITY + "/" + PATH_LOCATION;
-
-        public static final String TABLE_NAME = "location";
-        public static final String COLUMN_LOCATION_SETTING = "location_setting";
-        public static final String COLUMN_CITY_NAME = "city_name";
-        public static final String COLUMN_COORD_LAT = "coord_lat";
-        public static final String COLUMN_COORD_LONG = "coord_long";
-
-        public static Uri buildLocationUri(final long id) {
-            return ContentUris.withAppendedId(CONTENT_URI, id);
         }
     }
 }

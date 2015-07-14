@@ -24,7 +24,6 @@ import com.android.sunshine.app.model.OWMWeather;
 import com.android.sunshine.app.sync.WeatherRepository;
 import com.android.sunshine.app.utils.DateFormatter;
 import com.android.sunshine.app.utils.IntentLauncher;
-import com.android.sunshine.app.utils.TemperatureFormatter;
 import com.android.sunshine.app.utils.WeatherNotification;
 import java.util.Locale;
 import javax.inject.Inject;
@@ -45,9 +44,6 @@ public class DetailFragment extends Fragment {
 
     @Inject
     LocationProvider locationProvider;
-
-    @Inject
-    TemperatureFormatter temperatureFormatter;
 
     @Inject
     DateFormatter dateFormatter;

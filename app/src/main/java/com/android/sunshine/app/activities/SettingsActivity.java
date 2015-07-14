@@ -14,7 +14,9 @@ import com.android.sunshine.app.App;
 import com.android.sunshine.app.R;
 import com.android.sunshine.app.model.WeatherContract;
 import com.android.sunshine.app.sync.WeatherRepository;
+import com.android.sunshine.app.utils.ApplicationPreferences;
 import com.android.sunshine.app.utils.ServerStatusChanger;
+import com.android.sunshine.app.utils.TemperatureUnit;
 import javax.inject.Inject;
 
 public class SettingsActivity extends PreferenceActivity implements Preference.OnPreferenceChangeListener, SharedPreferences.OnSharedPreferenceChangeListener {
@@ -30,6 +32,9 @@ public class SettingsActivity extends PreferenceActivity implements Preference.O
 
     @Inject
     WeatherRepository weatherRepository;
+
+    @Inject
+    ApplicationPreferences applicationPreferences;
 
     @Override
     public void onCreate(final Bundle savedInstanceState) {
@@ -108,6 +113,8 @@ public class SettingsActivity extends PreferenceActivity implements Preference.O
             serverStatusChanger.resetServerStatus();
             weatherRepository.syncImmediately();
         } else if (key.equals(getString(R.string.pref_unit_key))) {
+            String unit = preferences.getString(getString(R.string.pref_unit_key), getString(R.string.prefs_units_imperial));
+            applicationPreferences.setTemperatureUnit(TemperatureUnit.fromString(unit));
             contentResolver.notifyChange(WeatherContract.WeatherEntry.CONTENT_URI, null);
         } else if (key.equals(getString(R.string.prefs_server_status))) {
             Preference locationPreference = findPreference(getString(R.string.pref_location_key));

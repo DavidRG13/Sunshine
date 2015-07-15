@@ -3,13 +3,12 @@ package com.android.sunshine.app.db;
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
-
-import static com.android.sunshine.app.model.WeatherContract.WeatherEntry;
+import com.android.sunshine.app.model.WeatherEntry;
 
 public class DBHelper extends SQLiteOpenHelper {
 
     public static final String DATABASE_NAME = "weather.db";
-    private static final int DATABASE_VERSION = 2;
+    private static final int DATABASE_VERSION = 4;
     private static final String DROP_TABLE_IF_EXISTS = "DROP TABLE IF EXISTS ";
 
     public DBHelper(final Context context) {
@@ -40,8 +39,6 @@ public class DBHelper extends SQLiteOpenHelper {
 
     @Override
     public void onUpgrade(final SQLiteDatabase sqLiteDatabase, final int oldVersion, final int newVersion) {
-        // TODO: remove this line in the next update
-        sqLiteDatabase.execSQL(DROP_TABLE_IF_EXISTS + "location");
         sqLiteDatabase.execSQL(DROP_TABLE_IF_EXISTS + WeatherEntry.TABLE_NAME);
         onCreate(sqLiteDatabase);
     }

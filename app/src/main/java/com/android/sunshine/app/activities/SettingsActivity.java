@@ -1,7 +1,6 @@
 package com.android.sunshine.app.activities;
 
 import android.annotation.TargetApi;
-import android.content.ContentResolver;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Build;
@@ -12,7 +11,6 @@ import android.preference.PreferenceActivity;
 import android.preference.PreferenceManager;
 import com.android.sunshine.app.App;
 import com.android.sunshine.app.R;
-import com.android.sunshine.app.model.WeatherContract;
 import com.android.sunshine.app.sync.WeatherRepository;
 import com.android.sunshine.app.utils.ApplicationPreferences;
 import com.android.sunshine.app.utils.ServerStatusChanger;
@@ -26,9 +24,6 @@ public class SettingsActivity extends PreferenceActivity implements Preference.O
 
     @Inject
     SharedPreferences preferences;
-
-    @Inject
-    ContentResolver contentResolver;
 
     @Inject
     WeatherRepository weatherRepository;
@@ -115,7 +110,6 @@ public class SettingsActivity extends PreferenceActivity implements Preference.O
         } else if (key.equals(getString(R.string.pref_unit_key))) {
             String unit = preferences.getString(getString(R.string.pref_unit_key), getString(R.string.prefs_units_imperial));
             applicationPreferences.setTemperatureUnit(TemperatureUnit.fromString(unit));
-            contentResolver.notifyChange(WeatherContract.WeatherEntry.CONTENT_URI, null);
         } else if (key.equals(getString(R.string.prefs_server_status))) {
             Preference locationPreference = findPreference(getString(R.string.pref_location_key));
             bindPreferenceSummaryToValue(locationPreference);

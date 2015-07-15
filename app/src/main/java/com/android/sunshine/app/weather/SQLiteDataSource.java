@@ -1,15 +1,16 @@
 package com.android.sunshine.app.weather;
 
-import android.content.ContentResolver;
 import android.content.ContentValues;
+import android.content.Context;
 import android.database.Cursor;
-import android.net.Uri;
+import android.database.sqlite.SQLiteDatabase;
+import com.android.sunshine.app.db.DBHelper;
 import com.android.sunshine.app.fragments.ForecastFragmentWeather;
 import com.android.sunshine.app.location.LocationProvider;
 import com.android.sunshine.app.model.OWMResponse;
 import com.android.sunshine.app.model.OWMWeather;
 import com.android.sunshine.app.model.OWMWeatherForecast;
-import com.android.sunshine.app.model.WeatherContract;
+import com.android.sunshine.app.model.WeatherEntry;
 import com.android.sunshine.app.utils.ApplicationPreferences;
 import com.android.sunshine.app.utils.DateFormatter;
 import com.android.sunshine.app.utils.WeatherNotification;
@@ -26,62 +27,67 @@ import javax.inject.Singleton;
 @Singleton
 public class SQLiteDataSource implements WeatherDataSource {
 
+    private static final String LOCATION_SETTINGS_WITH_START_DATE_SELECTION = WeatherEntry.COLUMN_LOCATION_SETTINGS + " = ? AND "
+        + WeatherEntry.COLUMN_DATE + " >= ? ";
+    private static final String LOCATION_SETTINGS_WITH_DAY_SELECTION = WeatherEntry.COLUMN_LOCATION_SETTINGS + " = ? AND "
+        + WeatherEntry.COLUMN_DATE + " = ? ";
+
+
     private static final String[] COLUMNS = new String[]{
-        WeatherContract.WeatherEntry.TABLE_NAME + "." + WeatherContract.WeatherEntry._ID,
-        WeatherContract.WeatherEntry.COLUMN_DATE,
-        WeatherContract.WeatherEntry.COLUMN_SHORT_DESC,
-        WeatherContract.WeatherEntry.COLUMN_MAX_TEMP,
-        WeatherContract.WeatherEntry.COLUMN_MIN_TEMP,
-        WeatherContract.WeatherEntry.COLUMN_HUMIDITY,
-        WeatherContract.WeatherEntry.COLUMN_PRESSURE,
-        WeatherContract.WeatherEntry.COLUMN_WIND_SPEED,
-        WeatherContract.WeatherEntry.COLUMN_WEATHER_ID
+        WeatherEntry.TABLE_NAME + "." + WeatherEntry._ID,
+        WeatherEntry.COLUMN_DATE,
+        WeatherEntry.COLUMN_SHORT_DESC,
+        WeatherEntry.COLUMN_MAX_TEMP,
+        WeatherEntry.COLUMN_MIN_TEMP,
+        WeatherEntry.COLUMN_HUMIDITY,
+        WeatherEntry.COLUMN_PRESSURE,
+        WeatherEntry.COLUMN_WIND_SPEED,
+        WeatherEntry.COLUMN_WEATHER_ID
     };
 
     private static final String[] TODAY_WIDGET_FORECAST_COLUMNS = {
-        WeatherContract.WeatherEntry.COLUMN_WEATHER_ID,
-        WeatherContract.WeatherEntry.COLUMN_SHORT_DESC,
-        WeatherContract.WeatherEntry.COLUMN_MAX_TEMP,
-        WeatherContract.WeatherEntry.COLUMN_MIN_TEMP
+        WeatherEntry.COLUMN_WEATHER_ID,
+        WeatherEntry.COLUMN_SHORT_DESC,
+        WeatherEntry.COLUMN_MAX_TEMP,
+        WeatherEntry.COLUMN_MIN_TEMP
     };
 
     private static final String[] FORECAST_LIST_COLUMNS = new String[] {
-        WeatherContract.WeatherEntry.TABLE_NAME + "." + WeatherContract.WeatherEntry._ID,
-        WeatherContract.WeatherEntry.COLUMN_DATE,
-        WeatherContract.WeatherEntry.COLUMN_SHORT_DESC,
-        WeatherContract.WeatherEntry.COLUMN_MAX_TEMP,
-        WeatherContract.WeatherEntry.COLUMN_MIN_TEMP,
-        WeatherContract.WeatherEntry.COLUMN_WEATHER_ID,
+        WeatherEntry.TABLE_NAME + "." + WeatherEntry._ID,
+        WeatherEntry.COLUMN_DATE,
+        WeatherEntry.COLUMN_SHORT_DESC,
+        WeatherEntry.COLUMN_MAX_TEMP,
+        WeatherEntry.COLUMN_MIN_TEMP,
+        WeatherEntry.COLUMN_WEATHER_ID,
     };
+    private static final String DATE_ASC_ORDER = WeatherEntry.COLUMN_DATE + " ASC";
 
-    private final ContentResolver contentResolver;
     private final DateFormatter dateFormatter;
+    private final SQLiteDatabase database;
     private LocationProvider locationProvider;
     private ApplicationPreferences applicationPreferences;
 
     @Inject
-    public SQLiteDataSource(final ContentResolver contentResolver, final DateFormatter dateFormatter, final LocationProvider locationProvider,
-        final ApplicationPreferences applicationPreferences) {
-        this.contentResolver = contentResolver;
+    public SQLiteDataSource(final Context context, final DateFormatter dateFormatter, final LocationProvider locationProvider, final ApplicationPreferences applicationPreferences) {
         this.dateFormatter = dateFormatter;
         this.locationProvider = locationProvider;
         this.applicationPreferences = applicationPreferences;
+        database = new DBHelper(context).getWritableDatabase();
     }
 
     @Override
     public WeatherNotification getForecastFor(final long date, final String location) {
-        final Uri weatherUri = WeatherContract.WeatherEntry.buildWeatherLocationWithDate(location, date);
-        Cursor cursor = contentResolver.query(weatherUri, COLUMNS, null, null, WeatherContract.WeatherEntry.COLUMN_DATE + " ASC");
+        Cursor cursor = database.query(WeatherEntry.TABLE_NAME, COLUMNS, LOCATION_SETTINGS_WITH_DAY_SELECTION, new String[]{location, String.valueOf(date)}, null, null, DATE_ASC_ORDER);
         WeatherNotification weatherNotification = WeatherNotification.INVALID_OBJECT;
         if (cursor.moveToFirst()) {
-            final int weatherId = cursor.getInt(cursor.getColumnIndex(WeatherContract.WeatherEntry.COLUMN_WEATHER_ID));
-            final String description = cursor.getString(cursor.getColumnIndex(WeatherContract.WeatherEntry.COLUMN_SHORT_DESC));
-            final long forecastDate = cursor.getLong(cursor.getColumnIndex(WeatherContract.WeatherEntry.COLUMN_DATE));
-            final String wind = cursor.getString(cursor.getColumnIndex(WeatherContract.WeatherEntry.COLUMN_WIND_SPEED));
-            final String pressure = cursor.getString(cursor.getColumnIndex(WeatherContract.WeatherEntry.COLUMN_PRESSURE));
-            final String humidity = cursor.getString(cursor.getColumnIndex(WeatherContract.WeatherEntry.COLUMN_HUMIDITY));
-            final double maxTemp = cursor.getDouble(cursor.getColumnIndex(WeatherContract.WeatherEntry.COLUMN_MAX_TEMP));
-            final double minTemp = cursor.getDouble(cursor.getColumnIndex(WeatherContract.WeatherEntry.COLUMN_MIN_TEMP));
+            final int weatherId = cursor.getInt(cursor.getColumnIndex(WeatherEntry.COLUMN_WEATHER_ID));
+            final String description = cursor.getString(cursor.getColumnIndex(WeatherEntry.COLUMN_SHORT_DESC));
+            final long forecastDate = cursor.getLong(cursor.getColumnIndex(WeatherEntry.COLUMN_DATE));
+            final String wind = cursor.getString(cursor.getColumnIndex(WeatherEntry.COLUMN_WIND_SPEED));
+            final String pressure = cursor.getString(cursor.getColumnIndex(WeatherEntry.COLUMN_PRESSURE));
+            final String humidity = cursor.getString(cursor.getColumnIndex(WeatherEntry.COLUMN_HUMIDITY));
+            final double maxTemp = cursor.getDouble(cursor.getColumnIndex(WeatherEntry.COLUMN_MAX_TEMP));
+            final double minTemp = cursor.getDouble(cursor.getColumnIndex(WeatherEntry.COLUMN_MIN_TEMP));
             final String max = applicationPreferences.getTemperatureUnit().format(maxTemp);
             final String min = applicationPreferences.getTemperatureUnit().format(minTemp);
 
@@ -94,16 +100,17 @@ public class SQLiteDataSource implements WeatherDataSource {
     @Override
     public ArrayList<ForecastDetailWidget> getForecastForDetailWidget() {
         ArrayList<ForecastDetailWidget> forecasts = new ArrayList<>();
-        Uri weatherForLocationUri = WeatherContract.WeatherEntry.buildWeatherLocationWithStartDate(locationProvider.getPostCode(), System.currentTimeMillis());
-        Cursor data = contentResolver.query(weatherForLocationUri, FORECAST_LIST_COLUMNS, null, null, WeatherContract.WeatherEntry.COLUMN_DATE + " ASC");
+        Cursor data = database.query(WeatherEntry.TABLE_NAME, FORECAST_LIST_COLUMNS, LOCATION_SETTINGS_WITH_DAY_SELECTION, new String[]{locationProvider.getPostCode(), String.valueOf(System.currentTimeMillis())}, null, null,
+            DATE_ASC_ORDER);
+
         while (data.moveToNext()) {
-            int weatherId = data.getInt(data.getColumnIndex(WeatherContract.WeatherEntry.COLUMN_WEATHER_ID));
+            int weatherId = data.getInt(data.getColumnIndex(WeatherEntry.COLUMN_WEATHER_ID));
             int weatherArtResourceId = OWMWeather.getIconResourceForWeatherCondition(weatherId);
-            String description = data.getString(data.getColumnIndex(WeatherContract.WeatherEntry.COLUMN_SHORT_DESC));
-            long dateInMillis = data.getLong(data.getColumnIndex(WeatherContract.WeatherEntry.COLUMN_DATE));
+            String description = data.getString(data.getColumnIndex(WeatherEntry.COLUMN_SHORT_DESC));
+            long dateInMillis = data.getLong(data.getColumnIndex(WeatherEntry.COLUMN_DATE));
             String formattedDate = dateFormatter.getFriendlyDay(dateInMillis, false);
-            double maxTemp = data.getDouble(data.getColumnIndex(WeatherContract.WeatherEntry.COLUMN_MAX_TEMP));
-            double minTemp = data.getDouble(data.getColumnIndex(WeatherContract.WeatherEntry.COLUMN_MIN_TEMP));
+            double maxTemp = data.getDouble(data.getColumnIndex(WeatherEntry.COLUMN_MAX_TEMP));
+            double minTemp = data.getDouble(data.getColumnIndex(WeatherEntry.COLUMN_MIN_TEMP));
             forecasts.add(new ForecastDetailWidget(weatherId, weatherArtResourceId, description, dateInMillis, formattedDate,
                 applicationPreferences.getTemperatureUnit().format(maxTemp), applicationPreferences.getTemperatureUnit().format(minTemp),
                 locationProvider.getPostCode()));
@@ -116,16 +123,17 @@ public class SQLiteDataSource implements WeatherDataSource {
     public List<ForecastFragmentWeather> getForecastList() {
         final ArrayList<ForecastFragmentWeather> forecastList = new ArrayList<>();
 
-        String sortOrder = WeatherContract.WeatherEntry.COLUMN_DATE + " ASC";
-        Uri weatherForLocationUri = WeatherContract.WeatherEntry.buildWeatherLocationWithStartDate(locationProvider.getPostCode(), new Date().getTime());
+        Cursor cursor = database.query(WeatherEntry.TABLE_NAME, FORECAST_LIST_COLUMNS,
+            LOCATION_SETTINGS_WITH_START_DATE_SELECTION,
+            new String[] {locationProvider.getPostCode(), String.valueOf(new Date().getTime())},
+            null, null, DATE_ASC_ORDER);
 
-        Cursor cursor = contentResolver.query(weatherForLocationUri, FORECAST_LIST_COLUMNS, null, null, sortOrder);
         while (cursor.moveToNext()) {
-            final int weatherId = cursor.getInt(cursor.getColumnIndex(WeatherContract.WeatherEntry.COLUMN_WEATHER_ID));
-            final long weatherDate = cursor.getLong(cursor.getColumnIndex(WeatherContract.WeatherEntry.COLUMN_DATE));
-            final String descriptionWeather = cursor.getString(cursor.getColumnIndex(WeatherContract.WeatherEntry.COLUMN_SHORT_DESC));
-            final float maxTemp = cursor.getFloat(cursor.getColumnIndex(WeatherContract.WeatherEntry.COLUMN_MAX_TEMP));
-            final float minTemp = cursor.getFloat(cursor.getColumnIndex(WeatherContract.WeatherEntry.COLUMN_MIN_TEMP));
+            final int weatherId = cursor.getInt(cursor.getColumnIndex(WeatherEntry.COLUMN_WEATHER_ID));
+            final long weatherDate = cursor.getLong(cursor.getColumnIndex(WeatherEntry.COLUMN_DATE));
+            final String descriptionWeather = cursor.getString(cursor.getColumnIndex(WeatherEntry.COLUMN_SHORT_DESC));
+            final float maxTemp = cursor.getFloat(cursor.getColumnIndex(WeatherEntry.COLUMN_MAX_TEMP));
+            final float minTemp = cursor.getFloat(cursor.getColumnIndex(WeatherEntry.COLUMN_MIN_TEMP));
             forecastList.add(new ForecastFragmentWeather(weatherId, weatherDate, dateFormatter.getFriendlyDay(weatherDate, true),
                 dateFormatter.getFriendlyDay(weatherDate, false), descriptionWeather,
                 applicationPreferences.getTemperatureUnit().format(maxTemp), applicationPreferences.getTemperatureUnit().format(minTemp)));
@@ -136,15 +144,15 @@ public class SQLiteDataSource implements WeatherDataSource {
 
     @Override
     public TodayForecast getForecastForNowAndCurrentPosition() {
-        Uri weatherForLocationUri = WeatherContract.WeatherEntry.buildWeatherLocationWithStartDate(locationProvider.getPostCode(), System.currentTimeMillis());
-        Cursor data = contentResolver.query(weatherForLocationUri, TODAY_WIDGET_FORECAST_COLUMNS, null, null, WeatherContract.WeatherEntry.COLUMN_DATE + " ASC");
+        Cursor data = database.query(WeatherEntry.TABLE_NAME, TODAY_WIDGET_FORECAST_COLUMNS, LOCATION_SETTINGS_WITH_DAY_SELECTION, new String[]{locationProvider.getPostCode(), String.valueOf(System.currentTimeMillis())}, null, null,
+            DATE_ASC_ORDER);
         TodayForecast todayForecast = TodayForecast.INVALID_OBJECT;
         if (data.moveToFirst()) {
-            int weatherId = data.getInt(data.getColumnIndex(WeatherContract.WeatherEntry.COLUMN_WEATHER_ID));
+            int weatherId = data.getInt(data.getColumnIndex(WeatherEntry.COLUMN_WEATHER_ID));
             int weatherArtResourceId = OWMWeather.getArtResourceForWeatherCondition(weatherId);
-            String description = data.getString(data.getColumnIndex(WeatherContract.WeatherEntry.COLUMN_SHORT_DESC));
-            double maxTemp = data.getDouble(data.getColumnIndex(WeatherContract.WeatherEntry.COLUMN_MAX_TEMP));
-            double minTemp = data.getDouble(data.getColumnIndex(WeatherContract.WeatherEntry.COLUMN_MIN_TEMP));
+            String description = data.getString(data.getColumnIndex(WeatherEntry.COLUMN_SHORT_DESC));
+            double maxTemp = data.getDouble(data.getColumnIndex(WeatherEntry.COLUMN_MAX_TEMP));
+            double minTemp = data.getDouble(data.getColumnIndex(WeatherEntry.COLUMN_MIN_TEMP));
             String formattedMaxTemperature = applicationPreferences.getTemperatureUnit().format(maxTemp);
             String formattedMinTemperature = applicationPreferences.getTemperatureUnit().format(minTemp);
             todayForecast = new TodayForecast(weatherArtResourceId, description, formattedMaxTemperature, formattedMinTemperature);
@@ -161,12 +169,12 @@ public class SQLiteDataSource implements WeatherDataSource {
 
         ArrayList<OWMWeatherForecast> weatherForecasts = owmResponse.getList();
         if (!weatherForecasts.isEmpty()) {
+            removePastForecast();
             ContentValues[] contentValues = toContentValues(weatherForecasts, cityName, cityLatitude, cityLongitude, locationSettings);
 
-            contentResolver.bulkInsert(WeatherContract.WeatherEntry.CONTENT_URI, contentValues);
-
-
-            removePastForecast();
+            for (ContentValues contentValue : contentValues) {
+                database.insert(WeatherEntry.TABLE_NAME, null, contentValue);
+            }
         }
     }
 
@@ -181,19 +189,19 @@ public class SQLiteDataSource implements WeatherDataSource {
                 calendar.add(Calendar.DAY_OF_YEAR, 1);
             }
 
-            weatherValues.put(WeatherContract.WeatherEntry.COLUMN_DATE, calendar.getTimeInMillis());
-            weatherValues.put(WeatherContract.WeatherEntry.COLUMN_HUMIDITY, weatherForecast.getHumidity());
-            weatherValues.put(WeatherContract.WeatherEntry.COLUMN_PRESSURE, weatherForecast.getPressure());
-            weatherValues.put(WeatherContract.WeatherEntry.COLUMN_WIND_SPEED, weatherForecast.getSpeed());
-            weatherValues.put(WeatherContract.WeatherEntry.COLUMN_DEGREES, weatherForecast.getDeg());
-            weatherValues.put(WeatherContract.WeatherEntry.COLUMN_MAX_TEMP, weatherForecast.getTemp().getMax());
-            weatherValues.put(WeatherContract.WeatherEntry.COLUMN_MIN_TEMP, weatherForecast.getTemp().getMin());
-            weatherValues.put(WeatherContract.WeatherEntry.COLUMN_SHORT_DESC, weatherForecast.getWeather().get(0).getDescription());
-            weatherValues.put(WeatherContract.WeatherEntry.COLUMN_WEATHER_ID, weatherForecast.getWeather().get(0).getId());
-            weatherValues.put(WeatherContract.WeatherEntry.COLUMN_CITY, cityName);
-            weatherValues.put(WeatherContract.WeatherEntry.COLUMN_LATITUDE, cityLatitude);
-            weatherValues.put(WeatherContract.WeatherEntry.COLUMN_LONGITUDE, cityLongitude);
-            weatherValues.put(WeatherContract.WeatherEntry.COLUMN_LOCATION_SETTINGS, locationSettings);
+            weatherValues.put(WeatherEntry.COLUMN_DATE, calendar.getTimeInMillis());
+            weatherValues.put(WeatherEntry.COLUMN_HUMIDITY, weatherForecast.getHumidity());
+            weatherValues.put(WeatherEntry.COLUMN_PRESSURE, weatherForecast.getPressure());
+            weatherValues.put(WeatherEntry.COLUMN_WIND_SPEED, weatherForecast.getSpeed());
+            weatherValues.put(WeatherEntry.COLUMN_DEGREES, weatherForecast.getDeg());
+            weatherValues.put(WeatherEntry.COLUMN_MAX_TEMP, weatherForecast.getTemp().getMax());
+            weatherValues.put(WeatherEntry.COLUMN_MIN_TEMP, weatherForecast.getTemp().getMin());
+            weatherValues.put(WeatherEntry.COLUMN_SHORT_DESC, weatherForecast.getWeather().get(0).getDescription());
+            weatherValues.put(WeatherEntry.COLUMN_WEATHER_ID, weatherForecast.getWeather().get(0).getId());
+            weatherValues.put(WeatherEntry.COLUMN_CITY, cityName);
+            weatherValues.put(WeatherEntry.COLUMN_LATITUDE, cityLatitude);
+            weatherValues.put(WeatherEntry.COLUMN_LONGITUDE, cityLongitude);
+            weatherValues.put(WeatherEntry.COLUMN_LOCATION_SETTINGS, locationSettings);
 
             contentValues[i] = weatherValues;
         }
@@ -201,9 +209,6 @@ public class SQLiteDataSource implements WeatherDataSource {
     }
 
     private void removePastForecast() {
-        Calendar cal = Calendar.getInstance();
-        cal.add(Calendar.DATE, -1);
-        String yesterdayDate = WeatherContract.getDbDateString(cal.getTime());
-        contentResolver.delete(WeatherContract.WeatherEntry.CONTENT_URI, WeatherContract.WeatherEntry.COLUMN_DATE + " <= ?", new String[] {yesterdayDate});
+        database.delete(WeatherEntry.TABLE_NAME, null, null);
     }
 }

@@ -39,12 +39,6 @@
             android:parentActivityName=".activities.MainActivity"
             android:theme="@style/SettingsTheme"/>
 
-        <provider
-            android:authorities="@string/content_authority"
-            android:name=".db.WeatherProvider"
-            android:exported="false"
-            android:syncable="true"/>
-
         <service
             android:name=".sync.AuthenticatorService">
             <intent-filter>

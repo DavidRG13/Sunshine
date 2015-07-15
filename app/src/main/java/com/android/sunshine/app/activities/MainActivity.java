@@ -1,6 +1,5 @@
 package com.android.sunshine.app.activities;
 
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -10,7 +9,6 @@ import com.android.sunshine.app.App;
 import com.android.sunshine.app.R;
 import com.android.sunshine.app.adapter.ForecastCursorAdapter;
 import com.android.sunshine.app.callbacks.ItemClickCallback;
-import com.android.sunshine.app.model.WeatherContract;
 import com.android.sunshine.app.utils.ApplicationPreferences;
 import com.android.sunshine.app.utils.IntentLauncher;
 import javax.inject.Inject;
@@ -32,10 +30,8 @@ public class MainActivity extends AppCompatActivity implements ItemClickCallback
 
         ((App) getApplication()).getComponent().inject(this);
 
-        Uri contentUri = getIntent() != null ? getIntent().getData() : null;
-        long dateFromUri = 0;
-        if (contentUri != null) {
-            dateFromUri = WeatherContract.WeatherEntry.getDateFromUri(contentUri);
+        long dateFromUri = getIntent().getLongExtra("date", 0);
+        if (dateFromUri != 0) {
             applicationPreferences.setInitialSelectedDate(dateFromUri);
             // TODO: mirar para k usamos InitialSelectedDate
         }

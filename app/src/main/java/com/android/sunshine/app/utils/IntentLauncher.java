@@ -16,8 +16,6 @@ import com.android.sunshine.app.activities.DetailActivity;
 import com.android.sunshine.app.activities.MainActivity;
 import com.android.sunshine.app.activities.SettingsActivity;
 import com.android.sunshine.app.fragments.DetailFragment;
-import com.android.sunshine.app.location.LatLong;
-import com.android.sunshine.app.model.WeatherContract;
 import javax.inject.Inject;
 
 public class IntentLauncher {
@@ -83,8 +81,8 @@ public class IntentLauncher {
 
     public Intent displayDetailsWith(final String postCode, final long dateInMillis) {
         final Intent fillInIntent = new Intent();
-        Uri weatherUri = WeatherContract.WeatherEntry.buildWeatherLocationWithDate(postCode, dateInMillis);
-        fillInIntent.setData(weatherUri);
+        fillInIntent.putExtra("postCode", postCode);
+        fillInIntent.putExtra("date", dateInMillis);
         return fillInIntent;
     }
 

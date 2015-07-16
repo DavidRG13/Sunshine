@@ -24,10 +24,12 @@ import static android.support.test.espresso.Espresso.pressBack;
 import static android.support.test.espresso.action.ViewActions.clearText;
 import static android.support.test.espresso.action.ViewActions.click;
 import static android.support.test.espresso.action.ViewActions.typeText;
+import static android.support.test.espresso.assertion.ViewAssertions.matches;
 import static android.support.test.espresso.intent.Intents.intended;
 import static android.support.test.espresso.intent.matcher.IntentMatchers.hasAction;
 import static android.support.test.espresso.intent.matcher.IntentMatchers.hasData;
 import static android.support.test.espresso.matcher.ViewMatchers.isAssignableFrom;
+import static android.support.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static android.support.test.espresso.matcher.ViewMatchers.withText;
 import static org.hamcrest.Matchers.allOf;
 
@@ -77,5 +79,12 @@ public class MainActivityTest {
             hasAction(Intent.ACTION_VIEW),
             hasData(Uri.parse("geo:99999"))
         ));
+    }
+
+    @Test
+    public void shouldContainMockedData() {
+        activityRule.launchActivity(new Intent());
+
+        onView(withText("manana")).check(matches(isDisplayed()));
     }
 }

@@ -4,6 +4,7 @@ import android.content.ContentResolver;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
+import com.android.sunshine.app.fragments.ForecastFragmentWeather;
 import com.android.sunshine.app.location.LocationProvider;
 import com.android.sunshine.app.location.PreferenceLocationProvider;
 import com.android.sunshine.app.sync.SyncAdapter;
@@ -16,7 +17,14 @@ import com.android.sunshine.app.weather.WeatherDataSource;
 import com.android.sunshine.app.weather.WeatherFetcher;
 import dagger.Module;
 import dagger.Provides;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.GregorianCalendar;
 import javax.inject.Named;
+import javax.inject.Singleton;
+import org.mockito.Mockito;
+
+import static org.mockito.Mockito.mock;
 
 @Module
 public class AppModuleMock {
@@ -69,8 +77,17 @@ public class AppModuleMock {
     }
 
     @Provides
-    WeatherRepository providesWeatherRepo(SyncAdapter weatherRepo) {
-        return weatherRepo;
+    WeatherRepository providesWeatherRepo(DateFormatter dateFormatter) {
+        WeatherRepository mock = mock(WeatherRepository.class);
+        final GregorianCalendar calendar = new GregorianCalendar();
+        ArrayList<ForecastFragmentWeather> value = new ArrayList<>();
+        value.add(new ForecastFragmentWeather(001, calendar.getTimeInMillis(), dateFormatter.getFriendlyDay(calendar.getTimeInMillis(), true), dateFormatter.getFriendlyDay(calendar.getTimeInMillis(), false), "sunny",
+            "30", "18"));
+        calendar.add(Calendar.DAY_OF_YEAR, 1);
+        value.add(new ForecastFragmentWeather(001, calendar.getTimeInMillis(), dateFormatter.getFriendlyDay(calendar.getTimeInMillis(), true), dateFormatter.getFriendlyDay(calendar.getTimeInMillis(), false), "sunny",
+            "30", "18"));
+        Mockito.when(mock.getForecastList()).thenReturn(value);
+        return mock;
     }
 
     @Provides

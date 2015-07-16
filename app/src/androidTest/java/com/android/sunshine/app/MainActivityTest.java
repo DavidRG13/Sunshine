@@ -19,7 +19,6 @@ import org.junit.runner.RunWith;
 
 import static android.support.test.espresso.Espresso.onData;
 import static android.support.test.espresso.Espresso.onView;
-import static android.support.test.espresso.Espresso.openActionBarOverflowOrOptionsMenu;
 import static android.support.test.espresso.Espresso.pressBack;
 import static android.support.test.espresso.action.ViewActions.clearText;
 import static android.support.test.espresso.action.ViewActions.click;
@@ -31,6 +30,7 @@ import static android.support.test.espresso.intent.matcher.IntentMatchers.hasDat
 import static android.support.test.espresso.matcher.ViewMatchers.isAssignableFrom;
 import static android.support.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static android.support.test.espresso.matcher.ViewMatchers.withText;
+import static com.android.sunshine.app.internal.EspressoInteractions.clickOnMenuOption;
 import static org.hamcrest.Matchers.allOf;
 
 @RunWith(AndroidJUnit4.class)
@@ -64,16 +64,14 @@ public class MainActivityTest {
     public void shouldShowCurrentSelectedLocationInMap() {
         MainActivity mainActivity = activityRule.launchActivity(new Intent());
 
-        openActionBarOverflowOrOptionsMenu(mainActivity);
-        onView(withText(R.string.action_settings)).perform(click());
+        clickOnMenuOption(withText(R.string.action_settings), mainActivity);
 
         onData(Matchers.<Object>allOf(PreferenceMatchers.withKey(mainActivity.getString(R.string.pref_location_key)))).perform(click());
         onView(isAssignableFrom(EditText.class)).perform(clearText(), typeText("99999"));
         onView(withText("OK")).perform(click());
         pressBack();
 
-        openActionBarOverflowOrOptionsMenu(mainActivity);
-        onView(withText(R.string.viewLocation)).perform(click());
+        clickOnMenuOption(withText(R.string.viewLocation), mainActivity);
 
         intended(allOf(
             hasAction(Intent.ACTION_VIEW),

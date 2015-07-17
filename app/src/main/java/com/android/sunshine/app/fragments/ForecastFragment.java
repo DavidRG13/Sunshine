@@ -173,7 +173,7 @@ public class ForecastFragment extends Fragment implements OnAdapterItemClickList
 
     @Override
     public void onClick(final long date, final ForecastCursorAdapter.ViewHolder viewHolder) {
-        ((ItemClickCallback) getActivity()).onItemSelected(date, viewHolder);
+        ((ItemClickCallback) getActivity()).onItemSelected(weatherRepository.getForecastFor(date, locationProvider.getPostCode()), viewHolder);
     }
 
     @Override

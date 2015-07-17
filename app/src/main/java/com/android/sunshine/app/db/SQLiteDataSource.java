@@ -11,9 +11,8 @@ import com.android.sunshine.app.owm.model.OWMWeather;
 import com.android.sunshine.app.owm.model.OWMWeatherForecast;
 import com.android.sunshine.app.utils.ApplicationPreferences;
 import com.android.sunshine.app.utils.DateFormatter;
-import com.android.sunshine.app.utils.WeatherNotification;
+import com.android.sunshine.app.utils.WeatherDetails;
 import com.android.sunshine.app.weather.WeatherDataSource;
-import com.android.sunshine.app.widget.ForecastDetailWidget;
 import com.android.sunshine.app.widget.TodayForecast;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -75,9 +74,9 @@ public class SQLiteDataSource implements WeatherDataSource {
     }
 
     @Override
-    public WeatherNotification getForecastFor(final long date, final String location) {
+    public WeatherDetails getForecastFor(final long date, final String location) {
         Cursor cursor = database.query(WeatherTable.TABLE_NAME, COLUMNS, LOCATION_SETTINGS_WITH_DAY_SELECTION, new String[]{location, String.valueOf(date)}, null, null, DATE_ASC_ORDER);
-        WeatherNotification weatherNotification = WeatherNotification.INVALID_OBJECT;
+        WeatherDetails weatherDetails = WeatherDetails.INVALID_OBJECT;
         if (cursor.moveToFirst()) {
             final int weatherId = cursor.getInt(cursor.getColumnIndex(WeatherTable.COLUMN_WEATHER_ID));
             final String description = cursor.getString(cursor.getColumnIndex(WeatherTable.COLUMN_SHORT_DESC));
@@ -90,16 +89,16 @@ public class SQLiteDataSource implements WeatherDataSource {
             final String max = applicationPreferences.getTemperatureUnit().format(maxTemp);
             final String min = applicationPreferences.getTemperatureUnit().format(minTemp);
 
-            weatherNotification = new WeatherNotification(weatherId, description, forecastDate, wind, pressure, humidity, max, min);
+            weatherDetails = new WeatherDetails(OWMWeather.getArtResourceForWeatherCondition(weatherId), description, dateFormatter.getFullFriendlyDayString(forecastDate), wind, pressure, humidity, max, min);
         }
         cursor.close();
-        return weatherNotification;
+        return weatherDetails;
     }
 
     @Override
-    public ArrayList<ForecastDetailWidget> getForecastForDetailWidget() {
-        ArrayList<ForecastDetailWidget> forecasts = new ArrayList<>();
-        Cursor data = database.query(WeatherTable.TABLE_NAME, FORECAST_LIST_COLUMNS, LOCATION_SETTINGS_WITH_DAY_SELECTION, new String[]{locationProvider.getPostCode(), String.valueOf(System.currentTimeMillis())}, null, null,
+    public ArrayList<WeatherDetails> getForecastForDetailWidget() {
+        ArrayList<WeatherDetails> forecasts = new ArrayList<>();
+        Cursor data = database.query(WeatherTable.TABLE_NAME, COLUMNS, LOCATION_SETTINGS_WITH_DAY_SELECTION, new String[]{locationProvider.getPostCode(), String.valueOf(System.currentTimeMillis())}, null, null,
             DATE_ASC_ORDER);
 
         while (data.moveToNext()) {
@@ -107,12 +106,16 @@ public class SQLiteDataSource implements WeatherDataSource {
             int weatherArtResourceId = OWMWeather.getIconResourceForWeatherCondition(weatherId);
             String description = data.getString(data.getColumnIndex(WeatherTable.COLUMN_SHORT_DESC));
             long dateInMillis = data.getLong(data.getColumnIndex(WeatherTable.COLUMN_DATE));
-            String formattedDate = dateFormatter.getFriendlyDay(dateInMillis, false);
+            String date = dateFormatter.getFriendlyDay(dateInMillis, false);
+            final String wind = data.getString(data.getColumnIndex(WeatherTable.COLUMN_WIND_SPEED));
+            final String pressure = data.getString(data.getColumnIndex(WeatherTable.COLUMN_PRESSURE));
+            final String humidity = data.getString(data.getColumnIndex(WeatherTable.COLUMN_HUMIDITY));
+
             double maxTemp = data.getDouble(data.getColumnIndex(WeatherTable.COLUMN_MAX_TEMP));
             double minTemp = data.getDouble(data.getColumnIndex(WeatherTable.COLUMN_MIN_TEMP));
-            forecasts.add(new ForecastDetailWidget(weatherId, weatherArtResourceId, description, dateInMillis, formattedDate,
-                applicationPreferences.getTemperatureUnit().format(maxTemp), applicationPreferences.getTemperatureUnit().format(minTemp),
-                locationProvider.getPostCode()));
+
+            forecasts.add(new WeatherDetails(weatherArtResourceId, description, date, wind, pressure, humidity,
+                applicationPreferences.getTemperatureUnit().format(maxTemp), applicationPreferences.getTemperatureUnit().format(minTemp)));
         }
         data.close();
         return forecasts;

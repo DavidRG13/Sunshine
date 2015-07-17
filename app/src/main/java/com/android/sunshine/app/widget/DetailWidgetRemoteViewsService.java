@@ -10,6 +10,7 @@ import android.widget.RemoteViewsService;
 import com.android.sunshine.app.App;
 import com.android.sunshine.app.R;
 import com.android.sunshine.app.utils.Navigator;
+import com.android.sunshine.app.utils.WeatherDetails;
 import com.android.sunshine.app.weather.WeatherRepository;
 import java.util.ArrayList;
 import javax.inject.Inject;
@@ -27,7 +28,7 @@ public class DetailWidgetRemoteViewsService extends RemoteViewsService {
     public RemoteViewsFactory onGetViewFactory(final Intent intent) {
         ((App) getApplication()).getComponent().inject(this);
         return new RemoteViewsFactory() {
-            private ArrayList<ForecastDetailWidget> forecasts;
+            private ArrayList<WeatherDetails> forecasts;
 
             @Override
             public void onCreate() {
@@ -56,17 +57,17 @@ public class DetailWidgetRemoteViewsService extends RemoteViewsService {
                     return null;
                 }
                 RemoteViews views = new RemoteViews(getPackageName(), R.layout.widget_detail_list_item);
-                ForecastDetailWidget forecast = forecasts.get(position);
+                WeatherDetails forecast = forecasts.get(position);
                 views.setImageViewResource(R.id.widget_icon, forecast.getIconResourceId());
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH_MR1) {
                     setRemoteContentDescription(views, forecast.getDescription());
                 }
                 views.setTextViewText(R.id.widget_date, forecast.getDate());
                 views.setTextViewText(R.id.widget_description, forecast.getDescription());
-                views.setTextViewText(R.id.widget_high_temperature, forecast.getMaxTemp());
-                views.setTextViewText(R.id.widget_low_temperature, forecast.getMinTemp());
+                views.setTextViewText(R.id.widget_high_temperature, forecast.getMax());
+                views.setTextViewText(R.id.widget_low_temperature, forecast.getMin());
 
-                views.setOnClickFillInIntent(R.id.widget_list_item, navigator.displayDetailsWith(forecast.getPostCode(), forecast.getDateInMillis()));
+                views.setOnClickFillInIntent(R.id.widget_list_item, navigator.displayDetailsWith(forecast));
                 return views;
             }
 
@@ -87,7 +88,7 @@ public class DetailWidgetRemoteViewsService extends RemoteViewsService {
 
             @Override
             public long getItemId(final int position) {
-                return forecasts.get(position).getWeatherId();
+                return forecasts.get(position).getIconResourceId();
             }
 
             @Override

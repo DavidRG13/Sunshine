@@ -19,12 +19,8 @@ import butterknife.ButterKnife;
 import com.android.sunshine.app.App;
 import com.android.sunshine.app.R;
 import com.android.sunshine.app.activities.DetailActivity;
-import com.android.sunshine.app.location.LocationProvider;
-import com.android.sunshine.app.owm.model.OWMWeather;
 import com.android.sunshine.app.utils.Navigator;
-import com.android.sunshine.app.weather.WeatherRepository;
-import com.android.sunshine.app.utils.DateFormatter;
-import com.android.sunshine.app.utils.WeatherNotification;
+import com.android.sunshine.app.utils.WeatherDetails;
 import java.util.Locale;
 import javax.inject.Inject;
 
@@ -43,16 +39,7 @@ public class DetailFragment extends Fragment {
     @Bind(R.id.detail_pressure_textview) TextView mPressureView;
 
     @Inject
-    LocationProvider locationProvider;
-
-    @Inject
-    DateFormatter dateFormatter;
-
-    @Inject
     Navigator navigator;
-
-    @Inject
-    WeatherRepository weatherRepository;
 
     private boolean transitionAnimation;
     private String weatherData;
@@ -77,8 +64,8 @@ public class DetailFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-        final long date = getArguments().getLong(Navigator.DATE_KEY);
-        renderData(weatherRepository.getForecastFor(date, locationProvider.getPostCode()));
+        final WeatherDetails weatherDetails = getArguments().getParcelable(Navigator.WEATHER_DETAILS);
+        renderData(weatherDetails);
     }
 
     @Override
@@ -89,26 +76,22 @@ public class DetailFragment extends Fragment {
         }
     }
 
-    private void renderData(final WeatherNotification weather) {
+    private void renderData(final WeatherDetails weather) {
         ViewParent vp = getView().getParent();
         if (vp instanceof CardView) {
             ((View) vp).setVisibility(View.VISIBLE);
         }
 
-        String date = dateFormatter.getFullFriendlyDayString(weather.getForecastDate());
-        dateView.setText(date);
-        String description = weather.getDescription();
-        mDescriptionView.setText(description);
-        String max = weather.getMax();
-        mHighTempView.setText(max);
-        String min = weather.getMin();
-        mLowTempView.setText(min);
+        dateView.setText(weather.getDate());
+        mDescriptionView.setText(weather.getDescription());
+        mHighTempView.setText(weather.getMax());
+        mLowTempView.setText(weather.getMin());
         mHumidityView.setText(weather.getHumidity());
         mWindView.setText(weather.getWind());
         mPressureView.setText(weather.getPressure());
-        iconView.setImageResource(OWMWeather.getArtResourceForWeatherCondition(weather.getWeatherId()));
+        iconView.setImageResource(weather.getIconResourceId());
 
-        weatherData = String.format(Locale.getDefault(), "%s - %s - %s/%s", date, description, max, min);
+        weatherData = String.format(Locale.getDefault(), "%s - %s - %s/%s", weather.getDate(), weather.getDescription(), weather.getMax(), weather.getMin());
 
         AppCompatActivity activity = (AppCompatActivity) getActivity();
         Toolbar toolbarView = (Toolbar) getView().findViewById(R.id.toolbar);

@@ -20,7 +20,7 @@ import javax.inject.Inject;
 
 public class Navigator {
 
-    public static final String DATE_KEY = "forecast_date";
+    public static final String WEATHER_DETAILS = "weather_details";
     public static final String ACTION_DATA_UPDATED = "com.example.android.sunshine.app.ACTION_DATA_UPDATED";
 
     @Inject
@@ -40,17 +40,19 @@ public class Navigator {
         context.startActivity(new Intent(context, SettingsActivity.class));
     }
 
-    public void transitionToDetails(final Activity activity, final long date, final View sharedView) {
+    public void transitionToDetails(final Activity activity, final WeatherDetails weatherDetails, final View sharedView) {
         final Intent intent = new Intent(activity, DetailActivity.class);
-        intent.putExtra(DATE_KEY, date);
+        Bundle bundle = new Bundle();
+        bundle.putParcelable(WEATHER_DETAILS, weatherDetails);
+        intent.putExtras(bundle);
         ActivityOptionsCompat activityOptions = ActivityOptionsCompat.makeSceneTransitionAnimation(activity,
             new Pair<>(sharedView, activity.getString(R.string.detail_icon_transition_name)));
         ActivityCompat.startActivity(activity, intent, activityOptions.toBundle());
     }
 
-    public void twoPaneDetails(final long date, final AppCompatActivity fromActivity) {
+    public void twoPaneDetails(final WeatherDetails weatherDetails, final AppCompatActivity fromActivity) {
         final Bundle args = new Bundle();
-        args.putLong(DATE_KEY, date);
+        args.putParcelable(WEATHER_DETAILS, weatherDetails);
         final DetailFragment fragment = new DetailFragment();
         fragment.setArguments(args);
         fromActivity.getSupportFragmentManager().beginTransaction()
@@ -58,9 +60,9 @@ public class Navigator {
             .commitAllowingStateLoss();
     }
 
-    public void detailsWithTransitionEnabled(final long date, final AppCompatActivity fromActivity) {
+    public void detailsWithTransitionEnabled(final WeatherDetails weatherDetails, final AppCompatActivity fromActivity) {
         final Bundle bundle = new Bundle();
-        bundle.putLong(DATE_KEY, date);
+        bundle.putParcelable(WEATHER_DETAILS, weatherDetails);
         bundle.putBoolean(DetailFragment.DETAIL_TRANSITION_ANIMATION, true);
         final DetailFragment detailFragment = new DetailFragment();
         detailFragment.setArguments(bundle);
@@ -78,10 +80,11 @@ public class Navigator {
         return shareIntent;
     }
 
-    public Intent displayDetailsWith(final String postCode, final long dateInMillis) {
+    public Intent displayDetailsWith(final WeatherDetails weatherDetails) {
         final Intent fillInIntent = new Intent();
-        fillInIntent.putExtra("postCode", postCode);
-        fillInIntent.putExtra("date", dateInMillis);
+        Bundle bundle = new Bundle();
+        bundle.putParcelable(WEATHER_DETAILS, weatherDetails);
+        fillInIntent.putExtras(bundle);
         return fillInIntent;
     }
 

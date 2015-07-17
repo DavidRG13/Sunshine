@@ -5,6 +5,7 @@ import android.support.v7.app.AppCompatActivity;
 import com.android.sunshine.app.App;
 import com.android.sunshine.app.R;
 import com.android.sunshine.app.utils.Navigator;
+import com.android.sunshine.app.utils.WeatherDetails;
 import javax.inject.Inject;
 
 public class DetailActivity extends AppCompatActivity {
@@ -20,8 +21,8 @@ public class DetailActivity extends AppCompatActivity {
         ((App) getApplication()).getComponent().inject(this);
 
         if (savedInstanceState == null) {
-            final long date = getIntent().getLongExtra(Navigator.DATE_KEY, 0);
-            navigator.detailsWithTransitionEnabled(date, this);
+            final WeatherDetails weatherDetails = getIntent().getParcelableExtra(Navigator.WEATHER_DETAILS);
+            navigator.detailsWithTransitionEnabled(weatherDetails, this);
         }
     }
 }

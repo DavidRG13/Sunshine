@@ -11,6 +11,8 @@ import com.android.sunshine.app.adapter.ForecastCursorAdapter;
 import com.android.sunshine.app.adapter.ItemClickCallback;
 import com.android.sunshine.app.utils.ApplicationPreferences;
 import com.android.sunshine.app.utils.Navigator;
+import com.android.sunshine.app.utils.WeatherDetails;
+import com.android.sunshine.app.weather.WeatherRepository;
 import javax.inject.Inject;
 
 public class MainActivity extends AppCompatActivity implements ItemClickCallback {
@@ -20,6 +22,9 @@ public class MainActivity extends AppCompatActivity implements ItemClickCallback
 
     @Inject
     ApplicationPreferences applicationPreferences;
+
+    @Inject
+    WeatherRepository weatherRepository;
 
     private boolean twoPane;
 
@@ -43,7 +48,7 @@ public class MainActivity extends AppCompatActivity implements ItemClickCallback
         if (findViewById(R.id.weather_detail_container) != null) {
             twoPane = true;
             if (savedInstanceState == null) {
-                navigator.twoPaneDetails(dateFromUri, this);
+                navigator.twoPaneDetails(weatherRepository.getForecastForDetailWidget().get(0), this);
             }
         } else {
             twoPane = false;
@@ -67,11 +72,11 @@ public class MainActivity extends AppCompatActivity implements ItemClickCallback
     }
 
     @Override
-    public void onItemSelected(final long date, final ForecastCursorAdapter.ViewHolder viewHolder) {
+    public void onItemSelected(final WeatherDetails weatherDetails, final ForecastCursorAdapter.ViewHolder viewHolder) {
         if (twoPane) {
-            navigator.twoPaneDetails(date, this);
+            navigator.twoPaneDetails(weatherDetails, this);
         } else {
-            navigator.transitionToDetails(this, date, viewHolder.forecastIcon);
+            navigator.transitionToDetails(this, weatherDetails, viewHolder.forecastIcon);
         }
     }
 }

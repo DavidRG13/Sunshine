@@ -2,8 +2,7 @@ package com.android.sunshine.app.weather;
 
 import com.android.sunshine.app.fragments.ForecastFragmentWeather;
 import com.android.sunshine.app.owm.model.OWMResponse;
-import com.android.sunshine.app.utils.WeatherNotification;
-import com.android.sunshine.app.widget.ForecastDetailWidget;
+import com.android.sunshine.app.utils.WeatherDetails;
 import com.android.sunshine.app.widget.TodayForecast;
 import java.util.ArrayList;
 import java.util.List;
@@ -14,9 +13,9 @@ public interface WeatherDataSource {
 
     TodayForecast getForecastForNowAndCurrentPosition();
 
-    WeatherNotification getForecastFor(long date, String location);
+    WeatherDetails getForecastFor(long date, String location);
 
-    ArrayList<ForecastDetailWidget> getForecastForDetailWidget();
+    ArrayList<WeatherDetails> getForecastForDetailWidget();
 
     List<ForecastFragmentWeather> getForecastList();
 }

@@ -17,11 +17,10 @@ import com.android.sunshine.app.owm.model.OWMResponse;
 import com.android.sunshine.app.utils.Navigator;
 import com.android.sunshine.app.utils.ServerStatusChanger;
 import com.android.sunshine.app.utils.UserNotificator;
-import com.android.sunshine.app.utils.WeatherNotification;
+import com.android.sunshine.app.utils.WeatherDetails;
 import com.android.sunshine.app.weather.WeatherDataSource;
 import com.android.sunshine.app.weather.WeatherFetcher;
 import com.android.sunshine.app.weather.WeatherRepository;
-import com.android.sunshine.app.widget.ForecastDetailWidget;
 import com.android.sunshine.app.widget.TodayForecast;
 import java.net.HttpURLConnection;
 import java.util.ArrayList;
@@ -83,12 +82,12 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements WeatherR
     }
 
     @Override
-    public WeatherNotification getForecastFor(final long date, final String location) {
+    public WeatherDetails getForecastFor(final long date, final String location) {
         return weatherDataSource.getForecastFor(date, location);
     }
 
     @Override
-    public ArrayList<ForecastDetailWidget> getForecastForDetailWidget() {
+    public ArrayList<WeatherDetails> getForecastForDetailWidget() {
         return weatherDataSource.getForecastForDetailWidget();
     }
 

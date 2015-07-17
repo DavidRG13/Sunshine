@@ -24,11 +24,15 @@ import static android.support.test.espresso.action.ViewActions.clearText;
 import static android.support.test.espresso.action.ViewActions.click;
 import static android.support.test.espresso.action.ViewActions.typeText;
 import static android.support.test.espresso.assertion.ViewAssertions.matches;
+import static android.support.test.espresso.contrib.RecyclerViewActions.actionOnItem;
+import static android.support.test.espresso.contrib.RecyclerViewActions.actionOnItemAtPosition;
 import static android.support.test.espresso.intent.Intents.intended;
 import static android.support.test.espresso.intent.matcher.IntentMatchers.hasAction;
 import static android.support.test.espresso.intent.matcher.IntentMatchers.hasData;
+import static android.support.test.espresso.matcher.ViewMatchers.hasDescendant;
 import static android.support.test.espresso.matcher.ViewMatchers.isAssignableFrom;
 import static android.support.test.espresso.matcher.ViewMatchers.isDisplayed;
+import static android.support.test.espresso.matcher.ViewMatchers.withId;
 import static android.support.test.espresso.matcher.ViewMatchers.withText;
 import static com.android.sunshine.app.internal.EspressoInteractions.clickOnMenuOption;
 import static org.hamcrest.Matchers.allOf;
@@ -84,5 +88,14 @@ public class MainActivityTest {
         activityRule.launchActivity(new Intent());
 
         onView(withText("manana")).check(matches(isDisplayed()));
+    }
+
+    @Test
+    public void shouldDisplayDetailsOnItemClicked() {
+        activityRule.launchActivity(new Intent());
+
+        onView(withId(R.id.recycler_view_forecast)).perform(actionOnItem(hasDescendant(withText("manana")), click()));
+
+        onView(withId(R.id.detail_date_textview)).check(matches(withText("manana")));
     }
 }

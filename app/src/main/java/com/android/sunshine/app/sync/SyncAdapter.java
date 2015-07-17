@@ -13,13 +13,14 @@ import android.os.Bundle;
 import com.android.sunshine.app.R;
 import com.android.sunshine.app.fragments.ForecastFragmentWeather;
 import com.android.sunshine.app.location.LocationProvider;
-import com.android.sunshine.app.model.OWMResponse;
-import com.android.sunshine.app.utils.IntentLauncher;
+import com.android.sunshine.app.owm.model.OWMResponse;
+import com.android.sunshine.app.utils.Navigator;
 import com.android.sunshine.app.utils.ServerStatusChanger;
 import com.android.sunshine.app.utils.UserNotificator;
 import com.android.sunshine.app.utils.WeatherNotification;
 import com.android.sunshine.app.weather.WeatherDataSource;
 import com.android.sunshine.app.weather.WeatherFetcher;
+import com.android.sunshine.app.weather.WeatherRepository;
 import com.android.sunshine.app.widget.ForecastDetailWidget;
 import com.android.sunshine.app.widget.TodayForecast;
 import java.net.HttpURLConnection;
@@ -36,7 +37,7 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements WeatherR
     public static final int SYNC_FLEXTIME = SYNC_INTERVAL / 3;
 
     private final WeatherDataSource weatherDataSource;
-    private final IntentLauncher intentLauncher;
+    private final Navigator navigator;
     private final LocationProvider locationProvider;
     private final ServerStatusChanger serverStatusChanger;
     private final UserNotificator userNotificator;
@@ -44,11 +45,11 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements WeatherR
     private final Context context;
 
     @Inject
-    public SyncAdapter(final WeatherDataSource weatherDataSource, final IntentLauncher intentLauncher, final LocationProvider locationProvider, final ServerStatusChanger serverStatusChanger, final UserNotificator userNotificator,
+    public SyncAdapter(final WeatherDataSource weatherDataSource, final Navigator navigator, final LocationProvider locationProvider, final ServerStatusChanger serverStatusChanger, final UserNotificator userNotificator,
         final WeatherFetcher weatherFetcher, final Context context, @Named("autoInitialize") boolean autoInitialize) {
         super(context, autoInitialize);
         this.weatherDataSource = weatherDataSource;
-        this.intentLauncher = intentLauncher;
+        this.navigator = navigator;
         this.locationProvider = locationProvider;
         this.serverStatusChanger = serverStatusChanger;
         this.userNotificator = userNotificator;
@@ -69,7 +70,7 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements WeatherR
         if (responseCode == HttpURLConnection.HTTP_OK) {
             weatherDataSource.saveWeatherForLocation(response, location);
             userNotificator.notifyWeather(weatherDataSource.getForecastForNowAndCurrentPosition());
-            intentLauncher.updateWidgets(context);
+            navigator.updateWidgets(context);
         }
     }
 

@@ -1,7 +1,6 @@
 package com.android.sunshine.app.utils;
 
 import android.test.AndroidTestCase;
-import com.android.sunshine.app.sync.ServerStatus;
 import java.net.HttpURLConnection;
 
 import static org.mockito.Mockito.mock;

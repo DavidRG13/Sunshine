@@ -6,13 +6,11 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.preference.PreferenceManager;
 import com.android.sunshine.app.R;
-import com.android.sunshine.app.fragments.ForecastFragment;
-import com.android.sunshine.app.sync.ServerStatus;
 import javax.inject.Inject;
 
-import static com.android.sunshine.app.sync.ServerStatus.NO_NETWORK_AVAILABLE;
-import static com.android.sunshine.app.sync.ServerStatus.SERVER_STATUS_OK;
-import static com.android.sunshine.app.sync.ServerStatus.SERVER_STATUS_UNKNOWN;
+import static com.android.sunshine.app.utils.ServerStatus.NO_NETWORK_AVAILABLE;
+import static com.android.sunshine.app.utils.ServerStatus.SERVER_STATUS_OK;
+import static com.android.sunshine.app.utils.ServerStatus.SERVER_STATUS_UNKNOWN;
 
 public class ServerStatusChanger {
 

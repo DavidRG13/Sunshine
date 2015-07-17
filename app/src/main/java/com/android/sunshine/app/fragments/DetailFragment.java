@@ -20,10 +20,10 @@ import com.android.sunshine.app.App;
 import com.android.sunshine.app.R;
 import com.android.sunshine.app.activities.DetailActivity;
 import com.android.sunshine.app.location.LocationProvider;
-import com.android.sunshine.app.model.OWMWeather;
-import com.android.sunshine.app.sync.WeatherRepository;
+import com.android.sunshine.app.owm.model.OWMWeather;
+import com.android.sunshine.app.utils.Navigator;
+import com.android.sunshine.app.weather.WeatherRepository;
 import com.android.sunshine.app.utils.DateFormatter;
-import com.android.sunshine.app.utils.IntentLauncher;
 import com.android.sunshine.app.utils.WeatherNotification;
 import java.util.Locale;
 import javax.inject.Inject;
@@ -49,7 +49,7 @@ public class DetailFragment extends Fragment {
     DateFormatter dateFormatter;
 
     @Inject
-    IntentLauncher intentLauncher;
+    Navigator navigator;
 
     @Inject
     WeatherRepository weatherRepository;
@@ -77,7 +77,7 @@ public class DetailFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-        final long date = getArguments().getLong(IntentLauncher.DATE_KEY);
+        final long date = getArguments().getLong(Navigator.DATE_KEY);
         renderData(weatherRepository.getForecastFor(date, locationProvider.getPostCode()));
     }
 
@@ -137,6 +137,6 @@ public class DetailFragment extends Fragment {
 
     private void finishCreatingMenu(final Menu menu) {
         MenuItem menuItem = menu.findItem(R.id.action_share);
-        menuItem.setIntent(intentLauncher.createShareIntent(weatherData));
+        menuItem.setIntent(navigator.createShareIntent(weatherData));
     }
 }

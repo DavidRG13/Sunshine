@@ -8,15 +8,15 @@ import android.view.MenuItem;
 import com.android.sunshine.app.App;
 import com.android.sunshine.app.R;
 import com.android.sunshine.app.adapter.ForecastCursorAdapter;
-import com.android.sunshine.app.callbacks.ItemClickCallback;
+import com.android.sunshine.app.adapter.ItemClickCallback;
 import com.android.sunshine.app.utils.ApplicationPreferences;
-import com.android.sunshine.app.utils.IntentLauncher;
+import com.android.sunshine.app.utils.Navigator;
 import javax.inject.Inject;
 
 public class MainActivity extends AppCompatActivity implements ItemClickCallback {
 
     @Inject
-    IntentLauncher intentLauncher;
+    Navigator navigator;
 
     @Inject
     ApplicationPreferences applicationPreferences;
@@ -43,7 +43,7 @@ public class MainActivity extends AppCompatActivity implements ItemClickCallback
         if (findViewById(R.id.weather_detail_container) != null) {
             twoPane = true;
             if (savedInstanceState == null) {
-                intentLauncher.twoPaneDetails(dateFromUri, this);
+                navigator.twoPaneDetails(dateFromUri, this);
             }
         } else {
             twoPane = false;
@@ -60,7 +60,7 @@ public class MainActivity extends AppCompatActivity implements ItemClickCallback
     @Override
     public boolean onOptionsItemSelected(final MenuItem item) {
         if (item.getItemId() == R.id.action_settings) {
-            intentLauncher.launchSettingsActivity(this);
+            navigator.launchSettingsActivity(this);
             return true;
         }
         return super.onOptionsItemSelected(item);
@@ -69,9 +69,9 @@ public class MainActivity extends AppCompatActivity implements ItemClickCallback
     @Override
     public void onItemSelected(final long date, final ForecastCursorAdapter.ViewHolder viewHolder) {
         if (twoPane) {
-            intentLauncher.twoPaneDetails(date, this);
+            navigator.twoPaneDetails(date, this);
         } else {
-            intentLauncher.transitionToDetails(this, date, viewHolder.forecastIcon);
+            navigator.transitionToDetails(this, date, viewHolder.forecastIcon);
         }
     }
 }

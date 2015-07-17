@@ -3,7 +3,7 @@
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:custom="http://schemas.android.com/apk/res/com.android.sunshine.app">
 
-   <com.android.sunshine.app.preferences.EditTextPreferencesWithAttributes
+   <com.android.sunshine.app.views.EditTextPreferencesWithAttributes
        android:key="@string/pref_location_key"
        android:title="@string/pref_location_label"
        android:defaultValue="@string/location_default"

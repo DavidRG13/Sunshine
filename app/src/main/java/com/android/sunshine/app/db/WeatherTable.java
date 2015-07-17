@@ -1,8 +1,8 @@
-package com.android.sunshine.app.model;
+package com.android.sunshine.app.db;
 
 import android.provider.BaseColumns;
 
-public final class WeatherEntry implements BaseColumns {
+public final class WeatherTable implements BaseColumns {
 
     public static final String TABLE_NAME = "weather";
     public static final String COLUMN_DATE = "date";
@@ -19,6 +19,6 @@ public final class WeatherEntry implements BaseColumns {
     public static final String COLUMN_CITY = "city";
     public static final String COLUMN_LOCATION_SETTINGS = "locSettings";
 
-    private WeatherEntry() {
+    private WeatherTable() {
     }
 }

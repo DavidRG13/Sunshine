@@ -4,13 +4,13 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import com.android.sunshine.app.App;
 import com.android.sunshine.app.R;
-import com.android.sunshine.app.utils.IntentLauncher;
+import com.android.sunshine.app.utils.Navigator;
 import javax.inject.Inject;
 
 public class DetailActivity extends AppCompatActivity {
 
     @Inject
-    IntentLauncher intentLauncher;
+    Navigator navigator;
 
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
@@ -20,8 +20,8 @@ public class DetailActivity extends AppCompatActivity {
         ((App) getApplication()).getComponent().inject(this);
 
         if (savedInstanceState == null) {
-            final long date = getIntent().getLongExtra(IntentLauncher.DATE_KEY, 0);
-            intentLauncher.detailsWithTransitionEnabled(date, this);
+            final long date = getIntent().getLongExtra(Navigator.DATE_KEY, 0);
+            navigator.detailsWithTransitionEnabled(date, this);
         }
     }
 }

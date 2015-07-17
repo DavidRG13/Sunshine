@@ -1,6 +1,4 @@
-package com.android.sunshine.app.callbacks;
-
-import com.android.sunshine.app.adapter.ForecastCursorAdapter;
+package com.android.sunshine.app.adapter;
 
 public interface ItemClickCallback {
 

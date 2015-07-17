@@ -1,7 +1,7 @@
 package com.android.sunshine.app.weather;
 
 import com.android.sunshine.app.fragments.ForecastFragmentWeather;
-import com.android.sunshine.app.model.OWMResponse;
+import com.android.sunshine.app.owm.model.OWMResponse;
 import com.android.sunshine.app.utils.WeatherNotification;
 import com.android.sunshine.app.widget.ForecastDetailWidget;
 import com.android.sunshine.app.widget.TodayForecast;

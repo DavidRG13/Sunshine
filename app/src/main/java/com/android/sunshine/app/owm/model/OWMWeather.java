@@ -1,4 +1,4 @@
-package com.android.sunshine.app.model;
+package com.android.sunshine.app.owm.model;
 
 import com.android.sunshine.app.R;
 import com.fasterxml.jackson.annotation.JsonProperty;

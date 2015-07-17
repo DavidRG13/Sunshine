@@ -3,7 +3,6 @@ package com.android.sunshine.app.db;
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
-import com.android.sunshine.app.model.WeatherEntry;
 
 public class DBHelper extends SQLiteOpenHelper {
 
@@ -18,28 +17,28 @@ public class DBHelper extends SQLiteOpenHelper {
     @Override
     public void onCreate(final SQLiteDatabase sqLiteDatabase) {
 
-        final String sqlCreateWeatherTable = "CREATE TABLE " + WeatherEntry.TABLE_NAME + " ("
-            + WeatherEntry._ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
-            + WeatherEntry.COLUMN_DATE + " INTEGER NOT NULL, "
-            + WeatherEntry.COLUMN_SHORT_DESC + " TEXT NOT NULL, "
-            + WeatherEntry.COLUMN_WEATHER_ID + " INTEGER NOT NULL,"
-            + WeatherEntry.COLUMN_MIN_TEMP + " REAL NOT NULL, "
-            + WeatherEntry.COLUMN_MAX_TEMP + " REAL NOT NULL, "
-            + WeatherEntry.COLUMN_HUMIDITY + " REAL NOT NULL, "
-            + WeatherEntry.COLUMN_PRESSURE + " REAL NOT NULL, "
-            + WeatherEntry.COLUMN_WIND_SPEED + " REAL NOT NULL, "
-            + WeatherEntry.COLUMN_DEGREES + " REAL NOT NULL, "
-            + WeatherEntry.COLUMN_LATITUDE + " REAL NOT NULL, "
-            + WeatherEntry.COLUMN_LONGITUDE + " REAL NOT NULL, "
-            + WeatherEntry.COLUMN_CITY + " TEXT NOT NULL, "
-            + WeatherEntry.COLUMN_LOCATION_SETTINGS + " TEXT NOT NULL);";
+        final String sqlCreateWeatherTable = "CREATE TABLE " + WeatherTable.TABLE_NAME + " ("
+            + WeatherTable._ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
+            + WeatherTable.COLUMN_DATE + " INTEGER NOT NULL, "
+            + WeatherTable.COLUMN_SHORT_DESC + " TEXT NOT NULL, "
+            + WeatherTable.COLUMN_WEATHER_ID + " INTEGER NOT NULL,"
+            + WeatherTable.COLUMN_MIN_TEMP + " REAL NOT NULL, "
+            + WeatherTable.COLUMN_MAX_TEMP + " REAL NOT NULL, "
+            + WeatherTable.COLUMN_HUMIDITY + " REAL NOT NULL, "
+            + WeatherTable.COLUMN_PRESSURE + " REAL NOT NULL, "
+            + WeatherTable.COLUMN_WIND_SPEED + " REAL NOT NULL, "
+            + WeatherTable.COLUMN_DEGREES + " REAL NOT NULL, "
+            + WeatherTable.COLUMN_LATITUDE + " REAL NOT NULL, "
+            + WeatherTable.COLUMN_LONGITUDE + " REAL NOT NULL, "
+            + WeatherTable.COLUMN_CITY + " TEXT NOT NULL, "
+            + WeatherTable.COLUMN_LOCATION_SETTINGS + " TEXT NOT NULL);";
 
         sqLiteDatabase.execSQL(sqlCreateWeatherTable);
     }
 
     @Override
     public void onUpgrade(final SQLiteDatabase sqLiteDatabase, final int oldVersion, final int newVersion) {
-        sqLiteDatabase.execSQL(DROP_TABLE_IF_EXISTS + WeatherEntry.TABLE_NAME);
+        sqLiteDatabase.execSQL(DROP_TABLE_IF_EXISTS + WeatherTable.TABLE_NAME);
         onCreate(sqLiteDatabase);
     }
 }

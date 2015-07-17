@@ -11,7 +11,7 @@ import android.preference.PreferenceActivity;
 import android.preference.PreferenceManager;
 import com.android.sunshine.app.App;
 import com.android.sunshine.app.R;
-import com.android.sunshine.app.sync.WeatherRepository;
+import com.android.sunshine.app.weather.WeatherRepository;
 import com.android.sunshine.app.utils.ApplicationPreferences;
 import com.android.sunshine.app.utils.ServerStatusChanger;
 import com.android.sunshine.app.utils.TemperatureUnit;

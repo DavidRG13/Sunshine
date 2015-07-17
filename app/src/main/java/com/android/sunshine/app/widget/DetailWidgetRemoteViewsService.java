@@ -9,8 +9,8 @@ import android.widget.RemoteViews;
 import android.widget.RemoteViewsService;
 import com.android.sunshine.app.App;
 import com.android.sunshine.app.R;
-import com.android.sunshine.app.sync.WeatherRepository;
-import com.android.sunshine.app.utils.IntentLauncher;
+import com.android.sunshine.app.utils.Navigator;
+import com.android.sunshine.app.weather.WeatherRepository;
 import java.util.ArrayList;
 import javax.inject.Inject;
 
@@ -21,7 +21,7 @@ public class DetailWidgetRemoteViewsService extends RemoteViewsService {
     WeatherRepository weatherRepository;
 
     @Inject
-    IntentLauncher intentLauncher;
+    Navigator navigator;
 
     @Override
     public RemoteViewsFactory onGetViewFactory(final Intent intent) {
@@ -66,7 +66,7 @@ public class DetailWidgetRemoteViewsService extends RemoteViewsService {
                 views.setTextViewText(R.id.widget_high_temperature, forecast.getMaxTemp());
                 views.setTextViewText(R.id.widget_low_temperature, forecast.getMinTemp());
 
-                views.setOnClickFillInIntent(R.id.widget_list_item, intentLauncher.displayDetailsWith(forecast.getPostCode(), forecast.getDateInMillis()));
+                views.setOnClickFillInIntent(R.id.widget_list_item, navigator.displayDetailsWith(forecast.getPostCode(), forecast.getDateInMillis()));
                 return views;
             }
 

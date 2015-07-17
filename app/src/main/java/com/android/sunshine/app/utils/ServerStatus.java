@@ -1,4 +1,4 @@
-package com.android.sunshine.app.sync;
+package com.android.sunshine.app.utils;
 
 import com.android.sunshine.app.R;
 import java.net.HttpURLConnection;

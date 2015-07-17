@@ -18,14 +18,13 @@ import com.android.sunshine.app.activities.SettingsActivity;
 import com.android.sunshine.app.fragments.DetailFragment;
 import javax.inject.Inject;
 
-public class IntentLauncher {
+public class Navigator {
 
     public static final String DATE_KEY = "forecast_date";
     public static final String ACTION_DATA_UPDATED = "com.example.android.sunshine.app.ACTION_DATA_UPDATED";
 
     @Inject
-    public IntentLauncher() {
-    }
+    public Navigator() { }
 
     public void displayMapWithLocation(final Context context, final String postCode) {
         Uri geoLocation = Uri.parse("geo:" + postCode);

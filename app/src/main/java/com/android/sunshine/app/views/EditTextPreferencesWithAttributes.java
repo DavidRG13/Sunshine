@@ -1,4 +1,4 @@
-package com.android.sunshine.app.preferences;
+package com.android.sunshine.app.views;
 
 import android.app.AlertDialog;
 import android.app.Dialog;

@@ -27,12 +27,12 @@ import com.android.sunshine.app.App;
 import com.android.sunshine.app.R;
 import com.android.sunshine.app.adapter.ForecastCursorAdapter;
 import com.android.sunshine.app.adapter.OnAdapterItemClickListener;
-import com.android.sunshine.app.callbacks.ItemClickCallback;
+import com.android.sunshine.app.adapter.ItemClickCallback;
 import com.android.sunshine.app.location.LocationProvider;
-import com.android.sunshine.app.sync.ServerStatus;
-import com.android.sunshine.app.sync.WeatherRepository;
+import com.android.sunshine.app.utils.Navigator;
+import com.android.sunshine.app.utils.ServerStatus;
+import com.android.sunshine.app.weather.WeatherRepository;
 import com.android.sunshine.app.utils.ApplicationPreferences;
-import com.android.sunshine.app.utils.IntentLauncher;
 import com.android.sunshine.app.utils.ServerStatusChanger;
 import com.android.sunshine.app.utils.ServerStatusListener;
 import java.util.List;
@@ -47,7 +47,7 @@ public class ForecastFragment extends Fragment implements OnAdapterItemClickList
     LocationProvider locationProvider;
 
     @Inject
-    IntentLauncher intentLauncher;
+    Navigator navigator;
 
     @Inject
     ServerStatusChanger serverStatusChanger;
@@ -237,7 +237,7 @@ public class ForecastFragment extends Fragment implements OnAdapterItemClickList
 
     private void showCurrentLocation() {
         if (adapter != null) {
-            intentLauncher.displayMapWithLocation(getActivity(), locationProvider.getPostCode());
+            navigator.displayMapWithLocation(getActivity(), locationProvider.getPostCode());
         }
     }
 }

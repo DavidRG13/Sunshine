@@ -1,4 +1,4 @@
-package com.android.sunshine.app.sync;
+package com.android.sunshine.app.weather;
 
 import com.android.sunshine.app.fragments.ForecastFragmentWeather;
 import com.android.sunshine.app.utils.WeatherNotification;

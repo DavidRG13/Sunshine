@@ -1,6 +1,7 @@
-package com.android.sunshine.app.weather;
+package com.android.sunshine.app.owm;
 
-import com.android.sunshine.app.model.OWMResponse;
+import com.android.sunshine.app.owm.model.OWMResponse;
+import com.android.sunshine.app.weather.WeatherFetcher;
 import retrofit.RestAdapter;
 import retrofit.converter.JacksonConverter;
 

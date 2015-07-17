@@ -13,7 +13,7 @@ import butterknife.Bind;
 import butterknife.ButterKnife;
 import com.android.sunshine.app.R;
 import com.android.sunshine.app.fragments.ForecastFragmentWeather;
-import com.android.sunshine.app.model.OWMWeather;
+import com.android.sunshine.app.owm.model.OWMWeather;
 import com.android.sunshine.app.utils.ApplicationPreferences;
 import java.util.List;
 

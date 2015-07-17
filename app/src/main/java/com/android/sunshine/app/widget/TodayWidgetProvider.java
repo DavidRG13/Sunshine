@@ -6,7 +6,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import com.android.sunshine.app.utils.IntentLauncher;
+import com.android.sunshine.app.utils.Navigator;
 
 public class TodayWidgetProvider extends AppWidgetProvider {
 
@@ -23,7 +23,7 @@ public class TodayWidgetProvider extends AppWidgetProvider {
     @Override
     public void onReceive(@NonNull final Context context, @NonNull final Intent intent) {
         super.onReceive(context, intent);
-        if (IntentLauncher.ACTION_DATA_UPDATED.equals(intent.getAction())) {
+        if (Navigator.ACTION_DATA_UPDATED.equals(intent.getAction())) {
             context.startService(new Intent(context, TodayWidgetIntentService.class));
         }
     }

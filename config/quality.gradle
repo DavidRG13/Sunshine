@@ -27,9 +27,6 @@ task findbugs(type: FindBugs) {
     reports {
         xml.enabled = false
         html.enabled = true
-        xml {
-            destination "$project.buildDir/reports/findbugs/findbugs.xml"
-        }
         html {
             destination "$project.buildDir/reports/findbugs/findbugs.html"
         }

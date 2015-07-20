@@ -1,6 +1,7 @@
 package com.android.sunshine.app.owm;
 
 import com.android.sunshine.app.owm.model.OWMResponse;
+import retrofit.Callback;
 import retrofit.http.GET;
 import retrofit.http.Query;
 
@@ -13,5 +14,5 @@ public interface OWM {
     String DAYS_PARAM = "cnt";
 
     @GET("/")
-    OWMResponse fetch(@Query(QUERY_PARAM) String queryParam, @Query(MODE_PARAM) String mode, @Query(UNITS_PARAM) String units, @Query(DAYS_PARAM) String days);
+    void fetch(@Query(QUERY_PARAM) String queryParam, @Query(MODE_PARAM) String mode, @Query(UNITS_PARAM) String units, @Query(DAYS_PARAM) String days, final Callback<OWMResponse> callback);
 }

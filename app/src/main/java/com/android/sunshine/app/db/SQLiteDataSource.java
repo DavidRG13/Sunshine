@@ -146,7 +146,7 @@ public class SQLiteDataSource implements WeatherDataSource {
 
     @Override
     public TodayForecast getForecastForNowAndCurrentPosition() {
-        Cursor data = database.query(WeatherTable.TABLE_NAME, TODAY_WIDGET_FORECAST_COLUMNS, LOCATION_SETTINGS_WITH_DAY_SELECTION, new String[]{locationProvider.getPostCode(), String.valueOf(System.currentTimeMillis())}, null, null,
+        Cursor data = database.query(WeatherTable.TABLE_NAME, TODAY_WIDGET_FORECAST_COLUMNS, LOCATION_SETTINGS_WITH_DAY_SELECTION, new String[]{locationProvider.getPostCode(), String.valueOf(getTodayInMillis())}, null, null,
             DATE_ASC_ORDER);
         TodayForecast todayForecast = TodayForecast.INVALID_OBJECT;
         if (data.moveToFirst()) {
@@ -184,6 +184,10 @@ public class SQLiteDataSource implements WeatherDataSource {
         final double cityLongitude, final String locationSettings) {
         ContentValues[] contentValues = new ContentValues[weatherForecasts.size()];
         GregorianCalendar calendar = new GregorianCalendar();
+        calendar.set(Calendar.MILLISECOND, 0);
+        calendar.set(Calendar.SECOND, 0);
+        calendar.set(Calendar.MINUTE, 0);
+        calendar.set(Calendar.HOUR, 0);
         for (int i = 0; i < weatherForecasts.size(); i++) {
             OWMWeatherForecast weatherForecast = weatherForecasts.get(i);
             ContentValues weatherValues = new ContentValues();
@@ -212,5 +216,14 @@ public class SQLiteDataSource implements WeatherDataSource {
 
     private void removePastForecast() {
         database.delete(WeatherTable.TABLE_NAME, null, null);
+    }
+
+    private long getTodayInMillis() {
+        GregorianCalendar calendar = new GregorianCalendar();
+        calendar.set(Calendar.MILLISECOND, 0);
+        calendar.set(Calendar.SECOND, 0);
+        calendar.set(Calendar.MINUTE, 0);
+        calendar.set(Calendar.HOUR, 0);
+        return calendar.getTimeInMillis();
     }
 }

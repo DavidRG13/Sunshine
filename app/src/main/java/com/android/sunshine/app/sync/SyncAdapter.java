@@ -11,99 +11,38 @@ import android.content.SyncResult;
 import android.os.Build;
 import android.os.Bundle;
 import com.android.sunshine.app.R;
-import com.android.sunshine.app.fragments.ForecastFragmentWeather;
-import com.android.sunshine.app.location.LocationProvider;
-import com.android.sunshine.app.owm.model.OWMResponse;
-import com.android.sunshine.app.utils.Navigator;
-import com.android.sunshine.app.utils.ServerStatusChanger;
-import com.android.sunshine.app.utils.UserNotificator;
-import com.android.sunshine.app.utils.WeatherDetails;
-import com.android.sunshine.app.weather.WeatherDataSource;
-import com.android.sunshine.app.weather.WeatherFetcher;
 import com.android.sunshine.app.weather.WeatherRepository;
-import com.android.sunshine.app.widget.TodayForecast;
-import java.net.HttpURLConnection;
-import java.util.ArrayList;
-import java.util.List;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
 @Singleton
-public class SyncAdapter extends AbstractThreadedSyncAdapter implements WeatherRepository {
+public class SyncAdapter extends AbstractThreadedSyncAdapter {
 
     public static final int SYNC_INTERVAL = 60 * 180;
     public static final int SYNC_FLEXTIME = SYNC_INTERVAL / 3;
 
-    private final WeatherDataSource weatherDataSource;
-    private final Navigator navigator;
-    private final LocationProvider locationProvider;
-    private final ServerStatusChanger serverStatusChanger;
-    private final UserNotificator userNotificator;
-    private final WeatherFetcher weatherFetcher;
-    private final Context context;
+    private final WeatherRepository weatherRepository;
 
     @Inject
-    public SyncAdapter(final WeatherDataSource weatherDataSource, final Navigator navigator, final LocationProvider locationProvider, final ServerStatusChanger serverStatusChanger, final UserNotificator userNotificator,
-        final WeatherFetcher weatherFetcher, final Context context, @Named("autoInitialize") boolean autoInitialize) {
+    public SyncAdapter(final WeatherRepository weatherRepository, final Context context, @Named("autoInitialize") boolean autoInitialize) {
         super(context, autoInitialize);
-        this.weatherDataSource = weatherDataSource;
-        this.navigator = navigator;
-        this.locationProvider = locationProvider;
-        this.serverStatusChanger = serverStatusChanger;
-        this.userNotificator = userNotificator;
-        this.weatherFetcher = weatherFetcher;
-        this.context = context;
-
+        this.weatherRepository = weatherRepository;
         getSyncAccount();
     }
 
     @Override
     public void onPerformSync(final Account account, final Bundle extras, final String authority, final ContentProviderClient provider, final SyncResult syncResult) {
-        final String location = locationProvider.getPostCode();
-
-        OWMResponse response = weatherFetcher.forecastForLocation(location);
-
-        int responseCode = Integer.parseInt(response.getCod());
-        serverStatusChanger.fromResponseCode(responseCode);
-        if (responseCode == HttpURLConnection.HTTP_OK) {
-            weatherDataSource.saveWeatherForLocation(response, location);
-            userNotificator.notifyWeather(weatherDataSource.getForecastForNowAndCurrentPosition());
-            navigator.updateWidgets(context);
-        }
+        weatherRepository.syncImmediately();
     }
 
-    @Override
     public void syncImmediately() {
-        Bundle bundle = new Bundle();
-        bundle.putBoolean(ContentResolver.SYNC_EXTRAS_EXPEDITED, true);
-        bundle.putBoolean(ContentResolver.SYNC_EXTRAS_MANUAL, true);
-        ContentResolver.requestSync(getSyncAccount(), context.getString(R.string.content_authority), bundle);
-    }
-
-    @Override
-    public WeatherDetails getForecastFor(final long date, final String location) {
-        return weatherDataSource.getForecastFor(date, location);
-    }
-
-    @Override
-    public ArrayList<WeatherDetails> getForecastForDetailWidget() {
-        return weatherDataSource.getForecastForDetailWidget();
-    }
-
-    @Override
-    public TodayForecast getForecastForNowAndCurrentPosition() {
-        return weatherDataSource.getForecastForNowAndCurrentPosition();
-    }
-
-    @Override
-    public List<ForecastFragmentWeather> getForecastList() {
-        return weatherDataSource.getForecastList();
+        weatherRepository.syncImmediately();
     }
 
     private Account getSyncAccount() {
-        AccountManager accountManager = (AccountManager) context.getSystemService(Context.ACCOUNT_SERVICE);
-        Account newAccount = new Account(context.getString(R.string.app_name), context.getString(R.string.sync_account_type));
+        AccountManager accountManager = (AccountManager) getContext().getSystemService(Context.ACCOUNT_SERVICE);
+        Account newAccount = new Account(getContext().getString(R.string.app_name), getContext().getString(R.string.sync_account_type));
 
         if (null == accountManager.getPassword(newAccount)) {
             if (!accountManager.addAccountExplicitly(newAccount, "", null)) {
@@ -116,12 +55,12 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements WeatherR
 
     private void onAccountCreated(final Account newAccount) {
         configurePeriodicSync(newAccount, SYNC_INTERVAL, SYNC_FLEXTIME);
-        ContentResolver.setSyncAutomatically(newAccount, context.getString(R.string.content_authority), true);
+        ContentResolver.setSyncAutomatically(newAccount, getContext().getString(R.string.content_authority), true);
         syncImmediately();
     }
 
     private void configurePeriodicSync(final Account newAccount, final int syncInterval, final int flexTime) {
-        String authority = context.getString(R.string.content_authority);
+        String authority = getContext().getString(R.string.content_authority);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
             SyncRequest request = new SyncRequest.Builder().syncPeriodic(syncInterval, flexTime).setSyncAdapter(newAccount, authority).build();
             ContentResolver.requestSync(request);

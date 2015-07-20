@@ -7,7 +7,7 @@ import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 import com.android.sunshine.app.location.LocationProvider;
 import com.android.sunshine.app.location.PreferenceLocationProvider;
-import com.android.sunshine.app.sync.SyncAdapter;
+import com.android.sunshine.app.weather.WeatherRepo;
 import com.android.sunshine.app.weather.WeatherRepository;
 import com.android.sunshine.app.utils.DateFormatter;
 import com.android.sunshine.app.utils.ServerStatusChanger;
@@ -70,7 +70,7 @@ public class AppModule {
     }
 
     @Provides
-    WeatherRepository providesWeatherRepo(SyncAdapter weatherRepo) {
+    WeatherRepository providesWeatherRepo(WeatherRepo weatherRepo) {
         return weatherRepo;
     }
 
